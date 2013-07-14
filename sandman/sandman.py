@@ -1,48 +1,9 @@
-"""REST API for DMF"""
+"""Sandman REST API creator for Flask and SQLAlchemy"""
 
 from flask import Flask, abort, jsonify, request
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.orm import sessionmaker
-from werkzeug.exceptions import HTTPException
-
-Base = declarative_base(cls=DeferredReflection)
-
-
-class JSONException(HTTPException):
-    def __init__(self, description=None, code=400, response=None):
-        super(JSONException, self).__init__(description, response)
-        self.code = code
-
-    def get_headers():
-        return [{'Content-type': 'application/json'}]
-
-    def get_body():
-        return jsonify({'result': False,
-            'message': self.message})
-
-class DictMixin(object):
-    def as_dict(self):
-        result_dict = {}
-        for column in self.__table__.columns.keys():
-            result_dict[column] = getattr(self, column, None)
-        result_dict['links'] = self.links()
-        return result_dict
-
-    def from_dict(self, dictionary):
-        for column in self.__table__.columns.keys():
-            value = dictionary.get(column, None)
-            setattr(self, column, value)
-        
-class Resource(DictMixin):
-    def resource_uri(self):
-        return '/{}/{}'.format(self.endpoint, self.primary_key())
-
-    def links(self):
-        """Get a list of links for possible actions on this resource"""
-        links = []
-        links.append({'rel': 'self', 'uri': self.resource_uri()})
-        return links
+from exception import JSONException
 
 
 class Job(Base, Resource):
@@ -66,7 +27,7 @@ class JobScheduleInfo(Base, Resource):
 class JobDependencies(Base, Resource):
     """Dependency information for a particular job"""
     __tablename__ = 'job_schedule_rule'
-    endpoing = 'jobDependencies'
+    endpoint = 'jobDependencies'
 
     def primary_key(self):
         """Return value of primary key field."""
