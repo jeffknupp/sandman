@@ -6,7 +6,7 @@ sandman
 Documentation
 -------------
 
-[Sandman documentation on pythonhosted.org](http://pythonhosted.org/sandman/)
+[Sandman documentation](https://sandman.readthedocs.org/en/latest/)
 
 **sandman** "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code for
