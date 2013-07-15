@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h3>{{ tablename }}</h3>
+<h4>{{ resource.pk }}</h4>
+<ul>
+{% for attribute in resource.attributes %}
+<li>{{ attribute }}</li>
+{% endfor %}
+</li>
+{% endblock %}

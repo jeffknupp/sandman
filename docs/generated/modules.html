@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quickstart &mdash; sandman 0.2.1 documentation</title>
+    <title>sandman &mdash; sandman 0.2.3.1 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.1',
+        VERSION:     '0.2.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,9 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.2.1 documentation" href="index.html" />
-    <link rel="next" title="sandman Package" href="sandman.html" />
-    <link rel="prev" title="Installation" href="installation.html" /> 
+    <link rel="top" title="sandman 0.2.3.1 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,13 +35,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="sandman.html" title="sandman Package"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="installation.html" title="Installation"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.2.3.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,28 +44,18 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="quickstart">
-<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
-<p>Create one file with the following contents (which I call <tt class="docutils literal"><span class="pre">runserver.py</span></tt>):</p>
-<div class="highlight-python"><pre>from sandman.model import register, Model
-
-# Insert Models here
-# Register models here
-# register((Model1, Model2, Model3))
-
-from sandman import app, db
-app.config[&#x27;SQLALCHEMY_DATABASE_URI&#x27;] = &#x27;&lt;your database connection string (using SQLAlchemy)&#x27;
-app.run()
-```</pre>
+  <div class="section" id="sandman">
+<h1>sandman<a class="headerlink" href="#sandman" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sandman.html">sandman Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sandman.html#module-sandman.exception"><tt class="docutils literal"><span class="pre">exception</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sandman.html#module-sandman.model"><tt class="docutils literal"><span class="pre">model</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sandman.html#module-sandman.sandman"><tt class="docutils literal"><span class="pre">sandman</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
 </div>
-<p>Then simply run:</p>
-<div class="highlight-python"><pre>python runserver.py</pre>
-</div>
-<p>and try curling your new REST API service!</p>
-<p>In a &#8220;real&#8221; project, you should divide the code into at least two files: one with the
-&#8220;Model&#8221; definitions (<tt class="docutils literal"><span class="pre">models.py</span></tt>) and the other with the configuration
-and <tt class="docutils literal"><span class="pre">app.run()</span></tt> call (<tt class="docutils literal"><span class="pre">runserver.py</span></tt>).</p>
-<p>Or you can come up with your own scheme. Whatever.</p>
 </div>
 
 
@@ -82,15 +64,9 @@ and <tt class="docutils literal"><span class="pre">app.run()</span></tt> call (<
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="installation.html"
-                        title="previous chapter">Installation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="sandman.html"
-                        title="next chapter">sandman Package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/quickstart.txt"
+    <li><a href="_sources/modules.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -119,13 +95,7 @@ and <tt class="docutils literal"><span class="pre">app.run()</span></tt> call (<
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="sandman.html" title="sandman Package"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="installation.html" title="Installation"
-             >previous</a> |</li>
-        <li><a href="index.html">sandman 0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.2.3.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

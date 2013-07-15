@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h3>{{ resources[0].__tablename__ }}</h3>
+<ol>
+    {% for resource in resources %}
+        <li>
+            <ul>
+                {% for attribute, value in resource.as_dict().items() %}
+                    {% if attribute == 'links' %}
+                    <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ value[0].rel }}</a></li>
+                    {% else %}
+                        <li>{{ attribute }}: {{ value }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+</ol>
+{% endblock %}
