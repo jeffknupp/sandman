@@ -1,7 +1,5 @@
-from sandman import app
-from models import Artist, Base
-from flask.ext.sqlalchemy import SQLAlchemy
-from . import sandman, model
+"""Run server"""
+from sandman import app, db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
-sandman.manager.register((Artist.endpoint, Artist))
+from . import models
 app.run(debug=True)

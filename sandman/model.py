@@ -1,4 +1,17 @@
-from . import db
+"""The model module is repsonsible exposes the Model class, from whic user
+models should derive. It also makes the 'register' function available, which
+maps endpoints to their associated classes."""
+from . import db, app
+from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
+from flask import current_app
+
+def register(cls):
+    """Register an endpoint with the Model class that represents it"""
+    with app.app_context():
+        if getattr(current_app, 'endpoint_classes', None) is None:
+            current_app.endpoint_classes = {}
+        current_app.endpoint_classes[cls.endpoint] = cls
+    Model.prepare(db.engine)
 
 class DictMixin(object):
     def as_dict(self):
@@ -23,3 +36,4 @@ class Resource(DictMixin):
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
+Model = declarative_base(cls=(DeferredReflection, Resource))

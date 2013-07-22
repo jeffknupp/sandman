@@ -1,11 +1,8 @@
-from sandman.model import Resource
-from sandman import db
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
-Base = declarative_base(cls=DeferredReflection)
+from sandman.model import register, Model
 
-class Artist(Base, Resource):
+class Artist(Model):
     __tablename__ = 'Artist'
     primary_key = 'artistId'
     endpoint = 'artists'
 
-Base.prepare(db.engine)
+register(Artist)

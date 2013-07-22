@@ -5,18 +5,11 @@ from . import app, db
 from sqlalchemy.orm import sessionmaker
 from .exception import JSONException
 
-def register(class_tuple):
-    """Register an endpoint with the Model class that represents it"""
-    with app.app_context():
-        if getattr(current_app, 'endpoint_classes', None) is None:
-            current_app.endpoint_classes = {}
-        current_app.endpoint_classes[class_tuple[0]] = class_tuple[1]
-
 def get_session():
+    """Return a database session"""
     session = getattr(g, '_session', None)
     if session is None:
-        Session = sessionmaker(db.engine)
-        session = g._session = Session()
+        session = g._session = sessionmaker(db.engine)()
     return session
 
 def created_response(resource):
