@@ -10,7 +10,11 @@ def register(cls):
     with app.app_context():
         if getattr(current_app, 'endpoint_classes', None) is None:
             current_app.endpoint_classes = {}
-        current_app.endpoint_classes[cls.endpoint] = cls
+        if isinstance(cls, (list, tuple)):
+            for entry in cls:
+                current_app.endpoint_classes[entry.endpoint] = entry
+        else:
+            current_app.endpoint_classes[cls.endpoint] = cls
     Model.prepare(db.engine)
 
 class DatabaseColumnDictMixin(object):
