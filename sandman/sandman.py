@@ -1,15 +1,14 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
 
-from flask import jsonify, request, g, current_app
+from flask import jsonify, request, g, current_app, Response
 from . import app, db
-from sqlalchemy.orm import sessionmaker
 from .exception import JSONException
 
 def get_session():
     """Return a database session"""
     session = getattr(g, '_session', None)
     if session is None:
-        session = g._session = sessionmaker(db.engine)()
+        session = g._session = db.session()
     return session
 
 def created_response(resource):
@@ -18,6 +17,13 @@ def created_response(resource):
     response.code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
     return response
+
+def deleted_response(resource):
+    """Return response for created resource"""
+    response = Response()
+    response.code = 204
+    return response
+
 
 @app.route('/<collection>', methods=['POST'])
 def add_resource(collection):
@@ -30,6 +36,21 @@ def add_resource(collection):
     session.add(resource)
     session.commit()
     return created_response(resource)
+
+@app.route('/<collection>/<lookup_id>', methods=['DELETE'])
+def delete_resource(collection, lookup_id):
+    """Return response for deleting a resource"""
+    with app.app_context():
+        cls = current_app.endpoint_classes[collection]
+    resource = cls()
+    session = get_session()
+    resource = session.query(cls).get(lookup_id)
+    if resource is None:
+        return JSONException('Requested resource not found', code=404)
+    session.delete(resource)
+    session.commit()
+    return deleted_response(resource)
+
 
 @app.route('/<collection>/<lookup_id>', methods=['GET'])
 def resource_handler(collection, lookup_id):
