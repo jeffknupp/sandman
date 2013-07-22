@@ -10,7 +10,7 @@ class JSONException(HTTPException):
         self.code = code
 
     def get_headers(self, environ=None):
-        return [{'Content-type': 'application/json'}]
+        return[('Content-type', 'application/json')]
 
     def get_body(self, environ=None):
         return jsonify({'result': False, 'message': self.message})
