@@ -81,7 +81,7 @@ RESTful API. For each table, Sandman creates:
     * PATCH
     * DELETE
 * responses with appropriate `rel` links automatically
-* essentially a HATEOAS system sitting in front of your database
+* essentially a HATEOAS service sitting in front of your database
 
 *Warning: Sandman is still very much a work in progress and is not suitable for
 use **anywhere.** Don't use it for anything important. It's also often changing 
@@ -93,7 +93,7 @@ For now, just `git clone` the sandman repo and run `python setup.py install`.
 
 ### Quickstart
 
-You'll need to create one file with the following contents:
+You'll need to create one file with the following contents (which I call `runserver.py`):
 
     from sandman.model import register, Model
 
@@ -104,3 +104,9 @@ You'll need to create one file with the following contents:
     from sandman import app, db
     app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
     app.run()
+
+Then simply run 
+
+    python runserver.py
+
+and try curling your new REST API service!
