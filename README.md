@@ -40,6 +40,9 @@ Let's start our new API server and make a request:
 * Running on http://127.0.0.1:5000/
 
 /home/jeff/sandman >>> curl GET http://localhost:5000/artists
+```
+
+```json
 ...
 {
     "ArtistId": 273,
