@@ -12,7 +12,7 @@ setup(
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=__doc__,
-    packages=['flask_sandman', 'flask_sandman.test'],
+    packages=['sandman'],
     include_package_data=True,
     zip_safe=False,
     platforms='any',
