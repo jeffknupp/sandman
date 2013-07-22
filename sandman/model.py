@@ -1,6 +1,6 @@
 from . import db
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
-Base = declarative_base()
+Base = declarative_base(cls=DeferredReflection)
 
 class DictMixin(object):
     def as_dict(self):
@@ -26,4 +26,4 @@ class Resource(DictMixin):
         return links
 
 print (db.engine.table_names())
-DeferredReflection.prepare(db.engine)
+Base.prepare(db.engine)
