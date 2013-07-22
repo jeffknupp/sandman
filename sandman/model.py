@@ -33,7 +33,8 @@ class DatabaseColumnDictMixin(object):
         """Set the instance's attributes based on a dictionary of instance's database columns.""" 
         for column in self.__table__.columns.keys():
             value = dictionary.get(column, None)
-            setattr(self, column, value)
+            if value:
+                setattr(self, column, value)
         
 class Resource(DatabaseColumnDictMixin):
     """A RESTful resource"""

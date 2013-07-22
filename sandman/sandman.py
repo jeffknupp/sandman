@@ -13,16 +13,38 @@ def get_session():
 
 def created_response(resource):
     """Return response for created resource"""
+    print 'created'
     response = jsonify(resource.as_dict())
-    response.code = 201
+    response.status_code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
     return response
 
-def deleted_response(resource):
-    """Return response for created resource"""
+def no_content_response():
+    """Return response when no resource is returned in body"""
     response = Response()
-    response.code = 204
+    response.status_code = 204
     return response
+
+@app.route('/<collection>/<lookup_id>', methods=['PATCH'])
+def patch_resource(collection, lookup_id):
+    """Return response for patching a resource"""
+    session = get_session()
+    with app.app_context():
+        cls = current_app.endpoint_classes[collection]
+    resource = session.query(cls).get(lookup_id)
+    if resource is None:
+        print 'None'
+        resource = cls()
+        resource.from_dict(request.json)
+        setattr(resource, cls.primary_key, lookup_id)
+        session.add(resource)
+        session.commit()
+        return created_response(resource)
+    else:
+        resource.from_dict(request.json)
+        updated_resource = session.merge(resource)
+        session.commit()
+        return no_content_response()
 
 
 @app.route('/<collection>', methods=['POST'])
@@ -49,7 +71,7 @@ def delete_resource(collection, lookup_id):
         return JSONException('Requested resource not found', code=404)
     session.delete(resource)
     session.commit()
-    return deleted_response(resource)
+    return no_content_response()
 
 
 @app.route('/<collection>/<lookup_id>', methods=['GET'])
