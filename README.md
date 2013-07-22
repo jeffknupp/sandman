@@ -8,6 +8,7 @@ an ORM. This fact alone stops many projects before they begin.
 Here's what's required to create a REST API from an existing database using
 **sandman**:
 
+    ```python
     from sandman.model import register, Model
 
     class Artist(Model):
@@ -30,9 +31,11 @@ Here's what's required to create a REST API from an existing database using
     from sandman import app, db
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
     app.run()
+    ```
 
 Let's start our new API server and make a request:
 
+    ```zsh
     /home/jeff/sandman >>> python runserver.py &
     * Running on http://127.0.0.1:5000/
 
@@ -69,6 +72,7 @@ Let's start our new API server and make a request:
       ]
     }
     ]
+    ```
 
 With **sandman**, (almost) zero boilerplate code is required. Your existing database
 structure and schema is introspected and your database tables magically get a
@@ -95,6 +99,7 @@ For now, just `git clone` the sandman repo and run `python setup.py install`.
 
 You'll need to create one file with the following contents (which I call `runserver.py`):
 
+    ```python
     from sandman.model import register, Model
 
     # Insert Models here
@@ -104,9 +109,12 @@ You'll need to create one file with the following contents (which I call `runser
     from sandman import app, db
     app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
     app.run()
+    ```
 
 Then simply run 
 
+    ```bash
     python runserver.py
+    ```
 
 and try curling your new REST API service!
