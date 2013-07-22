@@ -1,7 +1,8 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
 
 from flask import jsonify, request, g, current_app
-from . import app, Session
+from . import app, db
+from sqlalchemy.orm import sessionmaker
 from .exception import JSONException
 
 def register(class_tuple):
@@ -10,6 +11,13 @@ def register(class_tuple):
         if getattr(current_app, 'endpoint_classes', None) is None:
             current_app.endpoint_classes = {}
         current_app.endpoint_classes[class_tuple[0]] = class_tuple[1]
+
+def get_session():
+    session = getattr(g, '_session', None)
+    if session is None:
+        Session = sessionmaker(db.engine)
+        session = g._session = Session()
+    return session
 
 def created_response(resource):
     """Return response for created resource"""
@@ -25,7 +33,7 @@ def add_resource(collection):
         cls = current_app.endpoint_classes[collection]
     resource = cls()
     resource.from_dict(request.json)
-    session = Session()
+    session = get_session()
     session.add(resource)
     session.commit()
     return created_response(resource)
@@ -33,10 +41,9 @@ def add_resource(collection):
 @app.route('/<collection>/<lookup_id>', methods=['GET'])
 def resource_handler(collection, lookup_id):
     """Handler for single resource"""
-    session = Session()
+    session = get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    print cls, lookup_id
     resource = session.query(cls).get(lookup_id)
     if resource is None:
         return JSONException('Requested resource not found', code=404)
@@ -46,10 +53,9 @@ def resource_handler(collection, lookup_id):
 @app.route('/<collection>', methods=['GET'])
 def collection_handler(collection):
     """Handler for a collection of resources"""
-    print 'here'
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    session = Session()
+    session = get_session()
     resources = session.query(cls).all()
     result_list = []
     for resource in resources:

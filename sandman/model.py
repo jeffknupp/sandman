@@ -1,6 +1,4 @@
 from . import db
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
-Base = declarative_base(cls=DeferredReflection)
 
 class DictMixin(object):
     def as_dict(self):
@@ -17,7 +15,7 @@ class DictMixin(object):
         
 class Resource(DictMixin):
     def resource_uri(self):
-        return '/{}/{}'.format(self.endpoint, self.primary_key())
+        return '/{}/{}'.format(self.endpoint, self.primary_key)
 
     def links(self):
         """Get a list of links for possible actions on this resource"""
@@ -25,5 +23,3 @@ class Resource(DictMixin):
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
-print (db.engine.table_names())
-Base.prepare(db.engine)
