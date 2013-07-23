@@ -51,3 +51,26 @@ class SandmanTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert as_json['Name'] == 'Jeff Knupp'
 
+    def test_patch_new_resource(self):
+        response = self.app.patch('/artists/276', 
+                content_type='application/json', 
+                data=json.dumps({'Name': 'Jeff Knupp'}))
+        assert response.status_code == 201
+        assert json.loads(response.data)['Name'] == 'Jeff Knupp'
+        self.assertEqual(json.loads(response.data)['links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
+
+    def test_patch_existing_resource(self):
+        response = self.app.patch('/artists/275', 
+                content_type='application/json', 
+                data=json.dumps({'Name': 'Jeff Knupp'}))
+        assert response.status_code == 204
+        response = self.app.get('/artists/275')
+        assert response.status_code == 200
+        assert json.loads(response.data)['Name'] == 'Jeff Knupp'
+        assert json.loads(response.data)['ArtistId'] == 275
+
+    def test_delete_resource(self):
+        response = self.app.delete('/artists/275')
+        assert response.status_code == 204
+        response = self.app.get('/artists/275')
+        assert response.status_code == 404
