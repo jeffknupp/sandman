@@ -1,5 +1,8 @@
 *.py[cod]
 
+chinook
+runserver.py
+test_run
 # C extensions
 *.so
 

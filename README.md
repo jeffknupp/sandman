@@ -134,5 +134,6 @@ The models file is identical to the code pasted above.
 
 ### Coming Soon
 
+* Authentication
 * Class specific validation
 * More `links` automatically generated (i.e. `links` to related objects)
