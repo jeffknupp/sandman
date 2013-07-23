@@ -41,7 +41,8 @@ class Resource(DatabaseColumnDictMixin):
 
     def resource_uri(self):
         """Return the URI at which the resource can be found.""" 
-        return '/{}/{}'.format(self.endpoint, self.primary_key)
+        primary_key_value = getattr(self, self.primary_key, None)
+        return '/{}/{}'.format(self.endpoint, primary_key_value)
 
     def links(self):
         """Return a list of links for endpoints related to the resource."""
