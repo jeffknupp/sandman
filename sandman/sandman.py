@@ -34,7 +34,7 @@ def patch_resource(collection, lookup_id):
     if resource is None:
         resource = cls()
         resource.from_dict(request.json)
-        setattr(resource, cls.primary_key, lookup_id)
+        setattr(resource, resource.primary_key(), lookup_id)
         session.add(resource)
         session.commit()
         return created_response(resource)

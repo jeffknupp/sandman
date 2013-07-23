@@ -41,7 +41,7 @@ class Resource(DatabaseColumnDictMixin):
 
     def resource_uri(self):
         """Return the URI at which the resource can be found.""" 
-        primary_key_value = getattr(self, self.primary_key, None)
+        primary_key_value = getattr(self, self.primary_key(), None)
         return '/{}/{}'.format(self.endpoint, primary_key_value)
 
     def links(self):
@@ -49,5 +49,8 @@ class Resource(DatabaseColumnDictMixin):
         links = []
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
+
+    def primary_key(self):
+        return self.__table__.primary_key.columns.values()[0].name
 
 Model = declarative_base(cls=(DeferredReflection, Resource))
