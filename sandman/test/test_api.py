@@ -1,5 +1,0 @@
-"""Run server"""
-from sandman import app, db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
-from . import models
-app.run(debug=True)
