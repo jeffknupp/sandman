@@ -11,6 +11,10 @@ Here's what's required to create a REST API from an existing database using
 **sandman**:
 
 ```python
+from sandman import app, db
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
+
 from sandman.model import register, Model
 
 class Artist(Model):
@@ -30,8 +34,6 @@ class Playlist(Model):
 
 register((Artist, Album, Playlist))
 
-from sandman import app, db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 app.run()
 ```
 
@@ -90,7 +92,7 @@ RESTful API. For each table, Sandman creates:
     * PATCH
     * DELETE
 * responses with appropriate `rel` links automatically
-* essentially a HATEOAS service sitting in front of your database
+* essentially a HATEOAS-based service sitting in front of your database
 
 *Warning: Sandman is still very much a work in progress and is not suitable for
 use **anywhere.** Don't use it for anything important. It's also often changing 
