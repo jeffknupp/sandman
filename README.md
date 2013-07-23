@@ -1,6 +1,9 @@
 sandman
 =======
 [![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
+
+[See the blogpost here](http://www.jeffknupp.com/blog/2013/07/23/sandman-a-boilerplatefree-python-rest-api-for-existing-databases/)
+
 **sandman** "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code for
 the ORM you're using. 
