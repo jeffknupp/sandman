@@ -1,8 +1,17 @@
-"""Models"""
-from sandman.model import Model
+from sandman.model import register, Model
 
 class Artist(Model):
-    """Artist model"""
     __tablename__ = 'Artist'
-    primary_key = 'artistId'
-    endpoint = 'artist'
+
+class Album(Model):
+    __tablename__ = 'Album'
+
+class Playlist(Model):
+    __tablename__ = 'Playlist'
+
+class Genre(Model):
+    __tablename__ = 'Genre'
+    __endpoint__ = 'styles'
+    __methods__ = ('GET', 'DELETE')
+
+register((Artist, Album, Playlist, Genre))

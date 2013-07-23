@@ -12,9 +12,9 @@ def register(cls):
             current_app.endpoint_classes = {}
         if isinstance(cls, (list, tuple)):
             for entry in cls:
-                current_app.endpoint_classes[entry.endpoint] = entry
+                current_app.endpoint_classes[entry.endpoint()] = entry
         else:
-            current_app.endpoint_classes[cls.endpoint] = cls
+            current_app.endpoint_classes[cls.endpoint()] = cls
     Model.prepare(db.engine)
 
 class DatabaseColumnDictMixin(object):
@@ -33,19 +33,37 @@ class DatabaseColumnDictMixin(object):
         """Set the instance's attributes based on a dictionary of instance's database columns.""" 
         for column in self.__table__.columns.keys():
             value = dictionary.get(column, None)
-            setattr(self, column, value)
+            if value:
+                setattr(self, column, value)
         
 class Resource(DatabaseColumnDictMixin):
     """A RESTful resource"""
 
+    # override __endpoint__ if you wish to change from the default endpoint name
+    __endpoint__ = None
+
+    # override __methods__ if you wish to change the HTTP methods this resource
+    # supports
+    __methods__ = ('GET', 'POST', 'PATCH', 'DELETE')
+
+    @classmethod
+    def endpoint(cls):
+        if cls.__endpoint__ is not None:
+            return cls.__endpoint__
+        return cls.__tablename__.lower() + 's'
+
     def resource_uri(self):
         """Return the URI at which the resource can be found.""" 
-        return '/{}/{}'.format(self.endpoint, self.primary_key)
+        primary_key_value = getattr(self, self.primary_key(), None)
+        return '/{}/{}'.format(self.endpoint(), primary_key_value)
 
     def links(self):
         """Return a list of links for endpoints related to the resource."""
         links = []
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
+
+    def primary_key(self):
+        return self.__table__.primary_key.columns.values()[0].name
 
 Model = declarative_base(cls=(DeferredReflection, Resource))
