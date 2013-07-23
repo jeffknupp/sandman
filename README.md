@@ -104,14 +104,15 @@ For now, just `git clone` the sandman repo and run `python setup.py install`.
 You'll need to create one file with the following contents (which I call `runserver.py`):
 
 ```python
+from sandman import app, db
+app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
+
 from sandman.model import register, Model
 
 # Insert Models here
 # Register models here 
-# register((Model1, Model2, Model3))
+register((Model1, Model2, Model3))
 
-from sandman import app, db
-app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
 app.run()
 ```
 
