@@ -1,6 +1,6 @@
 sandman
 =======
-
+[![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
 **sandman** "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code, likely for
 an ORM. This fact alone stops many projects before they begin.
