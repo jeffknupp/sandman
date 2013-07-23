@@ -22,18 +22,12 @@ from sandman.model import register, Model
 
 class Artist(Model):
     __tablename__ = 'Artist'
-    endpoint = 'artists'
-    primary_key = 'ArtistId'
 
 class Album(Model):
     __tablename__ = 'Album'
-    endpoint = 'albums'
-    primary_key = 'AlbumId'
 
 class Playlist(Model):
     __tablename__ = 'Playlist'
-    endpoint = 'playlists'
-    primary_key = 'PlaylistId'
 
 register((Artist, Album, Playlist))
 
@@ -140,7 +134,5 @@ The models file is identical to the code pasted above.
 
 ### Coming Soon
 
-* Less boilerplate! (Requirement to document name of primary key field will be removed)
-* Ability to specify accepted HTTP methods on a per-class level
 * Class specific validation
 * More `links` automatically generated (i.e. `links` to related objects)
