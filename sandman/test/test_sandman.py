@@ -92,3 +92,13 @@ class SandmanTestCase(unittest.TestCase):
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Hip-Hop'}))
         assert response.status_code == 403
+
+    def test_get_user_defined_endpoint(self):
+        response = self.app.get('/styles')
+        assert response.status_code == 200
+        assert response.data
+        assert len(json.loads(response.data)[u'resources']) == 25
+
+    def test_user_validation(self):
+        response = self.app.get('/styles/1')
+        assert response.status_code == 403
