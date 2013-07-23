@@ -24,7 +24,6 @@ class SandmanTestCase(unittest.TestCase):
         self.app = None
 
     def test_get(self):
-        import json
         response = self.app.get('/artists')
         assert response.status_code == 200
         assert response.data
@@ -75,3 +74,11 @@ class SandmanTestCase(unittest.TestCase):
         assert response.status_code == 204
         response = self.app.get('/artists/275')
         assert response.status_code == 404
+
+    def test_get_user_defined_endpoint(self):
+        response = self.app.get('/styles')
+        assert response.status_code == 200
+        assert response.data
+        assert len(json.loads(response.data)[u'resources']) == 25
+
+

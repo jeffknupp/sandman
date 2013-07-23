@@ -12,9 +12,9 @@ def register(cls):
             current_app.endpoint_classes = {}
         if isinstance(cls, (list, tuple)):
             for entry in cls:
-                current_app.endpoint_classes[entry.endpoint] = entry
+                current_app.endpoint_classes[entry.endpoint()] = entry
         else:
-            current_app.endpoint_classes[cls.endpoint] = cls
+            current_app.endpoint_classes[cls.endpoint()] = cls
     Model.prepare(db.engine)
 
 class DatabaseColumnDictMixin(object):
@@ -39,10 +39,19 @@ class DatabaseColumnDictMixin(object):
 class Resource(DatabaseColumnDictMixin):
     """A RESTful resource"""
 
+    # override __endpoint__ if you wish to change from the default endpoint name
+    __endpoint__ = None
+
+    @classmethod
+    def endpoint(cls):
+        if cls.__endpoint__ is not None:
+            return cls.__endpoint__
+        return cls.__tablename__.lower() + 's'
+
     def resource_uri(self):
         """Return the URI at which the resource can be found.""" 
         primary_key_value = getattr(self, self.primary_key(), None)
-        return '/{}/{}'.format(self.endpoint, primary_key_value)
+        return '/{}/{}'.format(self.endpoint(), primary_key_value)
 
     def links(self):
         """Return a list of links for endpoints related to the resource."""
