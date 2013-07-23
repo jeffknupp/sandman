@@ -13,7 +13,6 @@ def get_session():
 
 def created_response(resource):
     """Return response for created resource"""
-    print 'created'
     response = jsonify(resource.as_dict())
     response.status_code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
@@ -33,7 +32,6 @@ def patch_resource(collection, lookup_id):
         cls = current_app.endpoint_classes[collection]
     resource = session.query(cls).get(lookup_id)
     if resource is None:
-        print 'None'
         resource = cls()
         resource.from_dict(request.json)
         setattr(resource, cls.primary_key, lookup_id)

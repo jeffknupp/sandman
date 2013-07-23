@@ -2,8 +2,10 @@ sandman
 =======
 [![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
 **sandman** "makes things REST". Have an existing database you'd like to expose via
-a REST API? Normally, you'd have to write a ton of boilerplate code, likely for
-an ORM. This fact alone stops many projects before they begin.
+a REST API? Normally, you'd have to write a ton of boilerplate code for
+the ORM you're using. 
+
+We're programmers. We don't write boilerplate.
 
 Here's what's required to create a REST API from an existing database using
 **sandman**:
@@ -100,7 +102,10 @@ For now, just `git clone` the sandman repo and run `python setup.py install`.
 
 ### Quickstart
 
-You'll need to create one file with the following contents (which I call `runserver.py`):
+You'll need to `pip install Flask-SQLAlchemy`. OK, that takes care of the
+requirements...
+
+Now you'll need to create one file with the following contents (which I call `runserver.py`):
 
 ```python
 from sandman.model import register, Model
@@ -121,3 +126,15 @@ python runserver.py
 ```
 
 and try curling your new REST API service!
+
+### Example Application
+
+Take a look in the `sandman/test` directory. The application found there makes
+use of the [Chinook](http://chinookdatabase.codeplex.com) sample SQL database.
+The models file is identical to the code pasted above.
+
+### Coming Soon
+
+* Less boilerplate! (Requirement to document name of primary key field will be removed)
+* Ability to specify accepted HTTP methods on a per-class level
+* Class specific validation
