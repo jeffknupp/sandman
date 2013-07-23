@@ -12,5 +12,6 @@ class Playlist(Model):
 class Genre(Model):
     __tablename__ = 'Genre'
     __endpoint__ = 'styles'
+    __methods__ = ('GET', 'DELETE')
 
 register((Artist, Album, Playlist, Genre))

@@ -42,6 +42,10 @@ class Resource(DatabaseColumnDictMixin):
     # override __endpoint__ if you wish to change from the default endpoint name
     __endpoint__ = None
 
+    # override __methods__ if you wish to change the HTTP methods this resource
+    # supports
+    __methods__ = ('GET', 'POST', 'PATCH', 'DELETE')
+
     @classmethod
     def endpoint(cls):
         if cls.__endpoint__ is not None:

@@ -11,11 +11,20 @@ def get_session():
         session = g._session = db.session()
     return session
 
+def validate_method(cls, method):
+    return method in cls.__methods__
+
 def created_response(resource):
     """Return response for created resource"""
     response = jsonify(resource.as_dict())
     response.status_code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
+    return response
+
+def unsupported_method_response():
+    """Return response when no resource is returned in body"""
+    response = Response()
+    response.status_code = 403
     return response
 
 def no_content_response():
@@ -30,6 +39,8 @@ def patch_resource(collection, lookup_id):
     session = get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
+    if not validate_method(cls, request.method):
+        return unsupported_method_response()
     resource = session.query(cls).get(lookup_id)
     if resource is None:
         resource = cls()
@@ -50,6 +61,8 @@ def add_resource(collection):
     """Return response for adding a resource"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
+    if not validate_method(cls, request.method):
+        return unsupported_method_response()
     resource = cls()
     resource.from_dict(request.json)
     session = get_session()
@@ -62,6 +75,8 @@ def delete_resource(collection, lookup_id):
     """Return response for deleting a resource"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
+    if not validate_method(cls, request.method):
+        return unsupported_method_response()
     resource = cls()
     session = get_session()
     resource = session.query(cls).get(lookup_id)
@@ -78,6 +93,8 @@ def resource_handler(collection, lookup_id):
     session = get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
+    if not validate_method(cls, request.method):
+        return unsupported_method_response()
     resource = session.query(cls).get(lookup_id)
     if resource is None:
         return JSONException('Requested resource not found', code=404)
@@ -89,6 +106,8 @@ def collection_handler(collection):
     """Handler for a collection of resources"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
+    if not validate_method(cls, request.method):
+        return unsupported_method_response()
     session = get_session()
     resources = session.query(cls).all()
     result_list = []

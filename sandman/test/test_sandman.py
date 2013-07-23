@@ -81,4 +81,14 @@ class SandmanTestCase(unittest.TestCase):
         assert response.data
         assert len(json.loads(response.data)[u'resources']) == 25
 
+    def test_get_user_defined_methods(self):
+        response = self.app.post('/styles',
+                content_type='application/json', 
+                data=json.dumps({u'Name': u'Hip-Hop'}))
+        assert response.status_code == 403
+        assert not response.data 
 
+        response = self.app.patch('/styles/26',
+                content_type='application/json', 
+                data=json.dumps({u'Name': u'Hip-Hop'}))
+        assert response.status_code == 403
