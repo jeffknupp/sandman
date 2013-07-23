@@ -143,3 +143,4 @@ The models file is identical to the code pasted above.
 * Less boilerplate! (Requirement to document name of primary key field will be removed)
 * Ability to specify accepted HTTP methods on a per-class level
 * Class specific validation
+* More `links` automatically generated (i.e. `links` to related objects)
