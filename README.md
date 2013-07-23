@@ -97,7 +97,8 @@ in backwards incompatible ways.*
 
 ### Installation
 
-For now, just `git clone` the sandman repo and run `python setup.py install`. 
+`pip install sandman`. The requirements aren't set up on PyPI yet but that's
+easily taken care of below.
 
 ### Quickstart
 
