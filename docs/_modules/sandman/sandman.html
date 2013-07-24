@@ -83,7 +83,7 @@
 
     <span class="k">return</span> <span class="bp">True</span>
 
-<span class="k">def</span> <span class="nf">_resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
+<div class="viewcode-block" id="resource_created_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.resource_created_response">[docs]</a><span class="k">def</span> <span class="nf">resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return HTTP response with status code *201*, signaling a created *resource*</span>
 <span class="sd">    </span>
 <span class="sd">    :param resource: resource created as a result of current request</span>
@@ -94,9 +94,9 @@
     <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">201</span>
     <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Location&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s">&#39;http://localhost:5000/&#39;</span> <span class="o">+</span> <span class="n">resource</span><span class="o">.</span><span class="n">resource_uri</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">response</span>
-
-<span class="k">def</span> <span class="nf">_unsupported_method_response</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* with status code *403*, signaling the HTTP method used</span>
+</div>
+<div class="viewcode-block" id="unsupported_method_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.unsupported_method_response">[docs]</a><span class="k">def</span> <span class="nf">unsupported_method_response</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* with status code *403*, signaling the HTTP method used</span>
 <span class="sd">    in the request is not supported for the given endpoint.</span>
 <span class="sd">    </span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
@@ -105,9 +105,9 @@
     <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
     <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">403</span>
     <span class="k">return</span> <span class="n">response</span>
-
-<span class="k">def</span> <span class="nf">_no_content_response</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* with status code *204*, signaling a completed action</span>
+</div>
+<div class="viewcode-block" id="no_content_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.no_content_response">[docs]</a><span class="k">def</span> <span class="nf">no_content_response</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* with status code *204*, signaling a completed action</span>
 <span class="sd">    which does not require data in the response body</span>
 <span class="sd">    </span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
@@ -115,10 +115,10 @@
     <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
     <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">204</span>
     <span class="k">return</span> <span class="n">response</span>
-
+</div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;lookup_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;PATCH&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="patch_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.patch_resource">[docs]</a><span class="k">def</span> <span class="nf">patch_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">lookup_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* based on action performed by HTTP PATCH request.</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* based on action performed by HTTP PATCH request.</span>
 <span class="sd">    </span>
 <span class="sd">    If no resource currently exists at `/&lt;collection&gt;/&lt;lookup_id&gt;`, create it</span>
 <span class="sd">    with *lookup_id* as its primary key and return a</span>
@@ -127,7 +127,7 @@
 <span class="sd">    If a resource *does* exist at `/&lt;collection&gt;/&lt;lookup_id&gt;`, update it with</span>
 <span class="sd">    the data sent in the request and return a :func:`no_content_response`.</span>
 
-<span class="sd">    *Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent</span>
+<span class="sd">    Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent</span>
 
 <span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
 <span class="sd">    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`</span>
@@ -141,7 +141,7 @@
     <span class="n">resource</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lookup_id</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_unsupported_method_response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">resource</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
@@ -149,17 +149,17 @@
         <span class="nb">setattr</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">primary_key</span><span class="p">(),</span> <span class="n">lookup_id</span><span class="p">)</span>
         <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
         <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">_resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
-        <span class="n">updated_resource</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
         <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">_no_content_response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
 
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;POST&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="add_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.add_resource">[docs]</a><span class="k">def</span> <span class="nf">add_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* based on adding a new resource to *collection*</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* based on adding a new resource to *collection*</span>
 
 <span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
@@ -171,16 +171,16 @@
     <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_unsupported_method_response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
 
     <span class="n">session</span> <span class="o">=</span> <span class="n">_get_session</span><span class="p">()</span>
     <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">_resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;lookup_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;DELETE&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="delete_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.delete_resource">[docs]</a><span class="k">def</span> <span class="nf">delete_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">lookup_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* for deleting an existing resource in *collection*</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for deleting an existing resource in *collection*</span>
 <span class="sd">    </span>
 <span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
 <span class="sd">    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`</span>
@@ -196,16 +196,16 @@
     <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="s">&#39;Requested resource not found&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_unsupported_method_response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
 
     <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">_no_content_response</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
 
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;lookup_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="resource_handler"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.resource_handler">[docs]</a><span class="k">def</span> <span class="nf">resource_handler</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">lookup_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* for retrieving a single resource</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a single resource</span>
 <span class="sd">    </span>
 <span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
 <span class="sd">    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`</span>
@@ -220,14 +220,14 @@
     <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="s">&#39;Requested resource not found&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_unsupported_method_response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
 
     <span class="n">result_dict</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="o">**</span><span class="n">result_dict</span><span class="p">)</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="collection_handler"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.collection_handler">[docs]</a><span class="k">def</span> <span class="nf">collection_handler</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return *Response* for retrieving a collection of resources</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a collection of resources</span>
 <span class="sd">    </span>
 <span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
 <span class="sd">    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`</span>
@@ -240,7 +240,7 @@
     <span class="n">resources</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_unsupported_method_response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
 
     <span class="n">result_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>

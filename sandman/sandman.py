@@ -34,7 +34,7 @@ def _validate(cls, method, resource=None):
 
     return True
 
-def _resource_created_response(resource):
+def resource_created_response(resource):
     """Return HTTP response with status code *201*, signaling a created *resource*
     
     :param resource: resource created as a result of current request
@@ -46,8 +46,8 @@ def _resource_created_response(resource):
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
     return response
 
-def _unsupported_method_response():
-    """Return *Response* with status code *403*, signaling the HTTP method used
+def unsupported_method_response():
+    """Return the appropriate *Response* with status code *403*, signaling the HTTP method used
     in the request is not supported for the given endpoint.
     
     :rtype: :class:`flask.Response`
@@ -57,8 +57,8 @@ def _unsupported_method_response():
     response.status_code = 403
     return response
 
-def _no_content_response():
-    """Return *Response* with status code *204*, signaling a completed action
+def no_content_response():
+    """Return the appropriate *Response* with status code *204*, signaling a completed action
     which does not require data in the response body
     
     :rtype: :class:`flask.Response`
@@ -69,7 +69,7 @@ def _no_content_response():
 
 @app.route('/<collection>/<lookup_id>', methods=['PATCH'])
 def patch_resource(collection, lookup_id):
-    """Return *Response* based on action performed by HTTP PATCH request.
+    """Return the appropriate *Response* based on action performed by HTTP PATCH request.
     
     If no resource currently exists at `/<collection>/<lookup_id>`, create it
     with *lookup_id* as its primary key and return a
@@ -78,7 +78,7 @@ def patch_resource(collection, lookup_id):
     If a resource *does* exist at `/<collection>/<lookup_id>`, update it with
     the data sent in the request and return a :func:`no_content_response`.
 
-    *Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent
+    Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent
 
     :param string collection: a :class:`sandman.model.Resource` endpoint
     :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
@@ -92,7 +92,7 @@ def patch_resource(collection, lookup_id):
     resource = session.query(cls).get(lookup_id)
 
     if not _validate(cls, request.method, resource):
-        return _unsupported_method_response()
+        return unsupported_method_response()
 
     if resource is None:
         resource = cls()
@@ -100,17 +100,17 @@ def patch_resource(collection, lookup_id):
         setattr(resource, resource.primary_key(), lookup_id)
         session.add(resource)
         session.commit()
-        return _resource_created_response(resource)
+        return resource_created_response(resource)
     else:
         resource.from_dict(request.json)
-        updated_resource = session.merge(resource)
+        session.merge(resource)
         session.commit()
-        return _no_content_response()
+        return no_content_response()
 
 
 @app.route('/<collection>', methods=['POST'])
 def add_resource(collection):
-    """Return *Response* based on adding a new resource to *collection*
+    """Return the appropriate *Response* based on adding a new resource to *collection*
 
     :param string collection: a :class:`sandman.model.Resource` endpoint
     :rtype: :class:`flask.Response`
@@ -122,16 +122,16 @@ def add_resource(collection):
     resource.from_dict(request.json)
 
     if not _validate(cls, request.method, resource):
-        return _unsupported_method_response()
+        return unsupported_method_response()
 
     session = _get_session()
     session.add(resource)
     session.commit()
-    return _resource_created_response(resource)
+    return resource_created_response(resource)
 
 @app.route('/<collection>/<lookup_id>', methods=['DELETE'])
 def delete_resource(collection, lookup_id):
-    """Return *Response* for deleting an existing resource in *collection*
+    """Return the appropriate *Response* for deleting an existing resource in *collection*
     
     :param string collection: a :class:`sandman.model.Resource` endpoint
     :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
@@ -147,16 +147,16 @@ def delete_resource(collection, lookup_id):
     if resource is None:
         return JSONException('Requested resource not found', code=404)
     elif not _validate(cls, request.method, resource):
-        return _unsupported_method_response()
+        return unsupported_method_response()
 
     session.delete(resource)
     session.commit()
-    return _no_content_response()
+    return no_content_response()
 
 
 @app.route('/<collection>/<lookup_id>', methods=['GET'])
 def resource_handler(collection, lookup_id):
-    """Return *Response* for retrieving a single resource
+    """Return the appropriate *Response* for retrieving a single resource
     
     :param string collection: a :class:`sandman.model.Resource` endpoint
     :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
@@ -171,14 +171,14 @@ def resource_handler(collection, lookup_id):
     if resource is None:
         return JSONException('Requested resource not found', code=404)
     elif not _validate(cls, request.method, resource):
-        return _unsupported_method_response()
+        return unsupported_method_response()
 
     result_dict = resource.as_dict()
     return jsonify(**result_dict)
 
 @app.route('/<collection>', methods=['GET'])
 def collection_handler(collection):
-    """Return *Response* for retrieving a collection of resources
+    """Return the appropriate *Response* for retrieving a collection of resources
     
     :param string collection: a :class:`sandman.model.Resource` endpoint
     :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
@@ -191,7 +191,7 @@ def collection_handler(collection):
     resources = session.query(cls).all()
 
     if not _validate(cls, request.method, resources):
-        return _unsupported_method_response()
+        return unsupported_method_response()
 
     result_list = []
     for resource in resources:
