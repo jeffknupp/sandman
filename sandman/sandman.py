@@ -29,10 +29,10 @@ def _single_resource_json_response(resource):
 def _single_resource_html_response(resource):
     """Return the HTML representation of *resource*"""
     tablename = resource.__tablename__
-    primary_key = getattr(resource, resource.primary_key())
-    attributes = resource.as_dict()
+    resource.pk = getattr(resource, resource.primary_key())
+    resource.attributes = resource.as_dict()
     return make_response(render_template('resource.html', resource=resource,
-        tablename=tablename, pk=primary_key, attributes=attributes))
+        tablename=tablename))
 
 def _collection_json_response(resources):
     """Return the HTML representation of the collection *resources*"""
@@ -153,6 +153,10 @@ def patch_resource(collection, lookup_id):
         session.commit()
         return no_content_response()
 
+
+@app.route('/favicon.ico')
+def pass_route():
+    return ''
 
 @app.route('/<collection>', methods=['POST'])
 def add_resource(collection):
