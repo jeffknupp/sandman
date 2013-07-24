@@ -54,10 +54,10 @@ class SandmanTestCase(unittest.TestCase):
         response = self.app.patch('/artists/276', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
-        #assert response.status_code == 201
+        assert response.status_code == 201
         assert type(response.data) == str
-        #assert json.loads(response.data) == u'Jeff Knupp'
-        #self.assertEqual(json.loads(response.data)['links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
+        assert json.loads(response.data)['Name'] == u'Jeff Knupp'
+        self.assertEqual(json.loads(response.data)['links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
 
     def test_patch_existing_resource(self):
         response = self.app.patch('/artists/275', 
@@ -102,3 +102,14 @@ class SandmanTestCase(unittest.TestCase):
     def test_user_validation(self):
         response = self.app.get('/styles/1')
         assert response.status_code == 403
+
+    def test_get_html(self):
+        response = self.app.get('/artists/1', headers={'Accept': 'text/html'})
+        assert response.status_code == 200
+        assert '<!DOCTYPE html>' in response.data
+
+    def test_get_html(self):
+        response = self.app.get('/artists', headers={'Accept': 'text/html'})
+        assert response.status_code == 200
+        assert '<!DOCTYPE html>' in response.data
+        assert 'Aerosmith' in response.data
