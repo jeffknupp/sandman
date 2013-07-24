@@ -1,14 +1,6 @@
 sandman Package
 ===============
 
-:mod:`sandman` Package
-----------------------
-
-.. automodule:: sandman.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`exception` Module
 -----------------------
 
@@ -32,11 +24,3 @@ sandman Package
     :members:
     :undoc-members:
     :show-inheritance:
-
-Subpackages
------------
-
-.. toctree::
-
-    sandman.test
-
