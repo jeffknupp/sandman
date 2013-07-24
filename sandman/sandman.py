@@ -1,8 +1,12 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
 
-from flask import jsonify, request, g, current_app, Response
+from flask import (jsonify, request, g, 
+        current_app, Response, render_template,
+        make_response)
 from . import app, db
 from .exception import JSONException
+
+JSON, HTML = range(2)
 
 def _get_session():
     """Return (and memoize) a database session"""
@@ -10,6 +14,37 @@ def _get_session():
     if session is None:
         session = g._session = db.session()
     return session
+
+def _get_mimetype(current_request):
+    """Return the mimetype for this request."""
+    if 'json' in current_request.headers['Accept']:
+        return JSON
+    else:
+        return HTML
+
+def _single_resource_json_response(resource):
+    """Return the JSON representation of *resource*"""
+    return jsonify(resource.as_dict())
+   
+def _single_resource_html_response(resource):
+    """Return the HTML representation of *resource*"""
+    tablename = resource.__tablename__
+    primary_key = getattr(resource, resource.primary_key())
+    attributes = resource.as_dict()
+    return make_response(render_template('resource.html', resource=resource,
+        tablename=tablename, pk=primary_key, attributes=attributes))
+
+def _collection_json_response(resources):
+    """Return the HTML representation of the collection *resources*"""
+    result_list = []
+    for resource in resources:
+        result_list.append(resource.as_dict())
+    return jsonify(resources=result_list)
+
+def _collection_html_response(resources):
+    """Return the HTML representation of the collection *resources*"""
+    return make_response(render_template('collection.html',
+        resources=resources))
 
 def _validate(cls, method, resource=None):
     """Return ``True`` if the the given *cls* supports the HTTP *method* found 
@@ -34,17 +69,28 @@ def _validate(cls, method, resource=None):
 
     return True
 
-def resource_created_response(resource):
+def resource_created_response(resource, current_request):
     """Return HTTP response with status code *201*, signaling a created *resource*
     
     :param resource: resource created as a result of current request
     :type resource: :class:`sandman.model.Resource`
     :rtype: :class:`flask.Response`
     """
-    response = jsonify(resource.as_dict())
+    if _get_mimetype(current_request) == JSON:
+        response = _single_resource_json_response(current_resource)
+    else:
+        response = _single_resource_html_response(current_resource)
     response.status_code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
     return response
+
+def resource_response(resource, current_request):
+    result_dict = resource.as_dict()
+    if _get_mimetype(current_request) == JSON:
+        return _single_resource_json_response(resource)
+    else:
+        return _single_resource_html_response(resource)
+
 
 def unsupported_method_response():
     """Return the appropriate *Response* with status code *403*, signaling the HTTP method used
@@ -100,7 +146,7 @@ def patch_resource(collection, lookup_id):
         setattr(resource, resource.primary_key(), lookup_id)
         session.add(resource)
         session.commit()
-        return resource_created_response(resource)
+        return resource_created_response(resource, request)
     else:
         resource.from_dict(request.json)
         session.merge(resource)
@@ -173,8 +219,7 @@ def resource_handler(collection, lookup_id):
     elif not _validate(cls, request.method, resource):
         return unsupported_method_response()
 
-    result_dict = resource.as_dict()
-    return jsonify(**result_dict)
+    return resource_response(resource, request)
 
 @app.route('/<collection>', methods=['GET'])
 def collection_handler(collection):
