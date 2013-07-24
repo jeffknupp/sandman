@@ -11,8 +11,17 @@ def get_session():
         session = g._session = db.session()
     return session
 
-def validate_method(cls, method):
-    return method in cls.__methods__
+def validate(cls, method, resource=None):
+    if not method in cls.__methods__:
+        return False
+
+    class_validator_name = 'do_' + method
+
+    if hasattr(cls, class_validator_name):
+        class_validator = getattr(cls, class_validator_name)
+        return class_validator(resource)
+
+    return True
 
 def created_response(resource):
     """Return response for created resource"""
@@ -39,9 +48,12 @@ def patch_resource(collection, lookup_id):
     session = get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    if not validate_method(cls, request.method):
-        return unsupported_method_response()
+
     resource = session.query(cls).get(lookup_id)
+
+    if not validate(cls, request.method, resource):
+        return unsupported_method_response()
+
     if resource is None:
         resource = cls()
         resource.from_dict(request.json)
@@ -61,10 +73,12 @@ def add_resource(collection):
     """Return response for adding a resource"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    if not validate_method(cls, request.method):
-        return unsupported_method_response()
     resource = cls()
     resource.from_dict(request.json)
+
+    if not validate(cls, request.method, resource):
+        return unsupported_method_response()
+
     session = get_session()
     session.add(resource)
     session.commit()
@@ -75,13 +89,15 @@ def delete_resource(collection, lookup_id):
     """Return response for deleting a resource"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    if not validate_method(cls, request.method):
-        return unsupported_method_response()
     resource = cls()
     session = get_session()
     resource = session.query(cls).get(lookup_id)
+
     if resource is None:
         return JSONException('Requested resource not found', code=404)
+    elif not validate(cls, request.method, resource):
+        return unsupported_method_response()
+
     session.delete(resource)
     session.commit()
     return no_content_response()
@@ -93,11 +109,13 @@ def resource_handler(collection, lookup_id):
     session = get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    if not validate_method(cls, request.method):
-        return unsupported_method_response()
     resource = session.query(cls).get(lookup_id)
+
     if resource is None:
         return JSONException('Requested resource not found', code=404)
+    elif not validate(cls, request.method, resource):
+        return unsupported_method_response()
+
     result_dict = resource.as_dict()
     return jsonify(**result_dict)
 
@@ -106,10 +124,12 @@ def collection_handler(collection):
     """Handler for a collection of resources"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    if not validate_method(cls, request.method):
-        return unsupported_method_response()
     session = get_session()
     resources = session.query(cls).all()
+
+    if not validate(cls, request.method, resources):
+        return unsupported_method_response()
+
     result_list = []
     for resource in resources:
         result_list.append(resource.as_dict())

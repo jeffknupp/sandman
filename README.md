@@ -97,7 +97,8 @@ in backwards incompatible ways.*
 
 ### Installation
 
-For now, just `git clone` the sandman repo and run `python setup.py install`. 
+`pip install sandman`. The requirements aren't set up on PyPI yet but that's
+easily taken care of below.
 
 ### Quickstart
 
@@ -135,5 +136,6 @@ The models file is identical to the code pasted above.
 
 ### Coming Soon
 
+* Authentication
 * Class specific validation
 * More `links` automatically generated (i.e. `links` to related objects)

@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sandman.sandman &mdash; sandman 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="sandman 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">sandman 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sandman.sandman</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;Sandman REST API creator for Flask and SQLAlchemy&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">.exception</span> <span class="kn">import</span> <span class="n">JSONException</span>
+
+<div class="viewcode-block" id="get_session"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.get_session">[docs]</a><span class="k">def</span> <span class="nf">get_session</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return a database session&quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;_session&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">session</span>
+</div>
+<div class="viewcode-block" id="validate"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.validate">[docs]</a><span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">__methods__</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">class_validator_name</span> <span class="o">=</span> <span class="s">&#39;do_&#39;</span> <span class="o">+</span> <span class="n">method</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">class_validator_name</span><span class="p">):</span>
+        <span class="n">class_validator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">class_validator_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">class_validator</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="created_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.created_response">[docs]</a><span class="k">def</span> <span class="nf">created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return response for created resource&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">201</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Location&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s">&#39;http://localhost:5000/&#39;</span> <span class="o">+</span> <span class="n">resource</span><span class="o">.</span><span class="n">resource_uri</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">response</span>
+</div>
+<div class="viewcode-block" id="unsupported_method_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.unsupported_method_response">[docs]</a><span class="k">def</span> <span class="nf">unsupported_method_response</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return response when no resource is returned in body&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">403</span>
+    <span class="k">return</span> <span class="n">response</span>
+</div>
+<div class="viewcode-block" id="no_content_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.no_content_response">[docs]</a><span class="k">def</span> <span class="nf">no_content_response</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return response when no resource is returned in body&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">204</span>
+    <span class="k">return</span> <span class="n">response</span>
+</div>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;lookup_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;PATCH&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="patch_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.patch_resource">[docs]</a><span class="k">def</span> <span class="nf">patch_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">lookup_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return response for patching a resource&quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+
+    <span class="n">resource</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lookup_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">primary_key</span><span class="p">(),</span> <span class="n">lookup_id</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+        <span class="n">updated_resource</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
+
+</div>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;POST&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="add_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.add_resource">[docs]</a><span class="k">def</span> <span class="nf">add_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return response for adding a resource&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+    <span class="n">resource</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+    <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+</div>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;lookup_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;DELETE&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="delete_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.delete_resource">[docs]</a><span class="k">def</span> <span class="nf">delete_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">lookup_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return response for deleting a resource&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+    <span class="n">resource</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
+    <span class="n">resource</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lookup_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="s">&#39;Requested resource not found&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
+
+    <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
+
+</div>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;lookup_id&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="resource_handler"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.resource_handler">[docs]</a><span class="k">def</span> <span class="nf">resource_handler</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">lookup_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handler for single resource&quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+    <span class="n">resource</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lookup_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="s">&#39;Requested resource not found&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
+
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="o">**</span><span class="n">result_dict</span><span class="p">)</span>
+</div>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="collection_handler"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.collection_handler">[docs]</a><span class="k">def</span> <span class="nf">collection_handler</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handler for a collection of resources&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
+    <span class="n">resources</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">unsupported_method_response</span><span class="p">()</span>
+
+    <span class="n">result_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>
+        <span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="n">result_list</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">sandman 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jeff Knupp.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
