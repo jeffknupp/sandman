@@ -245,7 +245,7 @@ def collection_handler(collection):
     if not _validate(cls, request.method, resources):
         return unsupported_method_response()
 
-    result_list = []
-    for resource in resources:
-        result_list.append(resource.as_dict())
-    return jsonify(resources=result_list)
+    if _get_mimetype(request) == JSON:
+        return _collection_json_response(resources)
+    else:
+        return _collection_html_response(resources)
