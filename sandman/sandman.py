@@ -17,6 +17,9 @@ def _get_session():
 
 def _get_mimetype(current_request):
     """Return the mimetype for this request."""
+    if 'Accept' not in current_request.headers:
+        return JSON
+
     if 'json' in current_request.headers['Accept']:
         return JSON
     else:
@@ -77,9 +80,9 @@ def resource_created_response(resource, current_request):
     :rtype: :class:`flask.Response`
     """
     if _get_mimetype(current_request) == JSON:
-        response = _single_resource_json_response(current_resource)
+        response = _single_resource_json_response(resource)
     else:
-        response = _single_resource_html_response(current_resource)
+        response = _single_resource_html_response(resource)
     response.status_code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
     return response
@@ -177,7 +180,7 @@ def add_resource(collection):
     session = _get_session()
     session.add(resource)
     session.commit()
-    return resource_created_response(resource)
+    return resource_created_response(resource, request)
 
 @app.route('/<collection>/<lookup_id>', methods=['DELETE'])
 def delete_resource(collection, lookup_id):
