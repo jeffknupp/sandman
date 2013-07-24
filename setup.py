@@ -1,6 +1,6 @@
 """
 sandman
------
+-------
 
 **sandman** "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code for
@@ -117,7 +117,7 @@ from setuptools import setup
 
 setup(
     name='sandman',
-    version='0.2.2',
+    version='0.2.2b',
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
