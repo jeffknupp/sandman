@@ -4,14 +4,25 @@ from flask import jsonify, request, g, current_app, Response
 from . import app, db
 from .exception import JSONException
 
-def get_session():
-    """Return a database session"""
+def _get_session():
+    """Return (and memoize) a database session"""
     session = getattr(g, '_session', None)
     if session is None:
         session = g._session = db.session()
     return session
 
 def validate(cls, method, resource=None):
+    """Return ``True`` if the the given *cls* supports the HTTP *method* found 
+    on the incoming HTTP request.
+    
+    :param cls: class associated with the request's endpoint
+    :type cls: :class:`sandman.model.Resource` instance
+    :param string method: HTTP method of incoming request
+    :param resource: *cls* instance associated with the request
+    :type resource: :class:`sandman.model.Resource` or None
+    :rtype: bool
+
+    """
     if not method in cls.__methods__:
         return False
 
@@ -24,7 +35,12 @@ def validate(cls, method, resource=None):
     return True
 
 def created_response(resource):
-    """Return response for created resource"""
+    """Return HTTP response with status code *201*, signaling a created *resource*
+    
+    :param resource: resource created as a result of current request
+    :type resource: :class:`sandman.model.Resource`
+    :rtype: :class:`flask.Response`
+    """
     response = jsonify(resource.as_dict())
     response.status_code = 201
     response.headers['Location']  = 'http://localhost:5000/' + resource.resource_uri()
@@ -45,7 +61,7 @@ def no_content_response():
 @app.route('/<collection>/<lookup_id>', methods=['PATCH'])
 def patch_resource(collection, lookup_id):
     """Return response for patching a resource"""
-    session = get_session()
+    session = _get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
 
@@ -79,7 +95,7 @@ def add_resource(collection):
     if not validate(cls, request.method, resource):
         return unsupported_method_response()
 
-    session = get_session()
+    session = _get_session()
     session.add(resource)
     session.commit()
     return created_response(resource)
@@ -90,7 +106,7 @@ def delete_resource(collection, lookup_id):
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
     resource = cls()
-    session = get_session()
+    session = _get_session()
     resource = session.query(cls).get(lookup_id)
 
     if resource is None:
@@ -106,7 +122,7 @@ def delete_resource(collection, lookup_id):
 @app.route('/<collection>/<lookup_id>', methods=['GET'])
 def resource_handler(collection, lookup_id):
     """Handler for single resource"""
-    session = get_session()
+    session = _get_session()
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
     resource = session.query(cls).get(lookup_id)
@@ -124,7 +140,7 @@ def collection_handler(collection):
     """Handler for a collection of resources"""
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
-    session = get_session()
+    session = _get_session()
     resources = session.query(cls).all()
 
     if not validate(cls, request.method, resources):
