@@ -2,6 +2,11 @@ sandman
 =======
 [![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
 
+Documentation
+-------------
+
+[sandman documentation on pythonhosted.org](http://pythonhosted.org/sandman/)
+
 [See the blogpost here](http://www.jeffknupp.com/blog/2013/07/23/sandman-a-boilerplatefree-python-rest-api-for-existing-databases/)
 
 **sandman** "makes things REST". Have an existing database you'd like to expose via
