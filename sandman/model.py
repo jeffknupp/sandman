@@ -13,7 +13,7 @@ def register(cls):
     endpoint.
     
     :param cls: User-defined class derived from :class:`sandman.Resource` to be
-    registered with the endpoint returned by :func:`endpoint()`
+                registered with the endpoint returned by :func:`endpoint()`
     :type cls: :class:`sandman.Resource` or tuple
     
     """
