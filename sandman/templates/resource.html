@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h3>{{ tablename }}</h3>
+<h4>{{ resource.pk }}</h4>
+    <ul>
+        {% for attribute, value in resource.attributes.items() %}
+            {% if attribute == 'links' %}
+                <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ value[0].rel }}</a></li>
+            {% else %}
+                <li>{{ attribute }}: {{ value }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endblock %}

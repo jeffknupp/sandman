@@ -6,9 +6,11 @@ class Artist(Model):
 
 class Album(Model):
     __tablename__ = 'Album'
+    __methods__ = ('POST', 'PATCH', 'DELETE')
 
 class Playlist(Model):
     __tablename__ = 'Playlist'
+    __methods__ = ('GET', 'POST', 'PATCH')
 
 class Genre(Model):
     __tablename__ = 'Genre'
@@ -16,7 +18,7 @@ class Genre(Model):
     __methods__ = ('GET', 'DELETE')
 
     @staticmethod
-    def do_GET(resource=None):
+    def validate_GET(resource=None):
         if isinstance(resource, list):
             return True
         elif resource and resource.GenreId == 1:
