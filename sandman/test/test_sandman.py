@@ -11,8 +11,6 @@ class SandmanTestCase(unittest.TestCase):
     DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
     def setUp(self):
         
-        if os.path.exists(self.DB_LOCATION):
-            os.unlink(self.DB_LOCATION)
         shutil.copy(os.path.join(os.getcwd(), 'sandman', 'test', 'data', 'chinook'), self.DB_LOCATION) 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['TESTING'] = True
@@ -75,11 +73,13 @@ class SandmanTestCase(unittest.TestCase):
         response = self.app.get('/artists/275')
         assert response.status_code == 404
 
-    def test_get_user_defined_endpoint(self):
-        response = self.app.get('/styles')
-        assert response.status_code == 200
-        assert response.data
-        assert len(json.loads(response.data)[u'resources']) == 25
+    def test_delete_non_existant_resource(self):
+        response = self.app.delete('/artists/404')
+        assert response.status_code == 404
+
+    def test_delete_not_supported(self):
+        response = self.app.delete('/playlists/1')
+        assert response.status_code == 403
 
     def test_get_user_defined_methods(self):
         response = self.app.post('/styles',
@@ -88,10 +88,21 @@ class SandmanTestCase(unittest.TestCase):
         assert response.status_code == 403
         assert not response.data 
 
+    def test_get_unsupported_resource_method(self):
         response = self.app.patch('/styles/26',
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Hip-Hop'}))
         assert response.status_code == 403
+
+    def test_get_supported_method(self):
+        response = self.app.get('/styles/5')
+        assert response.status_code == 200
+
+
+    def test_get_unsupported_collection_method(self):
+        response = self.app.get('/albums')
+        assert response.status_code == 403
+
 
     def test_get_user_defined_endpoint(self):
         response = self.app.get('/styles')
@@ -108,8 +119,22 @@ class SandmanTestCase(unittest.TestCase):
         assert response.status_code == 200
         assert '<!DOCTYPE html>' in response.data
 
-    def test_get_html(self):
+    def test_get_html_collection(self):
         response = self.app.get('/artists', headers={'Accept': 'text/html'})
         assert response.status_code == 200
         assert '<!DOCTYPE html>' in response.data
         assert 'Aerosmith' in response.data
+
+    def test_explicit_get_json(self):
+        response = self.app.get('/artists', headers={'Accept': 'application/json'})
+        assert response.status_code == 200
+        assert response.data
+        assert len(json.loads(response.data)[u'resources']) == 275
+
+    def test_post_html_response(self):
+        response = self.app.post('/artists', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps({u'Name': u'Jeff Knupp'}))
+        assert response.status_code == 201
+        assert 'Jeff Knupp' in response.data

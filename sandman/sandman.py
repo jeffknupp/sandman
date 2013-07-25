@@ -64,7 +64,7 @@ def _validate(cls, method, resource=None):
     if not method in cls.__methods__:
         return False
 
-    class_validator_name = 'do_' + method
+    class_validator_name = 'validate_' + method
 
     if hasattr(cls, class_validator_name):
         class_validator = getattr(cls, class_validator_name)
@@ -155,11 +155,6 @@ def patch_resource(collection, lookup_id):
         session.merge(resource)
         session.commit()
         return no_content_response()
-
-
-@app.route('/favicon.ico')
-def pass_route():
-    return ''
 
 @app.route('/<collection>', methods=['POST'])
 def add_resource(collection):
