@@ -94,12 +94,11 @@ endpoint.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> &#8211; User-defined class derived from <tt class="xref py py-class docutils literal"><span class="pre">sandman.Resource</span></tt> to be</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.Resource</span></tt> or tuple) &#8211; User-defined class derived from <tt class="xref py py-class docutils literal"><span class="pre">sandman.Resource</span></tt> to be
+registered with the endpoint returned by <tt class="xref py py-func docutils literal"><span class="pre">endpoint()</span></tt></td>
 </tr>
 </tbody>
 </table>
-<p>registered with the endpoint returned by <tt class="xref py py-func docutils literal"><span class="pre">endpoint()</span></tt>
-:type cls: <tt class="xref py py-class docutils literal"><span class="pre">sandman.Resource</span></tt> or tuple</p>
 </dd></dl>
 
 </div>
@@ -208,7 +207,7 @@ the data sent in the request and return a <a class="reference internal" href="#s
 
 <dl class="function">
 <dt id="sandman.sandman.resource_created_response">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_created_response</tt><big>(</big><em>resource</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_created_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_created_response" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_created_response</tt><big>(</big><em>resource</em>, <em>current_request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_created_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_created_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return HTTP response with status code <em>201</em>, signaling a created <em>resource</em></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -242,6 +241,11 @@ the data sent in the request and return a <a class="reference internal" href="#s
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.resource_response">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_response</tt><big>(</big><em>resource</em>, <em>current_request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="sandman.sandman.unsupported_method_response">

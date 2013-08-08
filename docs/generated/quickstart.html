@@ -55,16 +55,16 @@
   <div class="section" id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
 <p>Create one file with the following contents (which I call <tt class="docutils literal"><span class="pre">runserver.py</span></tt>):</p>
-<div class="highlight-python"><pre>from sandman.model import register, Model
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">Model</span>
 
-# Insert Models here
-# Register models here
-# register((Model1, Model2, Model3))
+<span class="c"># Insert Models here</span>
+<span class="c"># Register models here</span>
+<span class="c"># register((Model1, Model2, Model3))</span>
 
-from sandman import app, db
-app.config[&#x27;SQLALCHEMY_DATABASE_URI&#x27;] = &#x27;&lt;your database connection string (using SQLAlchemy)&#x27;
-app.run()
-```</pre>
+<span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;your database connection string (using SQLAlchemy)&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
 </div>
 <p>Then simply run:</p>
 <div class="highlight-python"><pre>python runserver.py</pre>
