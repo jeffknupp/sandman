@@ -100,7 +100,7 @@ class SandmanTestCase(unittest.TestCase):
 
 
     def test_get_unsupported_collection_method(self):
-        response = self.app.get('/albums')
+        response = self.app.get('/playlists')
         assert response.status_code == 403
 
 
@@ -138,3 +138,63 @@ class SandmanTestCase(unittest.TestCase):
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
         assert 'Jeff Knupp' in response.data
+
+    def test_put_resource(self):
+        response = self.app.put('/tracks/1', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps(
+                    {'Name': 'Some New Album',
+                      'AlbumId': 1,
+                      'GenreId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 1,
+                      'UnitPrice': 0.99,}))
+        assert response.status_code == 204
+        response = self.app.get('/tracks/1')
+        assert json.loads(response.data.decode('utf-8'))[u'Name'] == u'Some New Album'
+        assert json.loads(response.data.decode('utf-8'))[u'Composer'] is None
+
+    def test_put_unknown_resource(self):
+        import sys
+        response = self.app.put('/tracks/99999', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps(
+                    {'Name': 'Some New Album',
+                      'AlbumId': 1,
+                      'GenreId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 99999,
+                      'UnitPrice': 0.99,}))
+        assert response.status_code == 404
+
+
+    def test_put_invalid_foreign_key(self):
+        import sys
+        response = self.app.put('/tracks/998', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps(
+                    {'Name': 'Some New Album',
+                      'Milliseconds': 343719,
+                      'TrackId': 998,
+                      'UnitPrice': 0.99,}))
+        assert response.status_code == 422
+
+    def test_put_fail_validation(self):
+        import sys
+        response = self.app.put('/tracks/999', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps(
+                    {'Name': 'Some New Album',
+                      'GenreId': 1,
+                      'AlbumId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 999,
+                      'UnitPrice': 0.99,}))
+        assert response.status_code == 403

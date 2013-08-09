@@ -1,5 +1,8 @@
 from sandman.model import register, Model
 
+class Track(Model):
+    __tablename__ = 'Track'
+
 class Artist(Model):
     __tablename__ = 'Artist'
 
@@ -12,4 +15,4 @@ class Playlist(Model):
 class Genre(Model):
     __tablename__ = 'Genre'
 
-register((Artist, Album, Playlist, Genre))
+register((Artist, Album, Playlist, Genre, Track))
