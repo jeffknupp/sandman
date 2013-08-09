@@ -2,6 +2,8 @@
 
 chinook
 runserver.py
+htmlcov
+output.html
 test_run
 # C extensions
 *.so
