@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.model &mdash; sandman 0.2.2 documentation</title>
+    <title>sandman.model &mdash; sandman 0.2.3.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.2.2',
+        VERSION:     '0.2.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.2.2 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.2.3.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.2.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.2.3.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,6 +51,7 @@
 <span class="sd">models should derive. It also makes the :func:`register` function available, which</span>
 <span class="sd">maps endpoints to their associated classes.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">app</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span><span class="p">,</span> <span class="n">DeferredReflection</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
@@ -93,8 +94,8 @@
     <span class="c"># override :attr:`__methods__` if you wish to change the HTTP methods </span>
     <span class="c"># this :class:`sandman.Resource` supports.</span>
     <span class="c">#</span>
-    <span class="c"># Default: ``(&#39;GET&#39;, &#39;POST&#39;, &#39;PATCH&#39;, &#39;DELETE&#39;)``</span>
-    <span class="n">__methods__</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;PATCH&#39;</span><span class="p">,</span> <span class="s">&#39;DELETE&#39;</span><span class="p">)</span>
+    <span class="c"># Default: ``(&#39;GET&#39;, &#39;POST&#39;, &#39;PATCH&#39;, &#39;DELETE&#39;, &#39;PUT&#39;)``</span>
+    <span class="n">__methods__</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;PATCH&#39;</span><span class="p">,</span> <span class="s">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s">&#39;PUT&#39;</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">endpoint</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
@@ -142,6 +143,8 @@
         <span class="n">result_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">result_dict</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_dict</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">Decimal</span><span class="p">):</span>
+                <span class="n">result_dict</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">result_dict</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
         <span class="n">result_dict</span><span class="p">[</span><span class="s">&#39;links&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result_dict</span>
 
@@ -158,6 +161,20 @@
             <span class="n">value</span> <span class="o">=</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set all attributes which correspond to the </span>
+<span class="sd">        :class:`sandman.Resource`&#39;s columns to the values in *dictionary*,</span>
+<span class="sd">        inserting None if an attribute&#39;s value is not specified.</span>
+
+<span class="sd">        :param dict dictionary: A dictionary of attributes to set on the</span>
+<span class="sd">        instance whose keys are the column names of the :class:`sandman.Resource`&#39;s</span>
+<span class="sd">        underlying database table. </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
  
 <span class="n">Model</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="p">(</span><span class="n">DeferredReflection</span><span class="p">,</span> <span class="n">Resource</span><span class="p">))</span>
 </pre></div>
@@ -193,7 +210,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.2.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.2.3.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

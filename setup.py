@@ -117,7 +117,7 @@ from setuptools import setup
 
 setup(
     name='sandman',
-    version='0.2.2b',
+    version='0.2.3.1',
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
