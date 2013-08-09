@@ -217,7 +217,7 @@ def replace_resource(collection, key):
     try:
         session.commit()
     except IntegrityError as e:
-        return JSONException('Requested resource not found. Exception: [{}]'.format(e.message), code=404)
+        return JSONException('Requested resource not found. Exception: [{}]'.format(e.message), code=422)
     return no_content_response()
 
 @app.route('/<collection>', methods=['POST'])

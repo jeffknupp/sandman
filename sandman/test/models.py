@@ -7,6 +7,12 @@ class Artist(Model):
 class Track(Model):
     __tablename__ = 'Track'
 
+    @staticmethod
+    def validate_PUT(resource=None):
+        if int(resource.TrackId) == 999:
+            return False
+        return True
+
 class Album(Model):
     __tablename__ = 'Album'
     __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')

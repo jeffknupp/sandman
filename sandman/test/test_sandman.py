@@ -157,7 +157,8 @@ class SandmanTestCase(unittest.TestCase):
         assert json.loads(response.data.decode('utf-8'))[u'Composer'] is None
 
     def test_put_unknown_resource(self):
-        response = self.app.put('/tracks/999', 
+        import sys
+        response = self.app.put('/tracks/99999', 
                 content_type='application/json', 
                 headers={'Accept': 'text/html'},
                 data=json.dumps(
@@ -166,6 +167,34 @@ class SandmanTestCase(unittest.TestCase):
                       'GenreId': 1,
                       'MediaTypeId': 1,
                       'Milliseconds': 343719,
-                      'TrackId': 1,
+                      'TrackId': 99999,
                       'UnitPrice': 0.99,}))
         assert response.status_code == 404
+
+
+    def test_put_invalid_foreign_key(self):
+        import sys
+        response = self.app.put('/tracks/998', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps(
+                    {'Name': 'Some New Album',
+                      'Milliseconds': 343719,
+                      'TrackId': 998,
+                      'UnitPrice': 0.99,}))
+        assert response.status_code == 422
+
+    def test_put_fail_validation(self):
+        import sys
+        response = self.app.put('/tracks/999', 
+                content_type='application/json', 
+                headers={'Accept': 'text/html'},
+                data=json.dumps(
+                    {'Name': 'Some New Album',
+                      'GenreId': 1,
+                      'AlbumId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 999,
+                      'UnitPrice': 0.99,}))
+        assert response.status_code == 403
