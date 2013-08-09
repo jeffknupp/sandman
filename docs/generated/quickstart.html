@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; sandman 0.2.1 documentation</title>
+    <title>Quickstart &mdash; sandman 0.2.3.1 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.1',
+        VERSION:     '0.2.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.2.1 documentation" href="index.html" />
-    <link rel="next" title="Quickstart" href="quickstart.html" />
-    <link rel="prev" title="Welcome to sandman’s documentation!" href="index.html" /> 
+    <link rel="top" title="sandman 0.2.3.1 documentation" href="index.html" />
+    <link rel="next" title="sandman Package" href="sandman.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,12 +38,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="quickstart.html" title="Quickstart"
+          <a href="sandman.html" title="sandman Package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to sandman’s documentation!"
+          <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.2.3.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,17 +52,28 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Simply run:</p>
-<div class="highlight-python"><pre>pip install sandman</pre>
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>Create one file with the following contents (which I call <tt class="docutils literal"><span class="pre">runserver.py</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">Model</span>
+
+<span class="c"># Insert Models here</span>
+<span class="c"># Register models here</span>
+<span class="c"># register((Model1, Model2, Model3))</span>
+
+<span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;your database connection string (using SQLAlchemy)&#39;</span>
+<span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
 </div>
-<p>The requirements aren&#8217;t set up on PyPI yet but that&#8217;s easily taken care of below.</p>
-<p><strong>Requirements</strong></p>
-<p>You&#8217;ll need to install Flask-SQLAlchemy:</p>
-<div class="highlight-python"><pre>pip install Flask-SQLAlchemy</pre>
+<p>Then simply run:</p>
+<div class="highlight-python"><pre>python runserver.py</pre>
 </div>
-<p>OK, that takes care of the requirements...</p>
+<p>and try curling your new REST API service!</p>
+<p>In a &#8220;real&#8221; project, you should divide the code into at least two files: one with the
+&#8220;Model&#8221; definitions (<tt class="docutils literal"><span class="pre">models.py</span></tt>) and the other with the configuration
+and <tt class="docutils literal"><span class="pre">app.run()</span></tt> call (<tt class="docutils literal"><span class="pre">runserver.py</span></tt>).</p>
+<p>Or you can come up with your own scheme. Whatever.</p>
 </div>
 
 
@@ -72,14 +83,14 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to sandman&#8217;s documentation!</a></p>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="quickstart.html"
-                        title="next chapter">Quickstart</a></p>
+  <p class="topless"><a href="sandman.html"
+                        title="next chapter">sandman Package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/installation.txt"
+    <li><a href="_sources/quickstart.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -109,12 +120,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="quickstart.html" title="Quickstart"
+          <a href="sandman.html" title="sandman Package"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to sandman’s documentation!"
+          <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.2.3.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

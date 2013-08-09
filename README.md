@@ -1,16 +1,20 @@
 sandman
 =======
 [![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
+[![Coverage Status](https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop)](https://coveralls.io/r/jeffknupp/sandman?branch=develop)
 
-[See the blogpost here](http://www.jeffknupp.com/blog/2013/07/23/sandman-a-boilerplatefree-python-rest-api-for-existing-databases/)
+Documentation
+-------------
+
+[Sandman documentation on pythonhosted.org](http://pythonhosted.org/sandman/)
 
 **sandman** "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code for
-the ORM you're using. 
+the ORM you're using, then integrate that into some web framework. 
 
-We're programmers. We don't write boilerplate.
+I don't want to write boilerplate.
 
-Here's what's required to create a REST API from an existing database using
+Here's what's required to create a RESTful API service from an existing database using
 **sandman**:
 
 ```python
@@ -34,13 +38,13 @@ register((Artist, Album, Playlist))
 app.run()
 ```
 
-Let's start our new API server and make a request:
+Let's start our new service and make a request:
 
 ```zsh
-/home/jeff/sandman >>> python runserver.py &
+> python runserver.py &
 * Running on http://127.0.0.1:5000/
 
-/home/jeff/sandman >>> curl GET http://localhost:5000/artists
+> curl GET http://localhost:5000/artists
 ```
 
 ```json
@@ -87,6 +91,7 @@ RESTful API. For each table, Sandman creates:
     * GET
     * POST
     * PATCH
+    * PUT
     * DELETE
 * responses with appropriate `rel` links automatically
 * essentially a HATEOAS-based service sitting in front of your database
@@ -115,7 +120,11 @@ from sandman.model import register, Model
 
 # Insert Models here
 # Register models here 
-register((Model1, Model2, Model3))
+# register((Model1, Model2, Model3)) 
+# or
+# register(Model1)
+# register(Model2)
+# register(Model3)
 
 app.run()
 ```
@@ -126,7 +135,7 @@ Then simply run
 python runserver.py
 ```
 
-and try curling your new REST API service!
+and try curling your new RESTful API!
 
 ### Example Application
 
@@ -137,5 +146,4 @@ The models file is identical to the code pasted above.
 ### Coming Soon
 
 * Authentication
-* Class specific validation
 * More `links` automatically generated (i.e. `links` to related objects)

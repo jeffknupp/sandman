@@ -4,11 +4,22 @@ class Artist(Model):
     __tablename__ = 'Artist'
 
 
+class Track(Model):
+    __tablename__ = 'Track'
+
+    @staticmethod
+    def validate_PUT(resource=None):
+        if int(resource.TrackId) == 999:
+            return False
+        return True
+
 class Album(Model):
     __tablename__ = 'Album'
+    __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')
 
 class Playlist(Model):
     __tablename__ = 'Playlist'
+    __methods__ = ('POST', 'PATCH')
 
 class Genre(Model):
     __tablename__ = 'Genre'
@@ -16,12 +27,12 @@ class Genre(Model):
     __methods__ = ('GET', 'DELETE')
 
     @staticmethod
-    def do_GET(resource=None):
+    def validate_GET(resource=None):
         if isinstance(resource, list):
             return True
         elif resource and resource.GenreId == 1:
             return False
         return True
 
-register((Artist, Album, Playlist))
+register((Artist, Album, Playlist, Track))
 register(Genre)

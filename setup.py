@@ -1,6 +1,6 @@
 """
 sandman
------
+-------
 
 **sandman** "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code for
@@ -12,6 +12,7 @@ Simple Setup
 ````````````
 
 .. code:: python
+
     from sandman import app, db
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
@@ -40,7 +41,7 @@ Let's start our new API server and make a request.
 
     $ curl GET http://localhost:5000/artists
 
-Here is the JSON returned::
+Here is the JSON returned:
 
 .. code:: json
 
@@ -116,7 +117,7 @@ from setuptools import setup
 
 setup(
     name='sandman',
-    version='0.2.1',
+    version='0.2.3.1',
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',

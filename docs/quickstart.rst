@@ -13,7 +13,6 @@ Create one file with the following contents (which I call ``runserver.py``)::
     from sandman import app, db
     app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
     app.run()
-    ```
 
 Then simply run::
 

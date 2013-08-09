@@ -1,7 +1,11 @@
 language: python
 python:
   - "2.7"
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: pip install -r requirements.txt
-# command to run tests, e.g. python setup.py test
-script: python setup.py test
+install: 
+    - "pip install -r requirements.txt --use-mirrors"
+    - "pip install coverage"
+    - "pip install coveralls"
+script: 
+    - "coverage run --source=sandman setup.py test"
+after_success:
+    coveralls
