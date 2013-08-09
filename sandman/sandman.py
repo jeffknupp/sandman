@@ -3,6 +3,7 @@
 from flask import (jsonify, request, g, 
         current_app, Response, render_template,
         make_response)
+from sqlalchemy.exc import IntegrityError
 from . import app, db
 from .exception import JSONException
 
@@ -72,6 +73,30 @@ def _validate(cls, method, resource=None):
 
     return True
 
+def endpoint_class(collection):
+    """Return the :class:`sandman.model.Resource` associated with the endpoint
+    *collection*.
+
+    :param string collection: a :class:`sandman.model.Resource` endpoint
+    :rtype: :class:`sandman.model.Resource`
+
+    """
+    session = _get_session()
+    with app.app_context():
+        return current_app.endpoint_classes[collection]
+
+def retrieve_resource(collection, key):
+    """Return the resource of type *cls* identified by key *key*.
+
+    :param string collection: a :class:`sandman.model.Resource` endpoint
+    :param string key: primary key of resource
+    :rtype: class:`sandman.model.Resource`
+    """
+    session = _get_session()
+    with app.app_context():
+        cls = current_app.endpoint_classes[collection]
+    return session.query(cls).get(key)
+
 def resource_created_response(resource, current_request):
     """Return HTTP response with status code *201*, signaling a created *resource*
     
@@ -116,21 +141,38 @@ def no_content_response():
     response.status_code = 204
     return response
 
-@app.route('/<collection>/<lookup_id>', methods=['PATCH'])
-def patch_resource(collection, lookup_id):
-    """Return the appropriate *Response* based on action performed by HTTP PATCH request.
+def update_resource(resource, data):
+    """Replace the contents of a resource with *data* and return an appropriate
+    *Response*.
     
-    If no resource currently exists at `/<collection>/<lookup_id>`, create it
-    with *lookup_id* as its primary key and return a
+    :param resource: :class:`sandman.model.Resource` to be updated
+    :param data: New values for the fields in *resource*
+
+    """
+
+    resource.from_dict(request.json)
+    session = _get_session()
+    session.merge(resource)
+    session.commit()
+    return no_content_response()
+
+
+@app.route('/<collection>/<key>', methods=['PATCH'])
+def patch_resource(collection, key):
+    """"Upsert" a resource identified by the given key and return the appropriate
+    *Response*.
+    
+    If no resource currently exists at `/<collection>/<key>`, create it
+    with *key* as its primary key and return a
     :func:`resource_created_response`.
 
-    If a resource *does* exist at `/<collection>/<lookup_id>`, update it with
+    If a resource *does* exist at `/<collection>/<key>`, update it with
     the data sent in the request and return a :func:`no_content_response`.
 
     Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent
 
     :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
+    :param string key: the primary key for the associated :class:`sandman.model.Resource`
     :rtype: :class:`flask.Response`
 
     """
@@ -138,7 +180,7 @@ def patch_resource(collection, lookup_id):
     with app.app_context():
         cls = current_app.endpoint_classes[collection]
 
-    resource = session.query(cls).get(lookup_id)
+    resource = session.query(cls).get(key)
 
     if not _validate(cls, request.method, resource):
         return unsupported_method_response()
@@ -146,15 +188,37 @@ def patch_resource(collection, lookup_id):
     if resource is None:
         resource = cls()
         resource.from_dict(request.json)
-        setattr(resource, resource.primary_key(), lookup_id)
+        setattr(resource, resource.primary_key(), key)
         session.add(resource)
         session.commit()
         return resource_created_response(resource, request)
     else:
-        resource.from_dict(request.json)
-        session.merge(resource)
+        return update_resource(resource, request.json)
+
+@app.route('/<collection>/<key>', methods=['PUT'])
+def replace_resource(collection, key):
+    """Replace the resource identified by the given key and return the appropriate
+    response.
+
+    :param string collection: a :class:`sandman.model.Resource` endpoint
+    :rtype: :class:`flask.Response`
+
+    """
+    resource = retrieve_resource(collection, key)
+
+    if resource is None:
+        return JSONException('Requested resource not found', code=404)
+    elif not _validate(endpoint_class(collection), request.method, resource):
+        return unsupported_method_response()
+
+    resource.replace(request.json)
+    session = _get_session()
+    session.add(resource)
+    try:
         session.commit()
-        return no_content_response()
+    except IntegrityError as e:
+        return JSONException('Requested resource not found. Exception: [{}]'.format(e.message), code=404)
+    return no_content_response()
 
 @app.route('/<collection>', methods=['POST'])
 def add_resource(collection):
@@ -164,8 +228,7 @@ def add_resource(collection):
     :rtype: :class:`flask.Response`
 
     """
-    with app.app_context():
-        cls = current_app.endpoint_classes[collection]
+    cls = endpoint_class(collection)
     resource = cls()
     resource.from_dict(request.json)
 
@@ -177,12 +240,12 @@ def add_resource(collection):
     session.commit()
     return resource_created_response(resource, request)
 
-@app.route('/<collection>/<lookup_id>', methods=['DELETE'])
-def delete_resource(collection, lookup_id):
+@app.route('/<collection>/<key>', methods=['DELETE'])
+def delete_resource(collection, key):
     """Return the appropriate *Response* for deleting an existing resource in *collection*
     
     :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
+    :param string key: the primary key for the associated :class:`sandman.model.Resource`
     :rtype: :class:`flask.Response`
 
     """
@@ -190,11 +253,11 @@ def delete_resource(collection, lookup_id):
         cls = current_app.endpoint_classes[collection]
     resource = cls()
     session = _get_session()
-    resource = session.query(cls).get(lookup_id)
+    resource = session.query(cls).get(key)
 
     if resource is None:
         return JSONException('Requested resource not found', code=404)
-    elif not _validate(cls, request.method, resource):
+    elif not _validate(endpoint_class(collection), request.method, resource):
         return unsupported_method_response()
 
     session.delete(resource)
@@ -202,33 +265,30 @@ def delete_resource(collection, lookup_id):
     return no_content_response()
 
 
-@app.route('/<collection>/<lookup_id>', methods=['GET'])
-def resource_handler(collection, lookup_id):
+@app.route('/<collection>/<key>', methods=['GET'])
+def show_resource(collection, key):
     """Return the appropriate *Response* for retrieving a single resource
     
     :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
+    :param string key: the primary key for the associated :class:`sandman.model.Resource`
     :rtype: :class:`flask.Response`
 
     """
-    session = _get_session()
-    with app.app_context():
-        cls = current_app.endpoint_classes[collection]
-    resource = session.query(cls).get(lookup_id)
-
+    resource = retrieve_resource(collection, key)
+    
     if resource is None:
         return JSONException('Requested resource not found', code=404)
-    elif not _validate(cls, request.method, resource):
+    elif not _validate(endpoint_class(collection), request.method, resource):
         return unsupported_method_response()
 
     return resource_response(resource, request)
 
 @app.route('/<collection>', methods=['GET'])
-def collection_handler(collection):
+def show_collection(collection):
     """Return the appropriate *Response* for retrieving a collection of resources
     
     :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string lookup_id: the primary key for the associated :class:`sandman.model.Resource`
+    :param string key: the primary key for the associated :class:`sandman.model.Resource`
     :rtype: :class:`flask.Response`
 
     """
@@ -237,7 +297,7 @@ def collection_handler(collection):
     session = _get_session()
     resources = session.query(cls).all()
 
-    if not _validate(cls, request.method, resources):
+    if not _validate(endpoint_class(collection), request.method, resources):
         return unsupported_method_response()
 
     if _get_mimetype(request) == JSON:

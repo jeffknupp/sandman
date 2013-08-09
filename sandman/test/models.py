@@ -4,13 +4,16 @@ class Artist(Model):
     __tablename__ = 'Artist'
 
 
+class Track(Model):
+    __tablename__ = 'Track'
+
 class Album(Model):
     __tablename__ = 'Album'
-    __methods__ = ('POST', 'PATCH', 'DELETE')
+    __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')
 
 class Playlist(Model):
     __tablename__ = 'Playlist'
-    __methods__ = ('GET', 'POST', 'PATCH')
+    __methods__ = ('POST', 'PATCH')
 
 class Genre(Model):
     __tablename__ = 'Genre'
@@ -25,5 +28,5 @@ class Genre(Model):
             return False
         return True
 
-register((Artist, Album, Playlist))
+register((Artist, Album, Playlist, Track))
 register(Genre)
