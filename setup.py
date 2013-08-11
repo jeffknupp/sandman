@@ -1,7 +1,11 @@
 from __future__ import print_function
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
+import codecs
+import os
 import sys
+
+import sandman
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -32,7 +36,7 @@ class PyTest(TestCommand):
 
 setup(
     name='sandman',
-    version='0.2.3.4',
+    version=sandman.__version__,
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
@@ -45,7 +49,7 @@ setup(
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=long_description,
-    packages=find_packages(exclude=["docs", "tests*"]),
+    packages=['sandman'],
     include_package_data=True,
     platforms='any',
     test_suite='sandman.test.test_sandman',
