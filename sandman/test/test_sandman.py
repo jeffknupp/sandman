@@ -93,22 +93,30 @@ class TestSandman:
         response = self.app.delete('/playlists/1')
         assert response.status_code == 403
 
-    def test_unsupported_resource_method(self):
+    def test_unsupported_patch_resource(self):
         response = self.app.patch('/styles/26',
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Hip-Hop'}))
         assert response.status_code == 403
 
+    def test_unsupported_get_resource(self):
+        self.get_response('/playlists', 403)
+
     def test_unsupported_collection_method(self):
-        response = self.app.get('/playlists')
+        response = self.app.post('/styles', 
+                content_type='application/json', 
+                data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 403
 
     def test_user_defined_endpoint(self):
         response = self.get_response('/styles', 200)
         assert len(json.loads(response.data)[u'resources']) == 25
 
-    def test_user_validation(self):
+    def test_user_validation_reject(self):
         self.get_response('/styles/1', 403, False)
+
+    def test_user_validation_accept(self):
+        self.get_response('/styles/2', 200)
 
     def test_get_html(self):
         response = self.get_response('/artists/1', 200, headers={'Accept': 'text/html'})
