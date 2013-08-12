@@ -20,14 +20,14 @@ class TestSandman:
         os.unlink(self.DB_LOCATION)
         self.app = None
 
-    def successful_generic_get_response(self, uri, status_code, has_data=True):
+    def get_response(self, uri, status_code, has_data=True):
         response = self.app.get(uri)
         assert response.status_code == status_code
         if has_data:
             assert response.data
         return response
 
-    def generic_post_reponse(self):
+    def post_response(self):
         response = self.app.post('/artists', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
@@ -36,21 +36,21 @@ class TestSandman:
         return response
 
     def test_get(self):
-        response = self.successful_generic_get_response('/artists', 200)
+        response = self.get_response('/artists', 200)
         assert len(json.loads(response.data)[u'resources']) == 275
 
     def test_post(self):
-        response = self.generic_post_reponse()
+        response = self.post_response()
         assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
         assert json.loads(response.data)[u'links'] == [{u'rel': u'self', u'uri': u'/artists/276'}]
 
     def test_posted_location(self):
-        post_response = self.generic_post_reponse()
+        post_response = self.post_response()
         location = post_response.headers['Location']
-        response = self.successful_generic_get_response(location, 200)
+        response = self.get_response(location, 200)
 
     def test_posted_uri(self):
-        post_response = self.generic_post_reponse()
+        post_response = self.post_response()
         as_json = json.loads(post_response.data)
         uri = as_json[u'links'][0][u'uri']
         response = self.app.get(uri)
@@ -70,16 +70,14 @@ class TestSandman:
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 204
-        response = self.app.get(u'/artists/275')
-        assert response.status_code == 200
+        response = self.get_response('/artists/275', 200)
         assert json.loads(response.data.decode('utf-8'))[u'Name'] == u'Jeff Knupp'
         assert json.loads(response.data.decode('utf-8'))[u'ArtistId'] == 275
 
     def test_delete_resource(self):
         response = self.app.delete('/artists/275')
         assert response.status_code == 204
-        response = self.app.get('/artists/275')
-        assert response.status_code == 404
+        response = self.get_response('/artists/275', 404, False)
 
     def test_delete_non_existant_resource(self):
         response = self.app.delete('/artists/404')
