@@ -113,7 +113,18 @@ Links
 """
 
 from __future__ import print_function
-from setuptools import setup
+from setuptools import setup, Command
+
+class PyTest(Command):
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        import sys,subprocess
+        errno = subprocess.call([sys.executable, 'runtests.py'])
+        raise SystemExit(errno)
 
 setup(
     name='sandman',
@@ -121,6 +132,7 @@ setup(
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
+    cmdclass = {'test': PyTest},
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=__doc__,

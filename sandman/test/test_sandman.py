@@ -6,46 +6,60 @@ import os
 import shutil
 import json
 
-class SandmanTestCase(unittest.TestCase):
-
+class TestSandman:
     DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
-    def setUp(self):
-        
+
+    def setup_method(self, method):
         shutil.copy(os.path.join(os.getcwd(), 'sandman', 'test', 'data', 'chinook'), self.DB_LOCATION) 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['TESTING'] = True
         self.app = app.test_client()
         from . import models
 
-    def tearDown(self):
+    def teardown_method(self, method):
         os.unlink(self.DB_LOCATION)
         self.app = None
 
-    def test_get(self):
-        response = self.app.get('/artists')
-        assert response.status_code == 200
-        assert response.data
-        assert len(json.loads(response.data)[u'resources']) == 275
+    def get_response(self, uri, status_code, has_data=True, headers=None):
+        if headers is None:
+            headers = {}
+        response = self.app.get(uri, headers=headers)
+        assert response.status_code == status_code
+        if has_data:
+            assert response.data
+        return response
 
-    def test_post(self):
+    def post_response(self):
         response = self.app.post('/artists', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
         assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
-        self.assertEqual(json.loads(response.data)[u'links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
+        return response
 
-    def test_get_posted_resource(self):
-        post_response = self.app.post('/artists', 
-                content_type='application/json', 
-                data=json.dumps({u'Name': u'Jeff Knupp'}))
+    @staticmethod
+    def is_html_response(response):
+        return '<!DOCTYPE html>' in response.data
+
+    def test_get(self):
+        response = self.get_response('/artists', 200)
+        assert len(json.loads(response.data)[u'resources']) == 275
+
+    def test_post(self):
+        response = self.post_response()
+        assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
+        assert json.loads(response.data)[u'links'] == [{u'rel': u'self', u'uri': u'/artists/276'}]
+
+    def test_posted_location(self):
+        post_response = self.post_response()
         location = post_response.headers['Location']
+        response = self.get_response(location, 200)
+
+    def test_posted_uri(self):
+        post_response = self.post_response()
         as_json = json.loads(post_response.data)
         uri = as_json[u'links'][0][u'uri']
-        response = self.app.get(location)
-        assert response.status_code == 200
         response = self.app.get(uri)
-        assert response.status_code == 200
         assert as_json[u'Name'] == u'Jeff Knupp'
 
     def test_patch_new_resource(self):
@@ -55,23 +69,21 @@ class SandmanTestCase(unittest.TestCase):
         assert response.status_code == 201
         assert type(response.data) == str
         assert json.loads(response.data)['Name'] == u'Jeff Knupp'
-        self.assertEqual(json.loads(response.data)['links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
+        assert json.loads(response.data)['links'] == [{u'rel': u'self', u'uri': u'/artists/276'}]
 
     def test_patch_existing_resource(self):
         response = self.app.patch('/artists/275', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 204
-        response = self.app.get(u'/artists/275')
-        assert response.status_code == 200
+        response = self.get_response('/artists/275', 200)
         assert json.loads(response.data.decode('utf-8'))[u'Name'] == u'Jeff Knupp'
         assert json.loads(response.data.decode('utf-8'))[u'ArtistId'] == 275
 
     def test_delete_resource(self):
         response = self.app.delete('/artists/275')
         assert response.status_code == 204
-        response = self.app.get('/artists/275')
-        assert response.status_code == 404
+        response = self.get_response('/artists/275', 404, False)
 
     def test_delete_non_existant_resource(self):
         response = self.app.delete('/artists/404')
@@ -81,54 +93,34 @@ class SandmanTestCase(unittest.TestCase):
         response = self.app.delete('/playlists/1')
         assert response.status_code == 403
 
-    def test_get_user_defined_methods(self):
-        response = self.app.post('/styles',
-                content_type='application/json', 
-                data=json.dumps({u'Name': u'Hip-Hop'}))
-        assert response.status_code == 403
-        assert not response.data 
-
-    def test_get_unsupported_resource_method(self):
+    def test_unsupported_resource_method(self):
         response = self.app.patch('/styles/26',
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Hip-Hop'}))
         assert response.status_code == 403
 
-    def test_get_supported_method(self):
-        response = self.app.get('/styles/5')
-        assert response.status_code == 200
-
-
-    def test_get_unsupported_collection_method(self):
+    def test_unsupported_collection_method(self):
         response = self.app.get('/playlists')
         assert response.status_code == 403
 
-
-    def test_get_user_defined_endpoint(self):
-        response = self.app.get('/styles')
-        assert response.status_code == 200
-        assert response.data
+    def test_user_defined_endpoint(self):
+        response = self.get_response('/styles', 200)
         assert len(json.loads(response.data)[u'resources']) == 25
 
     def test_user_validation(self):
-        response = self.app.get('/styles/1')
-        assert response.status_code == 403
+        self.get_response('/styles/1', 403, False)
 
     def test_get_html(self):
-        response = self.app.get('/artists/1', headers={'Accept': 'text/html'})
-        assert response.status_code == 200
-        assert '<!DOCTYPE html>' in response.data
+        response = self.get_response('/artists/1', 200, headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
 
     def test_get_html_collection(self):
-        response = self.app.get('/artists', headers={'Accept': 'text/html'})
-        assert response.status_code == 200
-        assert '<!DOCTYPE html>' in response.data
+        response = self.app.get('/artists', 200, headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
         assert 'Aerosmith' in response.data
 
-    def test_explicit_get_json(self):
-        response = self.app.get('/artists', headers={'Accept': 'application/json'})
-        assert response.status_code == 200
-        assert response.data
+    def test_get_json(self):
+        response = self.get_response('/artists', 200, headers={'Accept': 'application/json'})
         assert len(json.loads(response.data)[u'resources']) == 275
 
     def test_post_html_response(self):
@@ -142,7 +134,6 @@ class SandmanTestCase(unittest.TestCase):
     def test_put_resource(self):
         response = self.app.put('/tracks/1', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'AlbumId': 1,
@@ -152,15 +143,13 @@ class SandmanTestCase(unittest.TestCase):
                       'TrackId': 1,
                       'UnitPrice': 0.99,}))
         assert response.status_code == 204
-        response = self.app.get('/tracks/1')
+        response = self.get_response('/tracks/1', 200)
         assert json.loads(response.data.decode('utf-8'))[u'Name'] == u'Some New Album'
         assert json.loads(response.data.decode('utf-8'))[u'Composer'] is None
 
     def test_put_unknown_resource(self):
-        import sys
         response = self.app.put('/tracks/99999', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'AlbumId': 1,
@@ -173,10 +162,8 @@ class SandmanTestCase(unittest.TestCase):
 
 
     def test_put_invalid_foreign_key(self):
-        import sys
         response = self.app.put('/tracks/998', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'Milliseconds': 343719,
@@ -185,10 +172,8 @@ class SandmanTestCase(unittest.TestCase):
         assert response.status_code == 422
 
     def test_put_fail_validation(self):
-        import sys
         response = self.app.put('/tracks/999', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'GenreId': 1,
