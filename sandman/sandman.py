@@ -28,7 +28,7 @@ def _get_mimetype(current_request):
 
 def _single_resource_json_response(resource):
     """Return the JSON representation of *resource*"""
-    return jsonify(resource.as_dict())
+    return jsonify(**resource.as_dict())
    
 def _single_resource_html_response(resource):
     """Return the HTML representation of *resource*"""

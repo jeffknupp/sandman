@@ -114,6 +114,19 @@ Links
 
 from __future__ import print_function
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
+import sys
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 setup(
     name='sandman',
@@ -121,6 +134,12 @@ setup(
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
+    tests_require=['pytest'],
+    install_requires=['Flask>=0.10.1',
+                      'Flask-SQLAlchemy>=1.0',
+                      'SQLAlchemy==0.8.2',
+                      ],
+    cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=__doc__,
