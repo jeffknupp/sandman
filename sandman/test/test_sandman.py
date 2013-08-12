@@ -20,8 +20,10 @@ class TestSandman:
         os.unlink(self.DB_LOCATION)
         self.app = None
 
-    def get_response(self, uri, status_code, has_data=True):
-        response = self.app.get(uri)
+    def get_response(self, uri, status_code, has_data=True, headers=None):
+        if headers is None:
+            headers = {}
+        response = self.app.get(uri, headers=headers)
         assert response.status_code == status_code
         if has_data:
             assert response.data
@@ -87,54 +89,34 @@ class TestSandman:
         response = self.app.delete('/playlists/1')
         assert response.status_code == 403
 
-    def test_get_user_defined_methods(self):
-        response = self.app.post('/styles',
-                content_type='application/json', 
-                data=json.dumps({u'Name': u'Hip-Hop'}))
-        assert response.status_code == 403
-        assert not response.data 
-
-    def test_get_unsupported_resource_method(self):
+    def test_unsupported_resource_method(self):
         response = self.app.patch('/styles/26',
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Hip-Hop'}))
         assert response.status_code == 403
 
-    def test_get_supported_method(self):
-        response = self.app.get('/styles/5')
-        assert response.status_code == 200
-
-
-    def test_get_unsupported_collection_method(self):
+    def test_unsupported_collection_method(self):
         response = self.app.get('/playlists')
         assert response.status_code == 403
 
-
-    def test_get_user_defined_endpoint(self):
-        response = self.app.get('/styles')
-        assert response.status_code == 200
-        assert response.data
+    def test_user_defined_endpoint(self):
+        response = self.get_response('/styles', 200)
         assert len(json.loads(response.data)[u'resources']) == 25
 
     def test_user_validation(self):
-        response = self.app.get('/styles/1')
-        assert response.status_code == 403
+        self.get_response('/styles/1', 403, False)
 
     def test_get_html(self):
-        response = self.app.get('/artists/1', headers={'Accept': 'text/html'})
-        assert response.status_code == 200
+        response = self.get_response('/artists/1', 200, headers={'Accept': 'text/html'})
         assert '<!DOCTYPE html>' in response.data
 
     def test_get_html_collection(self):
-        response = self.app.get('/artists', headers={'Accept': 'text/html'})
-        assert response.status_code == 200
+        response = self.app.get('/artists', 200, headers={'Accept': 'text/html'})
         assert '<!DOCTYPE html>' in response.data
         assert 'Aerosmith' in response.data
 
-    def test_explicit_get_json(self):
-        response = self.app.get('/artists', headers={'Accept': 'application/json'})
-        assert response.status_code == 200
-        assert response.data
+    def test_get_json(self):
+        response = self.get_response('/artists', 200, headers={'Accept': 'application/json'})
         assert len(json.loads(response.data)[u'resources']) == 275
 
     def test_post_html_response(self):
