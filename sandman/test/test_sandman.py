@@ -37,6 +37,10 @@ class TestSandman:
         assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
         return response
 
+    @staticmethod
+    def is_html_response(response):
+        return '<!DOCTYPE html>' in response.data
+
     def test_get(self):
         response = self.get_response('/artists', 200)
         assert len(json.loads(response.data)[u'resources']) == 275
@@ -108,11 +112,11 @@ class TestSandman:
 
     def test_get_html(self):
         response = self.get_response('/artists/1', 200, headers={'Accept': 'text/html'})
-        assert '<!DOCTYPE html>' in response.data
+        assert self.is_html_response(response)
 
     def test_get_html_collection(self):
         response = self.app.get('/artists', 200, headers={'Accept': 'text/html'})
-        assert '<!DOCTYPE html>' in response.data
+        assert self.is_html_response(response)
         assert 'Aerosmith' in response.data
 
     def test_get_json(self):
@@ -130,7 +134,6 @@ class TestSandman:
     def test_put_resource(self):
         response = self.app.put('/tracks/1', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'AlbumId': 1,
@@ -140,15 +143,13 @@ class TestSandman:
                       'TrackId': 1,
                       'UnitPrice': 0.99,}))
         assert response.status_code == 204
-        response = self.app.get('/tracks/1')
+        response = self.get_response('/tracks/1', 200)
         assert json.loads(response.data.decode('utf-8'))[u'Name'] == u'Some New Album'
         assert json.loads(response.data.decode('utf-8'))[u'Composer'] is None
 
     def test_put_unknown_resource(self):
-        import sys
         response = self.app.put('/tracks/99999', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'AlbumId': 1,
@@ -161,10 +162,8 @@ class TestSandman:
 
 
     def test_put_invalid_foreign_key(self):
-        import sys
         response = self.app.put('/tracks/998', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'Milliseconds': 343719,
@@ -173,10 +172,8 @@ class TestSandman:
         assert response.status_code == 422
 
     def test_put_fail_validation(self):
-        import sys
         response = self.app.put('/tracks/999', 
                 content_type='application/json', 
-                headers={'Accept': 'text/html'},
                 data=json.dumps(
                     {'Name': 'Some New Album',
                       'GenreId': 1,
