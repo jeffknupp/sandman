@@ -6,47 +6,59 @@ import os
 import shutil
 import json
 
-class SandmanTestCase(unittest.TestCase):
-
+class TestSandman:
     DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
-    def setUp(self):
-        
+
+    def setup_method(self, method):
         shutil.copy(os.path.join(os.getcwd(), 'sandman', 'test', 'data', 'chinook'), self.DB_LOCATION) 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['TESTING'] = True
         self.app = app.test_client()
         from . import models
 
-    def tearDown(self):
+    def teardown_method(self, method):
         os.unlink(self.DB_LOCATION)
         self.app = None
 
-    def test_get(self):
-        response = self.app.get('/artists')
+    def generic_get_response(self, uri):
+        response = self.app.get(uri)
         assert response.status_code == 200
         assert response.data
-        assert len(json.loads(response.data)[u'resources']) == 275
+        return response
 
-    def test_post(self):
+    def generic_post_reponse():
         response = self.app.post('/artists', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
         assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
-        self.assertEqual(json.loads(response.data)[u'links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
+        return response
 
-    def test_get_posted_resource(self):
+    def test_get(self):
+        reponse = generic_get_response('/artists')
+        assert len(json.loads(response.data)[u'resources']) == 275
+
+
+    def test_post(self):
+        response = self.generic_post_reponse()
+        assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
+        assert json.loads(response.data)[u'links'] == [{u'rel': u'self', u'uri': u'/artists/276'}]
+
+    def test_posted_location(self):
+        post_response = generic_post_reponse()
+        location = post_response.headers['Location']
+        response = self.generic_get_response(location)
+
+    def test_posted_uri(self):
         post_response = self.app.post('/artists', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
-        location = post_response.headers['Location']
         as_json = json.loads(post_response.data)
         uri = as_json[u'links'][0][u'uri']
-        response = self.app.get(location)
-        assert response.status_code == 200
         response = self.app.get(uri)
         assert response.status_code == 200
         assert as_json[u'Name'] == u'Jeff Knupp'
+
 
     def test_patch_new_resource(self):
         response = self.app.patch('/artists/276', 
