@@ -130,7 +130,7 @@ class PyTest(TestCommand):
 
 setup(
     name='sandman',
-    version='0.2.3.2',
+    version='0.2.3.4',
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
