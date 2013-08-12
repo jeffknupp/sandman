@@ -20,13 +20,14 @@ class TestSandman:
         os.unlink(self.DB_LOCATION)
         self.app = None
 
-    def generic_get_response(self, uri):
+    def successful_generic_get_response(self, uri, status_code, has_data=True):
         response = self.app.get(uri)
-        assert response.status_code == 200
-        assert response.data
+        assert response.status_code == status_code
+        if has_data:
+            assert response.data
         return response
 
-    def generic_post_reponse():
+    def generic_post_reponse(self):
         response = self.app.post('/artists', 
                 content_type='application/json', 
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
@@ -35,9 +36,8 @@ class TestSandman:
         return response
 
     def test_get(self):
-        reponse = generic_get_response('/artists')
+        reponse = self.successful_generic_get_response('/artists', 200)
         assert len(json.loads(response.data)[u'resources']) == 275
-
 
     def test_post(self):
         response = self.generic_post_reponse()
@@ -45,20 +45,16 @@ class TestSandman:
         assert json.loads(response.data)[u'links'] == [{u'rel': u'self', u'uri': u'/artists/276'}]
 
     def test_posted_location(self):
-        post_response = generic_post_reponse()
+        post_response = self.generic_post_reponse()
         location = post_response.headers['Location']
-        response = self.generic_get_response(location)
+        response = self.successful_generic_get_response(location, 200)
 
     def test_posted_uri(self):
-        post_response = self.app.post('/artists', 
-                content_type='application/json', 
-                data=json.dumps({u'Name': u'Jeff Knupp'}))
+        post_response = self.generic_post_reponse()
         as_json = json.loads(post_response.data)
         uri = as_json[u'links'][0][u'uri']
         response = self.app.get(uri)
-        assert response.status_code == 200
         assert as_json[u'Name'] == u'Jeff Knupp'
-
 
     def test_patch_new_resource(self):
         response = self.app.patch('/artists/276', 
@@ -67,7 +63,7 @@ class TestSandman:
         assert response.status_code == 201
         assert type(response.data) == str
         assert json.loads(response.data)['Name'] == u'Jeff Knupp'
-        self.assertEqual(json.loads(response.data)['links'], [{u'rel': u'self', u'uri': u'/artists/276'}])
+        assert json.loads(response.data)['links'] == [{u'rel': u'self', u'uri': u'/artists/276'}]
 
     def test_patch_existing_resource(self):
         response = self.app.patch('/artists/275', 
