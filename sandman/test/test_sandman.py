@@ -100,7 +100,7 @@ class TestSandman:
         assert response.status_code == 403
 
     def test_unsupported_get_resource(self):
-        self.get_response('/playlists', 403)
+        self.get_response('/playlists', 403, False)
 
     def test_unsupported_collection_method(self):
         response = self.app.post('/styles', 
