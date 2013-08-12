@@ -36,7 +36,7 @@ class TestSandman:
         return response
 
     def test_get(self):
-        reponse = self.successful_generic_get_response('/artists', 200)
+        response = self.successful_generic_get_response('/artists', 200)
         assert len(json.loads(response.data)[u'resources']) == 275
 
     def test_post(self):

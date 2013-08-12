@@ -43,7 +43,7 @@ def _collection_json_response(resources):
     result_list = []
     for resource in resources:
         result_list.append(resource.as_dict())
-    return jsonify(dict(result_list))
+    return jsonify(resources=result_list)
 
 def _collection_html_response(resources):
     """Return the HTML representation of the collection *resources*"""
