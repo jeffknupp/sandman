@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman Package &mdash; sandman 0.2.3.5 documentation</title>
+    <title>sandman Package &mdash; sandman 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.3.5',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.2.3.5 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.3.0 documentation" href="index.html" />
     <link rel="prev" title="Quickstart" href="quickstart.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="quickstart.html" title="Quickstart"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.2.3.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -76,6 +76,9 @@
 </div>
 <div class="section" id="module-sandman.model">
 <span id="model-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">model</span></tt> Module<a class="headerlink" href="#module-sandman.model" title="Permalink to this headline">¶</a></h2>
+<p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
+from which user models should derive. It also makes the <a class="reference internal" href="#sandman.model.register" title="sandman.model.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a>
+function available, which maps endpoints to their associated classes.</p>
 <dl class="function">
 <dt id="sandman.model.register">
 <tt class="descclassname">sandman.model.</tt><tt class="descname">register</tt><big>(</big><em>cls</em><big>)</big><a class="reference internal" href="_modules/sandman/model.html#register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.register" title="Permalink to this definition">¶</a></dt>
@@ -92,10 +95,7 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 </table>
 </dd></dl>
 
-<span class="target" id="module-sandman.model.models"></span><p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
-from which user models should derive. It also makes the <tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt>
-function available, which maps endpoints to their associated classes.</p>
-<dl class="class">
+<span class="target" id="module-sandman.model.models"></span><dl class="class">
 <dt id="sandman.model.models.Model">
 <em class="property">class </em><tt class="descclassname">sandman.model.models.</tt><tt class="descname">Model</tt><a class="reference internal" href="_modules/sandman/model/models.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
@@ -516,7 +516,7 @@ in the request is not supported for the given endpoint.</p>
         <li class="right" >
           <a href="quickstart.html" title="Quickstart"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.2.3.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
