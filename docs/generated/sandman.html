@@ -76,29 +76,130 @@
 </div>
 <div class="section" id="module-sandman.model">
 <span id="model-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">model</span></tt> Module<a class="headerlink" href="#module-sandman.model" title="Permalink to this headline">¶</a></h2>
-<p>The model module is repsonsible exposes the <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> class,
-from which user models should derive. It also makes the <a class="reference internal" href="#sandman.model.register" title="sandman.model.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a>
-function available, which maps endpoints to their associated classes.</p>
 <dl class="function">
 <dt id="sandman.model.register">
 <tt class="descclassname">sandman.model.</tt><tt class="descname">register</tt><big>(</big><em>cls</em><big>)</big><a class="reference internal" href="_modules/sandman/model.html#register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register with the API a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> class and associated
+<dd><p>Register with the API a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class and associated
 endpoint.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> or tuple) &#8211; User-defined class derived from <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> to be
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> or tuple) &#8211; User-defined class derived from <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> to be
 registered with the endpoint returned by <tt class="xref py py-func docutils literal"><span class="pre">endpoint()</span></tt></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="sandman.model.Model">
-<tt class="descclassname">sandman.model.</tt><tt class="descname">Model</tt><a class="reference internal" href="_modules/sandman/model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Base</span></tt></p>
+<span class="target" id="module-sandman.model.models"></span><p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
+from which user models should derive. It also makes the <tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt>
+function available, which maps endpoints to their associated classes.</p>
+<dl class="class">
+<dt id="sandman.model.models.Model">
+<em class="property">class </em><tt class="descclassname">sandman.model.models.</tt><tt class="descname">Model</tt><a class="reference internal" href="_modules/sandman/model/models.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A mixin class containing the majority of the RESTful API functionality.</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> is the base class of <cite>:class:`sandman.Model</cite>,
+from which user models are derived.</p>
+<dl class="method">
+<dt id="sandman.model.models.Model.as_dict">
+<tt class="descname">as_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary containing only the attributes which map to
+an instance&#8217;s database columns.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="sandman.model.models.Model.endpoint">
+<em class="property">classmethod </em><tt class="descname">endpoint</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.endpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s endpoint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.Model.from_dict">
+<tt class="descname">from_dict</tt><big>(</big><em>dictionary</em><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a set of attributes which correspond to the
+<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s columns.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictionary</strong> (<em>dict</em>) &#8211; A dictionary of attributes to set on the</td>
+</tr>
+</tbody>
+</table>
+<p>instance whose keys are the column names of the
+<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s underlying database table.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.Model.links">
+<tt class="descname">links</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.links"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.links" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of links for endpoints related to the resource.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="sandman.model.models.Model.primary_key">
+<em class="property">classmethod </em><tt class="descname">primary_key</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.primary_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.primary_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the table&#8217;s primary key</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.Model.replace">
+<tt class="descname">replace</tt><big>(</big><em>dictionary</em><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.replace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set all attributes which correspond to the
+<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s columns to the values in <em>dictionary</em>,
+inserting None if an attribute&#8217;s value is not specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictionary</strong> (<em>dict</em>) &#8211; A dictionary of attributes to set on the</td>
+</tr>
+</tbody>
+</table>
+<p>instance whose keys are the column names of the
+<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s underlying database table.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.Model.resource_uri">
+<tt class="descname">resource_uri</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.resource_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.resource_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the URI at which the resource can be found.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -114,7 +215,7 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
 </tr>
@@ -132,8 +233,8 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a></li>
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
 </ul>
 </td>
 </tr>
@@ -147,15 +248,15 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 <dl class="function">
 <dt id="sandman.sandman.endpoint_class">
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">endpoint_class</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#endpoint_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.endpoint_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> associated with the endpoint
+<dd><p>Return the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> associated with the endpoint
 <em>collection</em>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -192,8 +293,8 @@ the data sent in the request and return a <a class="reference internal" href="#s
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a></li>
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
 </ul>
 </td>
 </tr>
@@ -213,7 +314,7 @@ appropriate response.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
 </tr>
@@ -230,7 +331,7 @@ appropriate response.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a>) &#8211; resource created as a result of current request</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>) &#8211; resource created as a result of current request</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
 </tr>
@@ -248,7 +349,7 @@ the <em>current_request</em>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>resource</strong> (<a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a>) &#8211; resource created as a result of current request</li>
+<li><strong>resource</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>) &#8211; resource created as a result of current request</li>
 <li><strong>current_request</strong> (<tt class="xref py py-class docutils literal"><span class="pre">flask.Request</span></tt>) &#8211; <tt class="xref py py-class docutils literal"><span class="pre">flask.Request</span></tt> request being handled</li>
 </ul>
 </td>
@@ -269,7 +370,7 @@ the <em>current_request</em>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</li>
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
 <li><strong>key</strong> (<em>string</em>) &#8211; primary key of resource</li>
 </ul>
 </td>
@@ -291,8 +392,8 @@ resources.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a></li>
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
 </ul>
 </td>
 </tr>
@@ -312,8 +413,8 @@ resources.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> endpoint</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a></li>
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
 </ul>
 </td>
 </tr>
@@ -350,7 +451,7 @@ in the request is not supported for the given endpoint.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> &#8211; <a class="reference internal" href="#sandman.model.Model" title="sandman.model.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></a> to be updated</li>
+<li><strong>resource</strong> &#8211; <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> to be updated</li>
 <li><strong>data</strong> &#8211; New values for the fields in <em>resource</em></li>
 </ul>
 </td>

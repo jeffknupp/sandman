@@ -14,11 +14,9 @@ sandman Package
 
 .. automodule:: sandman.model
     :members: register
-    :undoc-members:
-    :show-inheritance:
 
-.. autoclass:: sandman.model.Model
-    :members: register
+.. automodule:: sandman.model.models
+    :members: Model
     :undoc-members:
     :show-inheritance:
 

@@ -1,33 +1,4 @@
-"""The model module is repsonsible exposes the :class:`sandman.model.Model` class,
-from which user models should derive. It also makes the :func:`register`
-function available, which maps endpoints to their associated classes."""
-
 from decimal import Decimal
-from . import db, app
-from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
-from flask import current_app
-
-__all__ = ['Model', 'register']
-
-def register(cls):
-    """Register with the API a :class:`sandman.model.Model` class and associated
-    endpoint.
-
-    :param cls: User-defined class derived from :class:`sandman.model.Model` to be
-                registered with the endpoint returned by :func:`endpoint()`
-    :type cls: :class:`sandman.model.Model` or tuple
-
-    """
-    with app.app_context():
-        if getattr(current_app, 'endpoint_classes', None) is None:
-            current_app.endpoint_classes = {}
-        if isinstance(cls, (list, tuple)):
-            for entry in cls:
-                current_app.endpoint_classes[entry.endpoint()] = entry
-        else:
-            current_app.endpoint_classes[cls.endpoint()] = cls
-    Model.prepare(db.engine)
-
 
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
@@ -134,5 +105,3 @@ class Model(object):
         for column in self.__table__.columns.keys():
             setattr(self, column, None)
         self.from_dict(dictionary)
-
-Model = declarative_base(cls=(Model, DeferredReflection))
