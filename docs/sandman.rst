@@ -16,7 +16,9 @@ sandman Package
     :members: register
 
 .. automodule:: sandman.model.models
-    :members: Model
+    :members:
+    :private-members:
+    :special-members: __endpoint__, __methods__, __table__, __tablename__
     :undoc-members:
     :show-inheritance:
 
