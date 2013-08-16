@@ -36,8 +36,8 @@ def _get_mimetype(current_request):
 def _single_resource_json_response(resource):
     """Return the JSON representation of *resource*.
 
-    :param resource: :class:`sandman.model.Resource` to render
-    :type resource: :class:`sandman.model.Resource`
+    :param resource: :class:`sandman.model.Model` to render
+    :type resource: :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """
@@ -46,8 +46,8 @@ def _single_resource_json_response(resource):
 def _single_resource_html_response(resource):
     """Return the HTML representation of *resource*.
 
-    :param resource: :class:`sandman.model.Resource` to render
-    :type resource: :class:`sandman.model.Resource`
+    :param resource: :class:`sandman.model.Model` to render
+    :type resource: :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """
@@ -60,7 +60,7 @@ def _single_resource_html_response(resource):
 def _collection_json_response(resources):
     """Return the JSON representation of the collection *resources*.
 
-    :param list resources: list of :class:`sandman.model.Resource`s to render
+    :param list resources: list of :class:`sandman.model.Model`s to render
     :rtype: :class:`flask.Response`
 
     """
@@ -72,7 +72,7 @@ def _collection_json_response(resources):
 def _collection_html_response(resources):
     """Return the HTML representation of the collection *resources*.
 
-    :param list resources: list of :class:`sandman.model.Resource`s to render
+    :param list resources: list of :class:`sandman.model.Model`s to render
     :rtype: :class:`flask.Response`
 
     """
@@ -84,10 +84,10 @@ def _validate(cls, method, resource=None):
     on the incoming HTTP request.
 
     :param cls: class associated with the request's endpoint
-    :type cls: :class:`sandman.model.Resource` instance
+    :type cls: :class:`sandman.model.Model` instance
     :param string method: HTTP method of incoming request
     :param resource: *cls* instance associated with the request
-    :type resource: :class:`sandman.model.Resource` or None
+    :type resource: :class:`sandman.model.Model` or None
     :rtype: bool
 
     """
@@ -103,22 +103,22 @@ def _validate(cls, method, resource=None):
     return True
 
 def endpoint_class(collection):
-    """Return the :class:`sandman.model.Resource` associated with the endpoint
+    """Return the :class:`sandman.model.Model` associated with the endpoint
     *collection*.
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
-    :rtype: :class:`sandman.model.Resource`
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :rtype: :class:`sandman.model.Model`
 
     """
     with app.app_context():
         return current_app.endpoint_classes[collection]
 
 def retrieve_resource(collection, key):
-    """Return the resource of type *cls* identified by key *key*.
+    """Return the resource in *collection* identified by key *key*.
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
+    :param string collection: a :class:`sandman.model.Model` endpoint
     :param string key: primary key of resource
-    :rtype: class:`sandman.model.Resource`
+    :rtype: class:`sandman.model.Model`
 
     """
     session = _get_session()
@@ -131,7 +131,7 @@ def resource_created_response(resource, current_request):
     *resource*
 
     :param resource: resource created as a result of current request
-    :type resource: :class:`sandman.model.Resource`
+    :type resource: :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """
@@ -149,7 +149,7 @@ def resource_response(resource, current_request):
     the *current_request*.
 
     :param resource: resource created as a result of current request
-    :type resource: :class:`sandman.model.Resource`
+    :type resource: :class:`sandman.model.Model`
     :param current_request: :class:`flask.Request` request being handled
     :type current_request: :class:`flask.Request`
     :rtype: :class:`flask.Response`
@@ -188,7 +188,7 @@ def update_resource(resource, data):
     """Replace the contents of a resource with *data* and return an appropriate
     *Response*.
 
-    :param resource: :class:`sandman.model.Resource` to be updated
+    :param resource: :class:`sandman.model.Model` to be updated
     :param data: New values for the fields in *resource*
 
     """
@@ -213,8 +213,8 @@ def patch_resource(collection, key):
 
     Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string key: the primary key for the :class:`sandman.model.Resource`
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :param string key: the primary key for the :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """
@@ -242,7 +242,7 @@ def replace_resource(collection, key):
     """Replace the resource identified by the given key and return the
     appropriate response.
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
+    :param string collection: a :class:`sandman.model.Model` endpoint
     :rtype: :class:`flask.Response`
 
     """
@@ -268,7 +268,7 @@ def add_resource(collection):
     """Return the appropriate *Response* based on adding a new resource to
     *collection*.
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
+    :param string collection: a :class:`sandman.model.Model` endpoint
     :rtype: :class:`flask.Response`
 
     """
@@ -289,8 +289,8 @@ def delete_resource(collection, key):
     """Return the appropriate *Response* for deleting an existing resource in
     *collection*.
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string key: the primary key for the :class:`sandman.model.Resource`
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :param string key: the primary key for the :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """
@@ -314,8 +314,8 @@ def delete_resource(collection, key):
 def show_resource(collection, key):
     """Return the appropriate *Response* for retrieving a single resource
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string key: the primary key for the :class:`sandman.model.Resource`
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :param string key: the primary key for the :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """
@@ -333,8 +333,8 @@ def show_collection(collection):
     """Return the appropriate *Response* for retrieving a collection of
     resources.
 
-    :param string collection: a :class:`sandman.model.Resource` endpoint
-    :param string key: the primary key for the :class:`sandman.model.Resource`
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :param string key: the primary key for the :class:`sandman.model.Model`
     :rtype: :class:`flask.Response`
 
     """

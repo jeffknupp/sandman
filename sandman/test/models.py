@@ -3,12 +3,12 @@
 from sandman.model import register, Model
 
 class Artist(Model):
-    """Resource mapped to the "Artist" table"""
+    """Model mapped to the "Artist" table"""
     __tablename__ = 'Artist'
 
 
 class Track(Model):
-    """Resource mapped to the "Artist" table"""
+    """Model mapped to the "Artist" table"""
     __tablename__ = 'Track'
 
     @staticmethod
@@ -16,7 +16,7 @@ class Track(Model):
         """Return False if request should not be processed.
 
         :param resource: resource related to current request
-        :type resource: :class:`sandman.model.Resource` or None
+        :type resource: :class:`sandman.model.Model` or None
 
         """
         if int(resource.TrackId) == 999:
@@ -24,7 +24,7 @@ class Track(Model):
         return True
 
 class Album(Model):
-    """Resource mapped to the "Album" table
+    """Model mapped to the "Album" table
 
     Only supports HTTP methods specified.
 
@@ -34,7 +34,7 @@ class Album(Model):
     __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')
 
 class Playlist(Model):
-    """Resource mapped to the "Playlist" table
+    """Model mapped to the "Playlist" table
 
     Only supports HTTP methods specified.
 
@@ -44,7 +44,7 @@ class Playlist(Model):
     __methods__ = ('POST', 'PATCH')
 
 class Genre(Model):
-    """Resource mapped to the "Genre" table
+    """Model mapped to the "Genre" table
 
     Has a custom endpoint ("styles" rather than the default, "genres").
     Only supports HTTP methods specified.
@@ -61,7 +61,7 @@ class Genre(Model):
         """Return False if the request should not be processed.
 
         :param resource: resource related to current request
-        :type resource: :class:`sandman.model.Resource` or None
+        :type resource: :class:`sandman.model.Model` or None
 
         """
 

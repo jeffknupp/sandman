@@ -47,9 +47,9 @@
           <div class="body">
             
   <h1>Source code for sandman.model</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;The model module is repsonsible exposes the :class:`sandman.Resource` class, from which user</span>
-<span class="sd">models should derive. It also makes the :func:`register` function available, which</span>
-<span class="sd">maps endpoints to their associated classes.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;The model module is repsonsible exposes the :class:`sandman.model.Model` class,</span>
+<span class="sd">from which user models should derive. It also makes the :func:`register`</span>
+<span class="sd">function available, which maps endpoints to their associated classes.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">app</span>
@@ -59,13 +59,13 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Model&#39;</span><span class="p">,</span> <span class="s">&#39;register&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="register"><a class="viewcode-back" href="../../sandman.html#sandman.model.register">[docs]</a><span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Register with the API a :class:`sandman.Resource` class and associated</span>
+    <span class="sd">&quot;&quot;&quot;Register with the API a :class:`sandman.model.Model` class and associated</span>
 <span class="sd">    endpoint.</span>
-<span class="sd">    </span>
-<span class="sd">    :param cls: User-defined class derived from :class:`sandman.Resource` to be</span>
+
+<span class="sd">    :param cls: User-defined class derived from :class:`sandman.model.Model` to be</span>
 <span class="sd">                registered with the endpoint returned by :func:`endpoint()`</span>
-<span class="sd">    :type cls: :class:`sandman.Resource` or tuple</span>
-<span class="sd">    </span>
+<span class="sd">    :type cls: :class:`sandman.model.Model` or tuple</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_app</span><span class="p">,</span> <span class="s">&#39;endpoint_classes&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -77,29 +77,37 @@
             <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()]</span> <span class="o">=</span> <span class="n">cls</span>
     <span class="n">Model</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
 
-       </div>
-<span class="k">class</span> <span class="nc">Resource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../sandman.html#sandman.model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A mixin class containing the majority of the RESTful API functionality.</span>
-<span class="sd">    </span>
-<span class="sd">    :class:`sandman.Resource` is the base class of `:class:`sandman.Model`,</span>
+
+<span class="sd">    :class:`sandman.model.Model` is the base class of `:class:`sandman.Model`,</span>
 <span class="sd">    from which user models are derived.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># override :attr:`__endpoint__` if you wish to configure the</span>
-    <span class="c"># :class:`sandman.Resource`&#39;s endpoint. </span>
+    <span class="c"># :class:`sandman.model.Model`&#39;s endpoint.</span>
     <span class="c">#</span>
     <span class="c"># Default: __tablename__ in lowercase and pluralized</span>
     <span class="n">__endpoint__</span> <span class="o">=</span> <span class="bp">None</span>
 
-    <span class="c"># override :attr:`__methods__` if you wish to change the HTTP methods </span>
-    <span class="c"># this :class:`sandman.Resource` supports.</span>
+    <span class="c"># The name of the database table this class should be mapped to</span>
+    <span class="c">#</span>
+    <span class="c"># Default: None</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c"># override :attr:`__methods__` if you wish to change the HTTP methods</span>
+    <span class="c"># this :class:`sandman.model.Model` supports.</span>
     <span class="c">#</span>
     <span class="c"># Default: ``(&#39;GET&#39;, &#39;POST&#39;, &#39;PATCH&#39;, &#39;DELETE&#39;, &#39;PUT&#39;)``</span>
     <span class="n">__methods__</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;PATCH&#39;</span><span class="p">,</span> <span class="s">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s">&#39;PUT&#39;</span><span class="p">)</span>
 
+    <span class="c"># Will be populated by SQLAlchemy with the table&#39;s meta-information.</span>
+    <span class="n">__table__</span> <span class="o">=</span> <span class="bp">None</span>
+
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">endpoint</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the :class:`sandman.Resource`&#39;s endpoint.</span>
+        <span class="sd">&quot;&quot;&quot;Return the :class:`sandman.model.Model`&#39;s endpoint.</span>
 
 <span class="sd">        :rtype: string</span>
 
@@ -110,10 +118,10 @@
 
     <span class="k">def</span> <span class="nf">resource_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the URI at which the resource can be found.</span>
-<span class="sd">        </span>
+
 <span class="sd">        :rtype: string</span>
 
-<span class="sd">        &quot;&quot;&quot;</span> 
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">primary_key_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_key</span><span class="p">(),</span> <span class="bp">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="s">&#39;/{}/{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">(),</span> <span class="n">primary_key_value</span><span class="p">)</span>
 
@@ -126,7 +134,7 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">primary_key</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the name of the table&#39;s primary key</span>
-<span class="sd">        </span>
+
 <span class="sd">        :rtype: string</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -134,12 +142,12 @@
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">primary_key</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
 
     <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a dictionary containing only the attributes which map to </span>
+        <span class="sd">&quot;&quot;&quot;Return a dictionary containing only the attributes which map to</span>
 <span class="sd">        an instance&#39;s database columns.</span>
-<span class="sd">        </span>
+
 <span class="sd">        :rtype: dict</span>
 
-<span class="sd">        &quot;&quot;&quot;</span> 
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">result_dict</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -149,34 +157,34 @@
         <span class="k">return</span> <span class="n">result_dict</span>
 
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set a set of attributes which correspond to the </span>
-<span class="sd">        :class:`sandman.Resource`&#39;s columns.</span>
+        <span class="sd">&quot;&quot;&quot;Set a set of attributes which correspond to the</span>
+<span class="sd">        :class:`sandman.model.Model`&#39;s columns.</span>
 
 <span class="sd">        :param dict dictionary: A dictionary of attributes to set on the</span>
-<span class="sd">        instance whose keys are the column names of the :class:`sandman.Resource`&#39;s</span>
-<span class="sd">        underlying database table. </span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span> 
+<span class="sd">        instance whose keys are the column names of the</span>
+<span class="sd">        :class:`sandman.model.Model`&#39;s underlying database table.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Set all attributes which correspond to the </span>
-<span class="sd">        :class:`sandman.Resource`&#39;s columns to the values in *dictionary*,</span>
+        <span class="sd">&quot;&quot;&quot;Set all attributes which correspond to the</span>
+<span class="sd">        :class:`sandman.model.Model`&#39;s columns to the values in *dictionary*,</span>
 <span class="sd">        inserting None if an attribute&#39;s value is not specified.</span>
 
 <span class="sd">        :param dict dictionary: A dictionary of attributes to set on the</span>
-<span class="sd">        instance whose keys are the column names of the :class:`sandman.Resource`&#39;s</span>
-<span class="sd">        underlying database table. </span>
+<span class="sd">        instance whose keys are the column names of the</span>
+<span class="sd">        :class:`sandman.model.Model`&#39;s underlying database table.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
- 
-<span class="n">Model</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="p">(</span><span class="n">DeferredReflection</span><span class="p">,</span> <span class="n">Resource</span><span class="p">))</span>
+</div>
+<span class="n">Model</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">DeferredReflection</span><span class="p">))</span>
 </pre></div>
 
           </div>

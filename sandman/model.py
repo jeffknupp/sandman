@@ -1,4 +1,4 @@
-"""The model module is repsonsible exposes the :class:`sandman.Resource` class,
+"""The model module is repsonsible exposes the :class:`sandman.model.Model` class,
 from which user models should derive. It also makes the :func:`register`
 function available, which maps endpoints to their associated classes."""
 
@@ -10,12 +10,12 @@ from flask import current_app
 __all__ = ['Model', 'register']
 
 def register(cls):
-    """Register with the API a :class:`sandman.Resource` class and associated
+    """Register with the API a :class:`sandman.model.Model` class and associated
     endpoint.
 
-    :param cls: User-defined class derived from :class:`sandman.Resource` to be
+    :param cls: User-defined class derived from :class:`sandman.model.Model` to be
                 registered with the endpoint returned by :func:`endpoint()`
-    :type cls: :class:`sandman.Resource` or tuple
+    :type cls: :class:`sandman.model.Model` or tuple
 
     """
     with app.app_context():
@@ -29,15 +29,15 @@ def register(cls):
     Model.prepare(db.engine)
 
 
-class Resource(object):
+class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
 
-    :class:`sandman.Resource` is the base class of `:class:`sandman.Model`,
+    :class:`sandman.model.Model` is the base class of `:class:`sandman.Model`,
     from which user models are derived.
     """
 
     # override :attr:`__endpoint__` if you wish to configure the
-    # :class:`sandman.Resource`'s endpoint.
+    # :class:`sandman.model.Model`'s endpoint.
     #
     # Default: __tablename__ in lowercase and pluralized
     __endpoint__ = None
@@ -48,7 +48,7 @@ class Resource(object):
     __tablename__ = None
 
     # override :attr:`__methods__` if you wish to change the HTTP methods
-    # this :class:`sandman.Resource` supports.
+    # this :class:`sandman.model.Model` supports.
     #
     # Default: ``('GET', 'POST', 'PATCH', 'DELETE', 'PUT')``
     __methods__ = ('GET', 'POST', 'PATCH', 'DELETE', 'PUT')
@@ -58,7 +58,7 @@ class Resource(object):
 
     @classmethod
     def endpoint(cls):
-        """Return the :class:`sandman.Resource`'s endpoint.
+        """Return the :class:`sandman.model.Model`'s endpoint.
 
         :rtype: string
 
@@ -109,11 +109,11 @@ class Resource(object):
 
     def from_dict(self, dictionary):
         """Set a set of attributes which correspond to the
-        :class:`sandman.Resource`'s columns.
+        :class:`sandman.model.Model`'s columns.
 
         :param dict dictionary: A dictionary of attributes to set on the
         instance whose keys are the column names of the
-        :class:`sandman.Resource`'s underlying database table.
+        :class:`sandman.model.Model`'s underlying database table.
 
         """
         for column in self.__table__.columns.keys():
@@ -123,16 +123,16 @@ class Resource(object):
 
     def replace(self, dictionary):
         """Set all attributes which correspond to the
-        :class:`sandman.Resource`'s columns to the values in *dictionary*,
+        :class:`sandman.model.Model`'s columns to the values in *dictionary*,
         inserting None if an attribute's value is not specified.
 
         :param dict dictionary: A dictionary of attributes to set on the
         instance whose keys are the column names of the
-        :class:`sandman.Resource`'s underlying database table.
+        :class:`sandman.model.Model`'s underlying database table.
 
         """
         for column in self.__table__.columns.keys():
             setattr(self, column, None)
         self.from_dict(dictionary)
 
-Model = declarative_base(cls=(DeferredReflection, Resource))
+Model = declarative_base(cls=(Model, DeferredReflection))
