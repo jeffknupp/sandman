@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>test Package &mdash; sandman 0.2.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="sandman 0.2.3.5 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">sandman 0.2.3.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="test-package">
+<h1>test Package<a class="headerlink" href="#test-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="models-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">models</span></tt> Module<a class="headerlink" href="#models-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sandman.test.test_sandman">
+<span id="test-sandman-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">test_sandman</span></tt> Module<a class="headerlink" href="#module-sandman.test.test_sandman" title="Permalink to this headline">¶</a></h2>
+<p>Main test class for sandman</p>
+<dl class="class">
+<dt id="sandman.test.test_sandman.TestSandman">
+<em class="property">class </em><tt class="descclassname">sandman.test.test_sandman.</tt><tt class="descname">TestSandman</tt><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="attribute">
+<dt id="sandman.test.test_sandman.TestSandman.DB_LOCATION">
+<tt class="descname">DB_LOCATION</tt><em class="property"> = '/home/jeff/code/github_code/sandman/sandman/test/chinook'</em><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.DB_LOCATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.get_response">
+<tt class="descname">get_response</tt><big>(</big><em>uri</em>, <em>status_code</em>, <em>has_data=True</em>, <em>headers=None</em><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.get_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the response generated from a generic GET request. Do basic
+validation on the response.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="sandman.test.test_sandman.TestSandman.is_html_response">
+<em class="property">static </em><tt class="descname">is_html_response</tt><big>(</big><em>response</em><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.is_html_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.is_html_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if <em>response</em> is an HTML response (TODO: check
+headers as well).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.post_response">
+<tt class="descname">post_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.post_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.post_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the response generated from a generic POST request. Do basic
+validation on the response.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.setup_method">
+<tt class="descname">setup_method</tt><big>(</big><em>_</em><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.setup_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.setup_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab the database file from the <em>data</em> directory and configure the
+app.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.teardown_method">
+<tt class="descname">teardown_method</tt><big>(</big><em>_</em><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.teardown_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.teardown_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the database file copied during setup.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_delete_non_existant_resource">
+<tt class="descname">test_delete_non_existant_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_delete_non_existant_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_delete_non_existant_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test DELETEing a resource that doesn&#8217;t exist.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_delete_not_supported">
+<tt class="descname">test_delete_not_supported</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_delete_not_supported"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_delete_not_supported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test DELETEing a resource for an endpoint that doesn&#8217;t support it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_delete_resource">
+<tt class="descname">test_delete_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_delete_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_delete_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test DELETEing a resource.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_get">
+<tt class="descname">test_get</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test simple HTTP GET</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_get_html">
+<tt class="descname">test_get_html</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_get_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_get_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting HTML version of a resource rather than JSON.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_get_html_collection">
+<tt class="descname">test_get_html_collection</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_get_html_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_get_html_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting HTML version of a collection rather than JSON.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_get_json">
+<tt class="descname">test_get_json</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_get_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_get_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test explicitly getting the JSON version of a resource.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_patch_existing_resource">
+<tt class="descname">test_patch_existing_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_patch_existing_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_patch_existing_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send HTTP PATCH for an existing resource (should be updated).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_patch_new_resource">
+<tt class="descname">test_patch_new_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_patch_new_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_patch_new_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send HTTP PATCH for a resource which doesn&#8217;t exist (should be
+created).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_post">
+<tt class="descname">test_post</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test simple HTTP POST</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_post_html_response">
+<tt class="descname">test_post_html_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_post_html_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_post_html_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test POSTing a resource and requesting the response be HTML
+formatted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_posted_location">
+<tt class="descname">test_posted_location</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_posted_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_posted_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure &#8216;Location&#8217; header returned in response actually points to
+new resource created during POST.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_posted_uri">
+<tt class="descname">test_posted_uri</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_posted_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_posted_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure &#8216;uri&#8217; in the links returned in response actually points to
+new resource created during POST.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_put_fail_validation">
+<tt class="descname">test_put_fail_validation</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_put_fail_validation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_put_fail_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test HTTP PUTing a resource that fails user-defined validation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_put_invalid_foreign_key">
+<tt class="descname">test_put_invalid_foreign_key</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_put_invalid_foreign_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_put_invalid_foreign_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test HTTP PUTing a resource with a field that refers to a
+non-existent resource (i.e. violate a foreign key constraint).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_put_resource">
+<tt class="descname">test_put_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_put_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test HTTP PUTing a resource that already exists (should be
+updated).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_put_unknown_resource">
+<tt class="descname">test_put_unknown_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_put_unknown_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_put_unknown_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test HTTP PUTing a resource that doesn&#8217;t exist. Should give 404.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_unsupported_collection_method">
+<tt class="descname">test_unsupported_collection_method</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_unsupported_collection_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_unsupported_collection_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test POSTing a collection for an endpoint that doesn&#8217;t support it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_unsupported_get_resource">
+<tt class="descname">test_unsupported_get_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_unsupported_get_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_unsupported_get_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test GETing a resource for an endpoint that doesn&#8217;t support it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_unsupported_patch_resource">
+<tt class="descname">test_unsupported_patch_resource</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_unsupported_patch_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_unsupported_patch_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test PATCHing a resource for an endpoint that doesn&#8217;t support it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_user_defined_endpoint">
+<tt class="descname">test_user_defined_endpoint</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_user_defined_endpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_user_defined_endpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure user-defined endpoint exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_user_validation_accept">
+<tt class="descname">test_user_validation_accept</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_user_validation_accept"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_user_validation_accept" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test user-defined validation which on request which should be
+accepted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.test.test_sandman.TestSandman.test_user_validation_reject">
+<tt class="descname">test_user_validation_reject</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/test/test_sandman.html#TestSandman.test_user_validation_reject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.test.test_sandman.TestSandman.test_user_validation_reject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test user-defined validation which on request which should be
+rejected.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">test Package</a><ul>
+<li><a class="reference internal" href="#models-module"><tt class="docutils literal"><span class="pre">models</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-sandman.test.test_sandman"><tt class="docutils literal"><span class="pre">test_sandman</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/sandman.test.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">sandman 0.2.3.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jeff Knupp.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

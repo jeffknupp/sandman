@@ -102,15 +102,11 @@ in backwards incompatible ways.*
 
 ### Installation
 
-`pip install sandman`. The requirements aren't set up on PyPI yet but that's
-easily taken care of below.
+`pip install sandman`. 
 
 ### Quickstart
 
-You'll need to `pip install Flask-SQLAlchemy`. OK, that takes care of the
-requirements...
-
-Now you'll need to create one file with the following contents (which I call `runserver.py`):
+You'll need to create one file with the following contents (which I call `runserver.py`):
 
 ```python
 from sandman.model import register, Model
