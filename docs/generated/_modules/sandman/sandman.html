@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.sandman &mdash; sandman 0.2.3.1 documentation</title>
+    <title>sandman.sandman &mdash; sandman 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.2.3.1',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.2.3.1 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.3.0 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.2.3.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.3.0 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,7 +49,7 @@
   <h1>Source code for sandman.sandman</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;Sandman REST API creator for Flask and SQLAlchemy&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="p">(</span><span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> 
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="p">(</span><span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span>
         <span class="n">current_app</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span>
         <span class="n">make_response</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
@@ -57,6 +57,8 @@
 <span class="kn">from</span> <span class="nn">.exception</span> <span class="kn">import</span> <span class="n">JSONException</span>
 
 <span class="n">JSON</span><span class="p">,</span> <span class="n">HTML</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">JSON_EXCEPTION_MESSAGE</span> <span class="o">=</span> <span class="s">&#39;Requested resource not found. Exception: [{}]&#39;</span>
 
 <span class="k">def</span> <span class="nf">_get_session</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Return (and memoize) a database session&quot;&quot;&quot;</span>
@@ -66,7 +68,12 @@
     <span class="k">return</span> <span class="n">session</span>
 
 <span class="k">def</span> <span class="nf">_get_mimetype</span><span class="p">(</span><span class="n">current_request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the mimetype for this request.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Return the mimetype for this request.</span>
+
+<span class="sd">    :param current_request: current HTTP request</span>
+<span class="sd">    :type current_request: :rtype: :class:`flask.Response`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="s">&#39;Accept&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_request</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">JSON</span>
 
@@ -76,11 +83,23 @@
         <span class="k">return</span> <span class="n">HTML</span>
 
 <span class="k">def</span> <span class="nf">_single_resource_json_response</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the JSON representation of *resource*&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
-   
+    <span class="sd">&quot;&quot;&quot;Return the JSON representation of *resource*.</span>
+
+<span class="sd">    :param resource: :class:`sandman.model.Model` to render</span>
+<span class="sd">    :type resource: :class:`sandman.model.Model`</span>
+<span class="sd">    :rtype: :class:`flask.Response`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="o">**</span><span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+
 <span class="k">def</span> <span class="nf">_single_resource_html_response</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the HTML representation of *resource*&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Return the HTML representation of *resource*.</span>
+
+<span class="sd">    :param resource: :class:`sandman.model.Model` to render</span>
+<span class="sd">    :type resource: :class:`sandman.model.Model`</span>
+<span class="sd">    :rtype: :class:`flask.Response`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tablename</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">__tablename__</span>
     <span class="n">resource</span><span class="o">.</span><span class="n">pk</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">primary_key</span><span class="p">())</span>
     <span class="n">resource</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
@@ -88,26 +107,36 @@
         <span class="n">tablename</span><span class="o">=</span><span class="n">tablename</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">_collection_json_response</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the HTML representation of the collection *resources*&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Return the JSON representation of the collection *resources*.</span>
+
+<span class="sd">    :param list resources: list of :class:`sandman.model.Model`s to render</span>
+<span class="sd">    :rtype: :class:`flask.Response`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>
         <span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="n">result_list</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_collection_html_response</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the HTML representation of the collection *resources*&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Return the HTML representation of the collection *resources*.</span>
+
+<span class="sd">    :param list resources: list of :class:`sandman.model.Model`s to render</span>
+<span class="sd">    :rtype: :class:`flask.Response`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;collection.html&#39;</span><span class="p">,</span>
         <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return ``True`` if the the given *cls* supports the HTTP *method* found </span>
+    <span class="sd">&quot;&quot;&quot;Return ``True`` if the the given *cls* supports the HTTP *method* found</span>
 <span class="sd">    on the incoming HTTP request.</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param cls: class associated with the request&#39;s endpoint</span>
-<span class="sd">    :type cls: :class:`sandman.model.Resource` instance</span>
+<span class="sd">    :type cls: :class:`sandman.model.Model` instance</span>
 <span class="sd">    :param string method: HTTP method of incoming request</span>
 <span class="sd">    :param resource: *cls* instance associated with the request</span>
-<span class="sd">    :type resource: :class:`sandman.model.Resource` or None</span>
+<span class="sd">    :type resource: :class:`sandman.model.Model` or None</span>
 <span class="sd">    :rtype: bool</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -123,23 +152,23 @@
     <span class="k">return</span> <span class="bp">True</span>
 
 <div class="viewcode-block" id="endpoint_class"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.endpoint_class">[docs]</a><span class="k">def</span> <span class="nf">endpoint_class</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the :class:`sandman.model.Resource` associated with the endpoint</span>
+    <span class="sd">&quot;&quot;&quot;Return the :class:`sandman.model.Model` associated with the endpoint</span>
 <span class="sd">    *collection*.</span>
 
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
-<span class="sd">    :rtype: :class:`sandman.model.Resource`</span>
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
+<span class="sd">    :rtype: :class:`sandman.model.Model`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">session</span> <span class="o">=</span> <span class="n">_get_session</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="retrieve_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.retrieve_resource">[docs]</a><span class="k">def</span> <span class="nf">retrieve_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the resource of type *cls* identified by key *key*.</span>
+    <span class="sd">&quot;&quot;&quot;Return the resource in *collection* identified by key *key*.</span>
 
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
 <span class="sd">    :param string key: primary key of resource</span>
-<span class="sd">    :rtype: class:`sandman.model.Resource`</span>
+<span class="sd">    :rtype: class:`sandman.model.Model`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">session</span> <span class="o">=</span> <span class="n">_get_session</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
@@ -147,22 +176,34 @@
     <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="resource_created_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.resource_created_response">[docs]</a><span class="k">def</span> <span class="nf">resource_created_response</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">current_request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return HTTP response with status code *201*, signaling a created *resource*</span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot;Return HTTP response with status code *201*, signaling a created</span>
+<span class="sd">    *resource*</span>
+
 <span class="sd">    :param resource: resource created as a result of current request</span>
-<span class="sd">    :type resource: :class:`sandman.model.Resource`</span>
+<span class="sd">    :type resource: :class:`sandman.model.Model`</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_get_mimetype</span><span class="p">(</span><span class="n">current_request</span><span class="p">)</span> <span class="o">==</span> <span class="n">JSON</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">_single_resource_json_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">_single_resource_html_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">201</span>
-    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Location&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s">&#39;http://localhost:5000/&#39;</span> <span class="o">+</span> <span class="n">resource</span><span class="o">.</span><span class="n">resource_uri</span><span class="p">()</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Location&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="s">&#39;http://localhost:5000/{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">resource</span><span class="o">.</span><span class="n">resource_uri</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">response</span>
 </div>
 <div class="viewcode-block" id="resource_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.resource_response">[docs]</a><span class="k">def</span> <span class="nf">resource_response</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">current_request</span><span class="p">):</span>
-    <span class="n">result_dict</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="sd">&quot;&quot;&quot;Return a response for the *resource* given the mimetype header value in</span>
+<span class="sd">    the *current_request*.</span>
+
+<span class="sd">    :param resource: resource created as a result of current request</span>
+<span class="sd">    :type resource: :class:`sandman.model.Model`</span>
+<span class="sd">    :param current_request: :class:`flask.Request` request being handled</span>
+<span class="sd">    :type current_request: :class:`flask.Request`</span>
+<span class="sd">    :rtype: :class:`flask.Response`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_get_mimetype</span><span class="p">(</span><span class="n">current_request</span><span class="p">)</span> <span class="o">==</span> <span class="n">JSON</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_single_resource_json_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -170,9 +211,10 @@
 
 </div>
 <div class="viewcode-block" id="unsupported_method_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.unsupported_method_response">[docs]</a><span class="k">def</span> <span class="nf">unsupported_method_response</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* with status code *403*, signaling the HTTP method used</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* with status code *403*, signaling the</span>
+<span class="sd">    HTTP method used</span>
 <span class="sd">    in the request is not supported for the given endpoint.</span>
-<span class="sd">    </span>
+
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -181,10 +223,11 @@
     <span class="k">return</span> <span class="n">response</span>
 </div>
 <div class="viewcode-block" id="no_content_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.no_content_response">[docs]</a><span class="k">def</span> <span class="nf">no_content_response</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* with status code *204*, signaling a completed action</span>
-<span class="sd">    which does not require data in the response body</span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* with status code *204*, signaling a</span>
+<span class="sd">    completed action which does not require data in the response body</span>
+
 <span class="sd">    :rtype: :class:`flask.Response`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">()</span>
     <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">204</span>
@@ -193,13 +236,12 @@
 <div class="viewcode-block" id="update_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.update_resource">[docs]</a><span class="k">def</span> <span class="nf">update_resource</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Replace the contents of a resource with *data* and return an appropriate</span>
 <span class="sd">    *Response*.</span>
-<span class="sd">    </span>
-<span class="sd">    :param resource: :class:`sandman.model.Resource` to be updated</span>
+
+<span class="sd">    :param resource: :class:`sandman.model.Model` to be updated</span>
 <span class="sd">    :param data: New values for the fields in *resource*</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+    <span class="n">resource</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">session</span> <span class="o">=</span> <span class="n">_get_session</span><span class="p">()</span>
     <span class="n">session</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
@@ -208,9 +250,9 @@
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;PATCH&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="patch_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.patch_resource">[docs]</a><span class="k">def</span> <span class="nf">patch_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;&quot;Upsert&quot; a resource identified by the given key and return the appropriate</span>
-<span class="sd">    *Response*.</span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot;&quot;Upsert&quot; a resource identified by the given key and return the</span>
+<span class="sd">    appropriate *Response*.</span>
+
 <span class="sd">    If no resource currently exists at `/&lt;collection&gt;/&lt;key&gt;`, create it</span>
 <span class="sd">    with *key* as its primary key and return a</span>
 <span class="sd">    :func:`resource_created_response`.</span>
@@ -220,8 +262,8 @@
 
 <span class="sd">    Note: HTTP `PATCH` (and, thus, :func:`patch_resource`) is idempotent</span>
 
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
-<span class="sd">    :param string key: the primary key for the associated :class:`sandman.model.Resource`</span>
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
+<span class="sd">    :param string key: the primary key for the :class:`sandman.model.Model`</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -246,10 +288,10 @@
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;PUT&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="replace_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.replace_resource">[docs]</a><span class="k">def</span> <span class="nf">replace_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Replace the resource identified by the given key and return the appropriate</span>
-<span class="sd">    response.</span>
+    <span class="sd">&quot;&quot;&quot;Replace the resource identified by the given key and return the</span>
+<span class="sd">    appropriate response.</span>
 
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -265,15 +307,17 @@
     <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-    <span class="k">except</span> <span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="s">&#39;Requested resource not found. Exception: [{}]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">),</span> <span class="n">code</span><span class="o">=</span><span class="mi">422</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="n">JSON_EXCEPTION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">),</span>
+                <span class="n">code</span><span class="o">=</span><span class="mi">422</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;POST&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="add_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.add_resource">[docs]</a><span class="k">def</span> <span class="nf">add_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* based on adding a new resource to *collection*</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* based on adding a new resource to</span>
+<span class="sd">    *collection*.</span>
 
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -291,10 +335,11 @@
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;DELETE&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="delete_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.delete_resource">[docs]</a><span class="k">def</span> <span class="nf">delete_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for deleting an existing resource in *collection*</span>
-<span class="sd">    </span>
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
-<span class="sd">    :param string key: the primary key for the associated :class:`sandman.model.Resource`</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for deleting an existing resource in</span>
+<span class="sd">    *collection*.</span>
+
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
+<span class="sd">    :param string key: the primary key for the :class:`sandman.model.Model`</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -317,14 +362,14 @@
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="show_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.show_resource">[docs]</a><span class="k">def</span> <span class="nf">show_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a single resource</span>
-<span class="sd">    </span>
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
-<span class="sd">    :param string key: the primary key for the associated :class:`sandman.model.Resource`</span>
+
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
+<span class="sd">    :param string key: the primary key for the :class:`sandman.model.Model`</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">resource</span> <span class="o">=</span> <span class="n">retrieve_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">JSONException</span><span class="p">(</span><span class="s">&#39;Requested resource not found&#39;</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">404</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">_validate</span><span class="p">(</span><span class="n">endpoint_class</span><span class="p">(</span><span class="n">collection</span><span class="p">),</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
@@ -334,10 +379,11 @@
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
 <div class="viewcode-block" id="show_collection"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.show_collection">[docs]</a><span class="k">def</span> <span class="nf">show_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a collection of resources</span>
-<span class="sd">    </span>
-<span class="sd">    :param string collection: a :class:`sandman.model.Resource` endpoint</span>
-<span class="sd">    :param string key: the primary key for the associated :class:`sandman.model.Resource`</span>
+    <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a collection of</span>
+<span class="sd">    resources.</span>
+
+<span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
+<span class="sd">    :param string key: the primary key for the :class:`sandman.model.Model`</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -386,7 +432,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.2.3.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.3.0 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
