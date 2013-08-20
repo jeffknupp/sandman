@@ -49,7 +49,7 @@ setup(
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=long_description,
-    packages=['sandman'],
+    packages=['sandman', 'sandman.model'],
     include_package_data=True,
     platforms='any',
     test_suite='sandman.test.test_sandman',
