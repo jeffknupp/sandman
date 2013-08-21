@@ -94,15 +94,17 @@ RESTful API. For each table, Sandman creates:
     * PUT
     * DELETE
 * responses with appropriate `rel` links automatically
+* custom validation by simply defining `validate_<METHOD>` methods on your Model
+* explicitly list supported methods for a Model by setting the `__methods__` attribute
+* customize a Models endpoint by setting the `__endpoint__` method
 * essentially a HATEOAS-based service sitting in front of your database
 
-*Warning: Sandman is still very much a work in progress and is not suitable for
-use **anywhere.** Don't use it for anything important. It's also often changing 
-in backwards incompatible ways.*
+*Warning: Sandman is still very much a work in progress. Use it at your own risk. 
+It's also often changing in backwards incompatible ways.*
 
 ### Installation
 
-`pip install sandman`. 
+`pip install sandman`
 
 ### Quickstart
 
@@ -120,7 +122,7 @@ from sandman.model import register, Model
 # register(Model3)
 
 from sandman import app, db
-app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
+app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)>'
 app.run()
 ```
 
@@ -136,7 +138,6 @@ and try curling your new RESTful API!
 
 Take a look in the `sandman/test` directory. The application found there makes
 use of the [Chinook](http://chinookdatabase.codeplex.com) sample SQL database.
-The models file is identical to the code pasted above.
 
 ### Coming Soon
 

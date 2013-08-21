@@ -97,26 +97,26 @@ tables magically get a RESTful API. For each table, Sandman creates:
    -  DELETE
 
 -  responses with appropriate ``rel`` links automatically
+-  custom validation by simply defining ``validate_<METHOD>`` methods on
+   your Model
+-  explicitly list supported methods for a Model by setting the
+   ``__methods__`` attribute
+-  customize a Models endpoint by setting the ``__endpoint__`` method
 -  essentially a HATEOAS-based service sitting in front of your database
 
-*Warning: Sandman is still very much a work in progress and is not
-suitable for use **anywhere.** Don't use it for anything important. It's
-also often changing in backwards incompatible ways.*
+*Warning: Sandman is still very much a work in progress. Use it at your
+own risk. It's also often changing in backwards incompatible ways.*
 
 Installation
 ~~~~~~~~~~~~
 
-``pip install sandman``. The requirements aren't set up on PyPI yet but
-that's easily taken care of below.
+``pip install sandman``
 
 Quickstart
 ~~~~~~~~~~
 
-You'll need to ``pip install Flask-SQLAlchemy``. OK, that takes care of
-the requirements...
-
-Now you'll need to create one file with the following contents (which I
-call ``runserver.py``):
+You'll need to create one file with the following contents (which I call
+``runserver.py``):
 
 .. code:: python
 
@@ -131,7 +131,7 @@ call ``runserver.py``):
     # register(Model3)
 
     from sandman import app, db
-    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
+    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)>'
     app.run()
 
 Then simply run
@@ -147,8 +147,7 @@ Example Application
 
 Take a look in the ``sandman/test`` directory. The application found
 there makes use of the `Chinook <http://chinookdatabase.codeplex.com>`__
-sample SQL database. The models file is identical to the code pasted
-above.
+sample SQL database.
 
 Coming Soon
 ~~~~~~~~~~~
