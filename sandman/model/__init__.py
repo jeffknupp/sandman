@@ -38,18 +38,13 @@ def register(cls, use_admin=True):
 def prepare_relationships():
     inspector = reflection.Inspector.from_engine(db.engine)
     with app.app_context():
-        print 'preparing'
         for class_name, cls in current_app.classes_by_name.items():
-            print 'got class {}'.format(class_name)
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
-                print 'got foreign_key {} in table {}'.format(foreign_key['referred_table'], cls.__tablename__)
                 other = current_app.classes_by_name[foreign_key['referred_table']]
                 setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
-                print type(getattr(other, cls.__tablename__))
-    print 'preparing'
-    Model.prepare(db.engine)
 
 def activate_admin_classes():
+    prepare_relationships()
     admin = Admin(app)
     with app.app_context():
         for cls in (cls for cls in current_app.classes_by_name.values() if cls._use_admin == True):
