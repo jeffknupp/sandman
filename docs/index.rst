@@ -13,6 +13,7 @@ Contents:
 
    installation
    using_sandman
+   admin
    sandman
 
 
