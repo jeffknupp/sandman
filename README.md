@@ -82,9 +82,15 @@ Let's start our new service and make a request:
 ]
 ```
 
+Oh, that's not enough? You also want a Django-style admin interface built
+automatically? Fine. Add one more line to the list of models to get access to
+this:
+
+![improved admin interface screenshot](/docs/images/admin_tracks_improved.jpg)
+
 With **sandman**, (almost) zero boilerplate code is required. Your existing database
 structure and schema is introspected and your database tables magically get a
-RESTful API. For each table, Sandman creates:
+RESTful API and admin interface. For each table, Sandman creates:
 
 * proper endpoints 
 * support for a configurable set of HTTP verbs 

@@ -108,3 +108,6 @@ class Model(object):
         for column in self.__table__.columns.keys():
             setattr(self, column, None)
         self.from_dict(dictionary)
+
+    def __str__(self):
+        return str(getattr(self, self.primary_key()))
