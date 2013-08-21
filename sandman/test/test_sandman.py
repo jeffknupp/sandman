@@ -5,7 +5,7 @@ import os
 import shutil
 import json
 
-class TestSandman(object):
+class TestSandmanBase(object):
     DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
 
     def setup_method(self, _):
@@ -56,6 +56,7 @@ class TestSandman(object):
         headers as well)."""
         return '<!DOCTYPE html>' in response.data
 
+class TestSandmanBasicVerbs(TestSandmanBase):
     def test_get(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200)
@@ -120,76 +121,6 @@ class TestSandman(object):
         response = self.app.delete('/artists/404')
         assert response.status_code == 404
 
-    def test_delete_not_supported(self):
-        """Test DELETEing a resource for an endpoint that doesn't support it."""
-        response = self.app.delete('/playlists/1')
-        assert response.status_code == 403
-
-    def test_unsupported_patch_resource(self):
-        """Test PATCHing a resource for an endpoint that doesn't support it."""
-        response = self.app.patch('/styles/26',
-                content_type='application/json',
-                data=json.dumps({u'Name': u'Hip-Hop'}))
-        assert response.status_code == 403
-
-    def test_unsupported_get_resource(self):
-        """Test GETing a resource for an endpoint that doesn't support it."""
-        self.get_response('/playlists', 403, False)
-
-    def test_unsupported_collection_method(self):
-        """Test POSTing a collection for an endpoint that doesn't support it."""
-        response = self.app.post('/styles',
-                content_type='application/json',
-                data=json.dumps({u'Name': u'Jeff Knupp'}))
-        assert response.status_code == 403
-
-    def test_user_defined_endpoint(self):
-        """Make sure user-defined endpoint exists."""
-        response = self.get_response('/styles', 200)
-        assert len(json.loads(response.data)[u'resources']) == 25
-
-    def test_user_validation_reject(self):
-        """Test user-defined validation which on request which should be
-        rejected."""
-        self.get_response('/styles/1', 403, False)
-
-    def test_user_validation_accept(self):
-        """Test user-defined validation which on request which should be
-        accepted."""
-        self.get_response('/styles/2', 200)
-
-    def test_get_html(self):
-        """Test getting HTML version of a resource rather than JSON."""
-        response = self.get_response('/artists/1',
-                200,
-                headers={'Accept': 'text/html'})
-        assert self.is_html_response(response)
-
-    def test_get_html_collection(self):
-        """Test getting HTML version of a collection rather than JSON."""
-        response = self.app.get('/artists',
-                200,
-                headers={'Accept': 'text/html'})
-        assert self.is_html_response(response)
-        assert 'Aerosmith' in response.data
-
-    def test_get_json(self):
-        """Test explicitly getting the JSON version of a resource."""
-        response = self.get_response('/artists',
-                200,
-                headers={'Accept': 'application/json'})
-        assert len(json.loads(response.data)[u'resources']) == 275
-
-    def test_post_html_response(self):
-        """Test POSTing a resource and requesting the response be HTML
-        formatted."""
-        response = self.app.post('/artists',
-                content_type='application/json',
-                headers={'Accept': 'text/html'},
-                data=json.dumps({u'Name': u'Jeff Knupp'}))
-        assert response.status_code == 201
-        assert 'Jeff Knupp' in response.data
-
     def test_put_resource(self):
         """Test HTTP PUTing a resource that already exists (should be
         updated)."""
@@ -236,6 +167,24 @@ class TestSandman(object):
                       'UnitPrice': 0.99,}))
         assert response.status_code == 422
 
+class TestSandmanUserDefinitions(TestSandmanBase):
+    """Sandman tests related to user-defined functionality"""
+
+    def test_user_defined_endpoint(self):
+        """Make sure user-defined endpoint exists."""
+        response = self.get_response('/styles', 200)
+        assert len(json.loads(response.data)[u'resources']) == 25
+
+    def test_user_validation_reject(self):
+        """Test user-defined validation which on request which should be
+        rejected."""
+        self.get_response('/styles/1', 403, False)
+
+    def test_user_validation_accept(self):
+        """Test user-defined validation which on request which should be
+        accepted."""
+        self.get_response('/styles/2', 200)
+
     def test_put_fail_validation(self):
         """Test HTTP PUTing a resource that fails user-defined validation."""
         response = self.app.put('/tracks/999',
@@ -249,3 +198,64 @@ class TestSandman(object):
                       'TrackId': 999,
                       'UnitPrice': 0.99,}))
         assert response.status_code == 403
+
+class TestSandmanValidation(TestSandmanBase):
+    """Sandman tests related to request validation"""
+
+    def test_delete_not_supported(self):
+        """Test DELETEing a resource for an endpoint that doesn't support it."""
+        response = self.app.delete('/playlists/1')
+        assert response.status_code == 403
+
+    def test_unsupported_patch_resource(self):
+        """Test PATCHing a resource for an endpoint that doesn't support it."""
+        response = self.app.patch('/styles/26',
+                content_type='application/json',
+                data=json.dumps({u'Name': u'Hip-Hop'}))
+        assert response.status_code == 403
+
+    def test_unsupported_get_resource(self):
+        """Test GETing a resource for an endpoint that doesn't support it."""
+        self.get_response('/playlists', 403, False)
+
+    def test_unsupported_collection_method(self):
+        """Test POSTing a collection for an endpoint that doesn't support it."""
+        response = self.app.post('/styles',
+                content_type='application/json',
+                data=json.dumps({u'Name': u'Jeff Knupp'}))
+        assert response.status_code == 403
+
+class TestSandmanContentTypes(TestSandmanBase):
+    """Sandman tests related to content types"""
+
+    def test_get_html(self):
+        """Test getting HTML version of a resource rather than JSON."""
+        response = self.get_response('/artists/1',
+                200,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+
+    def test_get_html_collection(self):
+        """Test getting HTML version of a collection rather than JSON."""
+        response = self.app.get('/artists',
+                200,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+        assert 'Aerosmith' in response.data
+
+    def test_get_json(self):
+        """Test explicitly getting the JSON version of a resource."""
+        response = self.get_response('/artists',
+                200,
+                headers={'Accept': 'application/json'})
+        assert len(json.loads(response.data)[u'resources']) == 275
+
+    def test_post_html_response(self):
+        """Test POSTing a resource and requesting the response be HTML
+        formatted."""
+        response = self.app.post('/artists',
+                content_type='application/json',
+                headers={'Accept': 'text/html'},
+                data=json.dumps({u'Name': u'Jeff Knupp'}))
+        assert response.status_code == 201
+        assert 'Jeff Knupp' in response.data
