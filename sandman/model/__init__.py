@@ -31,7 +31,7 @@ def register(cls, use_admin=True):
                 entry._use_admin = use_admin
         else:
             current_app.endpoint_classes[cls.endpoint()] = cls
-            current_app.classes_by_name(cls.__name__, cls)
+            current_app.classes_by_name[cls.__name__] = cls
             cls._use_admin = use_admin
     Model.prepare(db.engine)
 
