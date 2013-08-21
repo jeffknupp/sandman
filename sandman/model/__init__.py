@@ -27,11 +27,11 @@ def register(cls, use_admin=True):
         if isinstance(cls, (list, tuple)):
             for entry in cls:
                 current_app.endpoint_classes[entry.endpoint()] = entry
-                current_app.classes.add(entry)
+                current_app.classes_by_name[entry.__name__] = entry
                 entry._use_admin = use_admin
         else:
             current_app.endpoint_classes[cls.endpoint()] = cls
-            current_app.classes.add(cls)
+            current_app.classes_by_name(cls.__name__, cls)
             cls._use_admin = use_admin
     Model.prepare(db.engine)
 
@@ -39,12 +39,12 @@ def prepare_relationships():
     inspector = reflection.Inspector.from_engine(db.engine)
     with app.app_context():
         print 'preparing'
-        for cls in current_app.classes:
-            print 'got class'
+        for class_name, cls in current_app.classes_by_name.items():
+            print 'got class {}'.format(class_name)
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 print 'got foreign_key {} in table {}'.format(foreign_key['referred_table'], cls.__tablename__)
-                other = foreign_key['referred_table']
-                setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=foreign_key['referred_table']))
+                other = current_app.classes_by_name[foreign_key['referred_table']]
+                setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
                 print type(getattr(other, cls.__tablename__))
     print 'preparing'
     Model.prepare(db.engine)
@@ -52,7 +52,7 @@ def prepare_relationships():
 def activate_admin_classes():
     admin = Admin(app)
     with app.app_context():
-        for cls in (cls for cls in current_app.classes if cls._use_admin == True):
+        for cls in (cls for cls in current_app.classes_by_name.values() if cls._use_admin == True):
             admin.add_view(ModelView(cls, db.session))
 
 

@@ -27,7 +27,11 @@ class Genre(Model):
     def __str__(self):
         return self.Name
 
+class MediaType(Model):
+    __tablename__ = 'MediaType'
+    def __str__(self):
+        return self.Name
 
-register((Artist, Album, Playlist, Genre, Track))
-activate_admin_classes()
+register((Artist, Album, Playlist, Genre, Track, MediaType))
 prepare_relationships()
+activate_admin_classes()
