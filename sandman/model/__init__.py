@@ -41,7 +41,10 @@ def prepare_relationships():
         for class_name, cls in current_app.classes_by_name.items():
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[foreign_key['referred_table']]
-                setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
+                other.__related_tables__.append(cls)
+                cls.__related_tables__.append(other)
+                # Necessary to get Flask-Admin to register the relationship
+                setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
 
 def activate_admin_classes():
     prepare_relationships()
