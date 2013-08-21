@@ -1,3 +1,6 @@
+"""The Model class is meant to be the base class for user Models. It represents
+a table in the database that should be modeled as a resource."""
+
 from decimal import Decimal
 
 class Model(object):
@@ -85,8 +88,8 @@ class Model(object):
         """Set a set of attributes which correspond to the
         :class:`sandman.model.Model`'s columns.
 
-        :param dict dictionary: A dictionary of attributes to set on the instance 
-            whose keys are the column names of 
+        :param dict dictionary: A dictionary of attributes to set on the instance
+            whose keys are the column names of
             the :class:`sandman.model.Model`'s underlying database table.
 
         """

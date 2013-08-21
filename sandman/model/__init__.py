@@ -28,14 +28,16 @@ def register(cls, use_admin=True):
             for entry in cls:
                 current_app.endpoint_classes[entry.endpoint()] = entry
                 current_app.classes_by_name[entry.__name__] = entry
-                entry._use_admin = use_admin
+                entry.use_admin = use_admin
         else:
             current_app.endpoint_classes[cls.endpoint()] = cls
             current_app.classes_by_name[cls.__name__] = cls
-            cls._use_admin = use_admin
+            cls.use_admin = use_admin
     Model.prepare(db.engine)
 
 def prepare_relationships():
+    """Enrich the registered Models with SQLAlchemy ``relationships``
+    so that related tables are correctly processed up by the admin."""
     inspector = reflection.Inspector.from_engine(db.engine)
     with app.app_context():
         for class_name, cls in current_app.classes_by_name.items():
@@ -44,10 +46,12 @@ def prepare_relationships():
                 setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
 
 def activate_admin_classes():
+    """Activate each registed Model in the admin if it was registered with
+    *use_admin=True*."""
     prepare_relationships()
     admin = Admin(app)
     with app.app_context():
-        for cls in (cls for cls in current_app.classes_by_name.values() if cls._use_admin == True):
+        for cls in (cls for cls in current_app.classes_by_name.values() if cls.use_admin == True):
             admin.add_view(ModelView(cls, db.session))
 
 

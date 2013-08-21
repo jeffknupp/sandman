@@ -52,8 +52,8 @@ class TestSandmanBase(object):
 
     @staticmethod
     def is_html_response(response):
-        """Return True if *response* is an HTML response (TODO: check
-        headers as well)."""
+        """Return True if *response* is an HTML response"""
+        assert 'text/html' in response.headers['Content-type']
         return '<!DOCTYPE html>' in response.data
 
 class TestSandmanBasicVerbs(TestSandmanBase):
