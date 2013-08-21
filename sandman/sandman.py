@@ -305,8 +305,12 @@ def delete_resource(collection, key):
     elif not _validate(endpoint_class(collection), request.method, resource):
         return unsupported_method_response()
 
-    session.delete(resource)
-    session.commit()
+    try:
+        session.delete(resource)
+        session.commit()
+    except IntegrityError as exception:
+        return JSONException(JSON_EXCEPTION_MESSAGE.format(exception.message),
+                code=422)
     return no_content_response()
 
 
