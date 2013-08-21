@@ -1,11 +1,14 @@
 """Models for unit testing sandman"""
 
-from sandman.model import register, Model
+from sandman.model import register, Model, activate_admin_classes
 
 class Artist(Model):
     """Model mapped to the "Artist" table"""
     __tablename__ = 'Artist'
 
+class MediaType(Model):
+    """Model mapped to the "MediaType" table"""
+    __tablename__ = 'MediaType'
 
 class Track(Model):
     """Model mapped to the "Artist" table"""
@@ -71,5 +74,6 @@ class Genre(Model):
             return False
         return True
 
-register((Artist, Album, Playlist, Track))
+register((Artist, Album, Playlist, Track, MediaType))
 register(Genre)
+activate_admin_classes()

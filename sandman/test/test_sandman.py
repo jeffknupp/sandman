@@ -112,9 +112,15 @@ class TestSandmanBasicVerbs(TestSandmanBase):
 
     def test_delete_resource(self):
         """Test DELETEing a resource."""
-        response = self.app.delete('/artists/275')
+        response = self.app.delete('/artists/239')
         assert response.status_code == 204
-        response = self.get_response('/artists/275', 404, False)
+        response = self.get_response('/artists/239', 404, False)
+
+    def test_delete_resource_violating_constraint(self):
+        """Test DELETEing a resource which violates a foreign key
+        constraint (i.e. the record is still referred to in another table)."""
+        response = self.app.delete('/artists/275')
+        assert response.status_code == 422
 
     def test_delete_non_existant_resource(self):
         """Test DELETEing a resource that doesn't exist."""
@@ -259,3 +265,9 @@ class TestSandmanContentTypes(TestSandmanBase):
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
         assert 'Jeff Knupp' in response.data
+
+class TestSandmanAdmin(TestSandmanBase):
+
+    def test_admin_index(self):
+        """Ensure the main admin page is served correctly."""
+        response = self.get_response('/admin/', 200)
