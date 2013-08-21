@@ -1,5 +1,6 @@
 *.py[cod]
 
+*.swp
 chinook
 runserver.py
 htmlcov
