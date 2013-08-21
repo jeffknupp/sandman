@@ -1,4 +1,4 @@
-sandman Package
+sandman API
 ===============
 
 :mod:`exception` Module

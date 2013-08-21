@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quickstart &mdash; sandman 0.3.0 documentation</title>
+    <title>Using Sandman &mdash; sandman 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="sandman 0.3.0 documentation" href="index.html" />
-    <link rel="next" title="sandman Package" href="sandman.html" />
+    <link rel="next" title="sandman API" href="sandman.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="sandman.html" title="sandman Package"
+          <a href="sandman.html" title="sandman API"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Installation"
@@ -52,8 +52,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="quickstart">
-<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="using-sandman">
+<h1>Using Sandman<a class="headerlink" href="#using-sandman" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="the-simplest-application">
 <h2>The Simplest Application<a class="headerlink" href="#the-simplest-application" title="Permalink to this headline">¶</a></h2>
 <p>We&#8217;ll be using a subset of the Chinook test database as an example.
@@ -96,7 +96,7 @@ Even though the example above is short, let&#8217;s walk through it step by step
 </div>
 <div class="section" id="creating-models">
 <h2>Creating Models<a class="headerlink" href="#creating-models" title="Permalink to this headline">¶</a></h2>
-<p>A <em>Model</em> represents a table in your database. You control which tables to
+<p>A <tt class="docutils literal"><span class="pre">Model</span></tt> represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
 <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a>. The only attribute you must define in your
 class is the <tt class="docutils literal"><span class="pre">__tablename__</span></tt> attribute. sandman uses this to map your
@@ -193,7 +193,7 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Quickstart</a><ul>
+<li><a class="reference internal" href="#">Using Sandman</a><ul>
 <li><a class="reference internal" href="#the-simplest-application">The Simplest Application</a><ul>
 <li><a class="reference internal" href="#a-quick-guide-to-rest-apis">A Quick Guide to REST APIs</a></li>
 </ul>
@@ -215,10 +215,10 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
                         title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="sandman.html"
-                        title="next chapter">sandman Package</a></p>
+                        title="next chapter">sandman API</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/quickstart.txt"
+    <li><a href="_sources/using_sandman.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -248,7 +248,7 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="sandman.html" title="sandman Package"
+          <a href="sandman.html" title="sandman API"
              >next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Installation"

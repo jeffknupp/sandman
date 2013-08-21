@@ -1,6 +1,6 @@
-===========
-Quickstart
-===========
+=============
+Using Sandman
+=============
 
 The Simplest Application
 ------------------------
@@ -48,7 +48,7 @@ Even though the example above is short, let's walk through it step by step.
 Creating Models
 ---------------
 
-A *Model* represents a table in your database. You control which tables to
+A ``Model`` represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from 
 :class:`sandman.model.models.Model`. The only attribute you must define in your 
 class is the ``__tablename__`` attribute. sandman uses this to map your
