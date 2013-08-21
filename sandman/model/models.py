@@ -1,4 +1,6 @@
 from decimal import Decimal
+from sandman import app
+from flask import current_app
 
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
@@ -57,6 +59,12 @@ class Model(object):
     def links(self):
         """Return a list of links for endpoints related to the resource."""
         links = []
+        for foreign_key in self.__table__.foreign_keys:
+            column = foreign_key.column.name
+            table = foreign_key.column.table.name
+            with app.app_context():
+                endpoint = current_app.table_to_endpoint[table]
+            links.append({'rel': endpoint, 'uri': '/{}/{}'.format(endpoint, getattr(self, column))})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 

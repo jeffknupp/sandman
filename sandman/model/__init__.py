@@ -24,16 +24,21 @@ def register(cls, use_admin=True):
         if getattr(current_app, 'endpoint_classes', None) is None:
             current_app.endpoint_classes = {}
             current_app.classes_by_name = {}
+            current_app.table_to_endpoint = {}
         if isinstance(cls, (list, tuple)):
             for entry in cls:
-                current_app.endpoint_classes[entry.endpoint()] = entry
-                current_app.classes_by_name[entry.__name__] = entry
+                _register_internal_data(entry)
                 entry._use_admin = use_admin
         else:
-            current_app.endpoint_classes[cls.endpoint()] = cls
-            current_app.classes_by_name[cls.__name__] = cls
+            _register_internal_data(cls)
             cls._use_admin = use_admin
     Model.prepare(db.engine)
+
+def _register_internal_data(cls):
+    with app.app_context():
+        current_app.endpoint_classes[cls.endpoint()] = cls
+        current_app.table_to_endpoint[cls.__tablename__] = cls.endpoint()
+        current_app.classes_by_name[cls.__name__] = cls
 
 def prepare_relationships():
     inspector = reflection.Inspector.from_engine(db.engine)
