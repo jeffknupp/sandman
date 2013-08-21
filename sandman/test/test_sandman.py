@@ -280,6 +280,14 @@ class TestSandmanAdmin(TestSandmanBase):
         # If related tables are being loaded correctly, Tracks will have a
         # Mediatype column, at least one of which has the value 'MPEG audio
         # file'.
-        print response.data
         assert 'MPEG audio file' in response.data
+
+    def test_admin_default_str_repr(self):
+        """Ensure default ``__str__`` implementations works in the admin."""
+
+        response = self.get_response('/admin/trackview/?page=3/', 200)
+        # If related tables are being loaded correctly, Tracks will have a
+        # Genre column, but should display the GenreId and not the name ('Jazz'
+        # is the genre for many results on the third page
+        assert 'Jazz' not in response.data
 
