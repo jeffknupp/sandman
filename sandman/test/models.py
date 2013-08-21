@@ -6,13 +6,22 @@ class Artist(Model):
     """Model mapped to the "Artist" table"""
     __tablename__ = 'Artist'
 
+    def __str__(self):
+        return self.Name
+
 class MediaType(Model):
     """Model mapped to the "MediaType" table"""
     __tablename__ = 'MediaType'
 
+    def __str__(self):
+        return self.Name
+
 class Track(Model):
     """Model mapped to the "Artist" table"""
     __tablename__ = 'Track'
+
+    def __str__(self):
+        return self.Name
 
     @staticmethod
     def validate_PUT(resource=None):
@@ -36,6 +45,9 @@ class Album(Model):
     __tablename__ = 'Album'
     __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')
 
+    def __str__(self):
+        return self.Title
+
 class Playlist(Model):
     """Model mapped to the "Playlist" table
 
@@ -45,6 +57,9 @@ class Playlist(Model):
 
     __tablename__ = 'Playlist'
     __methods__ = ('POST', 'PATCH')
+
+    def __str__(self):
+        return self.Name
 
 class Genre(Model):
     """Model mapped to the "Genre" table
@@ -73,6 +88,9 @@ class Genre(Model):
         elif resource and resource.GenreId == 1:
             return False
         return True
+
+    def __str__(self):
+        return self.Name
 
 register((Artist, Album, Playlist, Track, MediaType))
 register(Genre)

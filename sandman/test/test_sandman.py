@@ -271,3 +271,15 @@ class TestSandmanAdmin(TestSandmanBase):
     def test_admin_index(self):
         """Ensure the main admin page is served correctly."""
         response = self.get_response('/admin/', 200)
+
+    def test_admin_collection_view(self):
+        """Ensure user-defined ``__str__`` implementations are being picked up
+        by the admin."""
+
+        response = self.get_response('/admin/trackview/', 200)
+        # If related tables are being loaded correctly, Tracks will have a
+        # Mediatype column, at least one of which has the value 'MPEG audio
+        # file'.
+        print response.data
+        assert 'MPEG audio file' in response.data
+
