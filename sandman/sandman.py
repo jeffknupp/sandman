@@ -246,9 +246,6 @@ def replace_resource(collection, key):
     """
     resource = retrieve_resource(collection, key)
 
-    if resource is None:
-        raise InvalidAPIUsage(404, 'Requested resource not found')
-
     _validate(endpoint_class(collection), request.method, resource)
 
     resource.replace(request.json)
