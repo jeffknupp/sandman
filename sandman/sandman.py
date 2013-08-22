@@ -9,7 +9,7 @@ from .exception import InvalidAPIUsage
 
 JSON, HTML = range(2)
 
-FORWARDED_EXCEPTION_MESSAGE = 'Requested resource not found. Exception: [{}]'
+FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
 
 def _get_session():
     """Return (and memoize) a database session"""
@@ -30,6 +30,8 @@ def _get_mimetype():
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
+    """Return a response with the appropriate status code, message, and content
+    type when an ``InvalidAPIUsage`` exception is raised."""
     if _get_mimetype() == JSON:
         response = jsonify(error.to_dict())
         response.status_code = error.code
@@ -131,8 +133,6 @@ def retrieve_collection(collection):
     session = _get_session()
     cls = endpoint_class(collection)
     resources = session.query(cls).all()
-    if resources is None:
-        raise InvalidAPIUsage(404)
     return resources
 
 
@@ -315,14 +315,11 @@ def delete_resource(collection, key):
     """
     cls = endpoint_class(collection)
     resource = cls()
-    session = _get_session()
     resource = retrieve_resource(collection, key)
-
-    if resource is None:
-        raise InvalidAPIUsage(404, 'Requested resource not found')
 
     _validate(cls, request.method, resource)
 
+    session = _get_session()
     try:
         session.delete(resource)
         session.commit()
