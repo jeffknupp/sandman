@@ -2,14 +2,14 @@
 
 from flask import (jsonify, request, g,
         current_app, Response, render_template,
-        make_response)
+        make_response, abort)
 from sqlalchemy.exc import IntegrityError
 from . import app, db
-from .exception import JSONException
+from .exception import InvalidAPIUsage
 
 JSON, HTML = range(2)
 
-JSON_EXCEPTION_MESSAGE = 'Requested resource not found. Exception: [{}]'
+FORWARDED_EXCEPTION_MESSAGE = 'Requested resource not found. Exception: [{}]'
 
 def _get_session():
     """Return (and memoize) a database session"""
@@ -32,6 +32,16 @@ def _get_mimetype(current_request):
         return JSON
     else:
         return HTML
+
+@app.errorhandler(InvalidAPIUsage)
+def handle_exception(error):
+    if _get_mimetype(request) == JSON:
+        response = jsonify(error.to_dict())
+        response.status_code = error.code
+        return response
+    else:
+        error.abort()
+
 
 def _single_resource_json_response(resource):
     """Return the JSON representation of *resource*.
@@ -91,7 +101,7 @@ def _validate(cls, method, resource=None):
     :rtype: bool
 
     """
-    if not method in cls.__methods__:
+    if not cls or not method in cls.__methods__:
         return False
 
     class_validator_name = 'validate_' + method
@@ -111,7 +121,10 @@ def endpoint_class(collection):
 
     """
     with app.app_context():
-        return current_app.endpoint_classes[collection]
+        try:
+            cls = current_app.endpoint_classes[collection]
+        except KeyError:
+            return None
 
 def retrieve_resource(collection, key):
     """Return the resource in *collection* identified by key *key*.
@@ -123,7 +136,10 @@ def retrieve_resource(collection, key):
     """
     session = _get_session()
     with app.app_context():
-        cls = current_app.endpoint_classes[collection]
+        try:
+            cls = current_app.endpoint_classes[collection]
+        except KeyError:
+            raise InvalidAPIUsage(404)
     return session.query(cls).get(key)
 
 def resource_created_response(resource, current_request):
@@ -159,19 +175,6 @@ def resource_response(resource, current_request):
         return _single_resource_json_response(resource)
     else:
         return _single_resource_html_response(resource)
-
-
-def unsupported_method_response():
-    """Return the appropriate *Response* with status code *403*, signaling the
-    HTTP method used
-    in the request is not supported for the given endpoint.
-
-    :rtype: :class:`flask.Response`
-
-    """
-    response = Response()
-    response.status_code = 403
-    return response
 
 def no_content_response():
     """Return the appropriate *Response* with status code *204*, signaling a
@@ -225,7 +228,7 @@ def patch_resource(collection, key):
     resource = session.query(cls).get(key)
 
     if not _validate(cls, request.method, resource):
-        return unsupported_method_response()
+        raise InvalidAPIUsage(403)
 
     if resource is None:
         resource = cls()
@@ -249,9 +252,9 @@ def replace_resource(collection, key):
     resource = retrieve_resource(collection, key)
 
     if resource is None:
-        return JSONException('Requested resource not found', code=404)
+        raise InvalidAPIUsage(404, 'Requested resource not found')
     elif not _validate(endpoint_class(collection), request.method, resource):
-        return unsupported_method_response()
+        raise InvalidAPIUsage(403)
 
     resource.replace(request.json)
     session = _get_session()
@@ -259,8 +262,7 @@ def replace_resource(collection, key):
     try:
         session.commit()
     except IntegrityError as exception:
-        return JSONException(JSON_EXCEPTION_MESSAGE.format(exception.message),
-                code=422)
+        raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(exception.message))
     return no_content_response()
 
 @app.route('/<collection>', methods=['POST'])
@@ -273,11 +275,13 @@ def add_resource(collection):
 
     """
     cls = endpoint_class(collection)
+    if cls is None:
+        raise InvalidAPIUsage(404)
     resource = cls()
     resource.from_dict(request.json)
 
     if not _validate(cls, request.method, resource):
-        return unsupported_method_response()
+        raise InvalidAPIUsage(403)
 
     session = _get_session()
     session.add(resource)
@@ -301,16 +305,15 @@ def delete_resource(collection, key):
     resource = session.query(cls).get(key)
 
     if resource is None:
-        return JSONException('Requested resource not found', code=404)
+        raise InvalidAPIUsage(404, 'Requested resource not found')
     elif not _validate(endpoint_class(collection), request.method, resource):
-        return unsupported_method_response()
+        raise InvalidAPIUsage(403)
 
     try:
         session.delete(resource)
         session.commit()
     except IntegrityError as exception:
-        return JSONException(JSON_EXCEPTION_MESSAGE.format(exception.message),
-                code=422)
+        raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(exception.message))
     return no_content_response()
 
 
@@ -326,9 +329,9 @@ def show_resource(collection, key):
     resource = retrieve_resource(collection, key)
 
     if resource is None:
-        return JSONException('Requested resource not found', code=404)
+        raise InvalidAPIUsage(404, 'Requested resource not found')
     elif not _validate(endpoint_class(collection), request.method, resource):
-        return unsupported_method_response()
+        raise InvalidAPIUsage(403)
 
     return resource_response(resource, request)
 
@@ -343,12 +346,15 @@ def show_collection(collection):
 
     """
     with app.app_context():
-        cls = current_app.endpoint_classes[collection]
+        try:
+            cls = current_app.endpoint_classes[collection]
+        except KeyError:
+            raise InvalidAPIUsage(404)
     session = _get_session()
     resources = session.query(cls).all()
 
     if not _validate(endpoint_class(collection), request.method, resources):
-        return unsupported_method_response()
+        raise InvalidAPIUsage(403)
 
     if _get_mimetype(request) == JSON:
         return _collection_json_response(resources)

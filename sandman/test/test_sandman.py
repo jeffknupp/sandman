@@ -266,6 +266,11 @@ class TestSandmanContentTypes(TestSandmanBase):
         assert response.status_code == 201
         assert 'Jeff Knupp' in response.data
 
+    def test_get_unknown_url(self):
+        """Test sending a GET request to a URL that would match the 
+        URL patterns of the API but is not a valid endpoint (e.g. 'foo/bar')."""
+        response = self.get_response('/foo/bar', 404)
+
 class TestSandmanAdmin(TestSandmanBase):
 
     def test_admin_index(self):
