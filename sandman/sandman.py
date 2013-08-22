@@ -18,25 +18,19 @@ def _get_session():
         session = g._session = db.session()
     return session
 
-def _get_mimetype(current_request):
-    """Return the mimetype for this request.
-
-    :param current_request: current HTTP request
-    :type current_request: :rtype: :class:`flask.Response`
-
-    """
-    if 'Accept' not in current_request.headers:
+def _get_mimetype():
+    """Return the mimetype for this request."""
+    if 'Accept' not in request.headers:
         return JSON
 
-    if 'html' in current_request.headers['Accept']:
+    if 'html' in request.headers['Accept']:
         return HTML
     else:
         return JSON
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
-    print 'here'
-    if _get_mimetype(request) == JSON:
+    if _get_mimetype() == JSON:
         response = jsonify(error.to_dict())
         response.status_code = error.code
         return response
@@ -144,7 +138,7 @@ def retrieve_resource(collection, key):
             raise InvalidAPIUsage(404)
     return session.query(cls).get(key)
 
-def resource_created_response(resource, current_request):
+def resource_created_response(resource):
     """Return HTTP response with status code *201*, signaling a created
     *resource*
 
@@ -153,7 +147,7 @@ def resource_created_response(resource, current_request):
     :rtype: :class:`flask.Response`
 
     """
-    if _get_mimetype(current_request) == JSON:
+    if _get_mimetype() == JSON:
         response = _single_resource_json_response(resource)
     else:
         response = _single_resource_html_response(resource)
@@ -173,7 +167,7 @@ def resource_response(resource, current_request):
     :rtype: :class:`flask.Response`
 
     """
-    if _get_mimetype(current_request) == JSON:
+    if _get_mimetype() == JSON:
         return _single_resource_json_response(resource)
     else:
         return _single_resource_html_response(resource)
@@ -238,7 +232,7 @@ def patch_resource(collection, key):
         setattr(resource, resource.primary_key(), key)
         session.add(resource)
         session.commit()
-        return resource_created_response(resource, request)
+        return resource_created_response(resource)
     else:
         return update_resource(resource, request.json)
 
@@ -288,7 +282,7 @@ def add_resource(collection):
     session = _get_session()
     session.add(resource)
     session.commit()
-    return resource_created_response(resource, request)
+    return resource_created_response(resource)
 
 @app.route('/<collection>/<key>', methods=['DELETE'])
 def delete_resource(collection, key):
@@ -358,7 +352,7 @@ def show_collection(collection):
     if not _validate(endpoint_class(collection), request.method, resources):
         raise InvalidAPIUsage(403)
 
-    if _get_mimetype(request) == JSON:
+    if _get_mimetype() == JSON:
         return _collection_json_response(resources)
     else:
         return _collection_html_response(resources)
