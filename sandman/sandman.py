@@ -119,7 +119,7 @@ def endpoint_class(collection):
         try:
             cls = current_app.endpoint_classes[collection]
         except KeyError:
-            return None
+            raise InvalidAPIUsage(404)
         return cls
 
 def retrieve_resource(collection, key):
@@ -131,11 +131,7 @@ def retrieve_resource(collection, key):
 
     """
     session = _get_session()
-    with app.app_context():
-        try:
-            cls = current_app.endpoint_classes[collection]
-        except KeyError:
-            raise InvalidAPIUsage(404)
+    cls = endpoint_class(collection)
     return session.query(cls).get(key)
 
 def resource_created_response(resource):
@@ -218,8 +214,7 @@ def patch_resource(collection, key):
 
     """
     session = _get_session()
-    with app.app_context():
-        cls = current_app.endpoint_classes[collection]
+    cls = endpoint_class(collection)
 
     resource = session.query(cls).get(key)
 
@@ -294,15 +289,14 @@ def delete_resource(collection, key):
     :rtype: :class:`flask.Response`
 
     """
-    with app.app_context():
-        cls = current_app.endpoint_classes[collection]
+    cls = endpoint_class(collection)
     resource = cls()
     session = _get_session()
     resource = session.query(cls).get(key)
 
     if resource is None:
         raise InvalidAPIUsage(404, 'Requested resource not found')
-    elif not _validate(endpoint_class(collection), request.method, resource):
+    elif not _validate(cls, request.method, resource):
         raise InvalidAPIUsage(403)
 
     try:
@@ -341,15 +335,11 @@ def show_collection(collection):
     :rtype: :class:`flask.Response`
 
     """
-    with app.app_context():
-        try:
-            cls = current_app.endpoint_classes[collection]
-        except KeyError:
-            raise InvalidAPIUsage(404)
+    cls = endpoint_class(collection)
     session = _get_session()
     resources = session.query(cls).all()
 
-    if not _validate(endpoint_class(collection), request.method, resources):
+    if not _validate(cls, request.method, resources):
         raise InvalidAPIUsage(403)
 
     if _get_mimetype() == JSON:

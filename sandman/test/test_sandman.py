@@ -241,6 +241,14 @@ class TestSandmanContentTypes(TestSandmanBase):
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)
 
+    def test_get_html_non_existant_resource(self):
+        """Test getting HTML version of a resource rather than JSON."""
+        response = self.get_response('/artists/99999',
+                404,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+
+
     def test_get_html_collection(self):
         """Test getting HTML version of a collection rather than JSON."""
         response = self.app.get('/artists',
