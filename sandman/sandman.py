@@ -92,7 +92,7 @@ def _validate(cls, method, resource=None):
     :type cls: :class:`sandman.model.Model` instance
     :param string method: HTTP method of incoming request
     :param resource: *cls* instance associated with the request
-    :type resource: :class:`sandman.model.Model` or None
+    :type resource: :class:`sandman.model.Model` or list of :class:`sandman.model.Model` or None
     :rtype: bool
 
     """
@@ -120,6 +120,21 @@ def endpoint_class(collection):
         except KeyError:
             raise InvalidAPIUsage(404)
         return cls
+
+def retrieve_collection(collection):
+    """Return the resources in *collection*.
+
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :rtype: class:`sandman.model.Model`
+
+    """
+    session = _get_session()
+    cls = endpoint_class(collection)
+    resources = session.query(cls).all()
+    if resources is None:
+        raise InvalidAPIUsage(404)
+    return resources
+
 
 def retrieve_resource(collection, key):
     """Return the resource in *collection* identified by key *key*.
@@ -153,6 +168,20 @@ def resource_created_response(resource):
     response.headers['Location']  = 'http://localhost:5000/{}'.format(
             resource.resource_uri())
     return response
+
+def collection_response(resources):
+    """Return a response for the *resources* of the appropriate content type.
+
+    :param resources: resources to be returned in request
+    :type resource: list of :class:`sandman.model.Model`
+    :rtype: :class:`flask.Response`
+
+    """
+    if _get_mimetype() == JSON:
+        return _collection_json_response(resources)
+    else:
+        return _collection_html_response(resources)
+
 
 def resource_response(resource, current_request):
     """Return a response for the *resource* given the mimetype header value in
@@ -267,8 +296,6 @@ def add_resource(collection):
 
     """
     cls = endpoint_class(collection)
-    if cls is None:
-        raise InvalidAPIUsage(404)
     resource = cls()
     resource.from_dict(request.json)
 
@@ -317,10 +344,6 @@ def show_resource(collection, key):
 
     """
     resource = retrieve_resource(collection, key)
-
-    if resource is None:
-        raise InvalidAPIUsage(404, 'Requested resource not found')
-
     _validate(endpoint_class(collection), request.method, resource)
 
     return resource_response(resource, request)
@@ -336,12 +359,8 @@ def show_collection(collection):
 
     """
     cls = endpoint_class(collection)
-    session = _get_session()
-    resources = session.query(cls).all()
+    resources = retrieve_collection(collection)
 
     _validate(cls, request.method, resources)
 
-    if _get_mimetype() == JSON:
-        return _collection_json_response(resources)
-    else:
-        return _collection_html_response(resources)
+    return collection_response(resources)
