@@ -183,14 +183,11 @@ def collection_response(resources):
         return _collection_html_response(resources)
 
 
-def resource_response(resource, current_request):
-    """Return a response for the *resource* given the mimetype header value in
-    the *current_request*.
+def resource_response(resource):
+    """Return a response for the *resource* of the appropriate content type.
 
-    :param resource: resource created as a result of current request
+    :param resource: resource to be returned in request
     :type resource: :class:`sandman.model.Model`
-    :param current_request: :class:`flask.Request` request being handled
-    :type current_request: :class:`flask.Request`
     :rtype: :class:`flask.Response`
 
     """
@@ -265,7 +262,7 @@ def patch_resource(collection, key):
         return update_resource(resource, request.json)
 
 @app.route('/<collection>/<key>', methods=['PUT'])
-def replace_resource(collection, key):
+def put_resource(collection, key):
     """Replace the resource identified by the given key and return the
     appropriate response.
 
@@ -287,7 +284,7 @@ def replace_resource(collection, key):
     return no_content_response()
 
 @app.route('/<collection>', methods=['POST'])
-def add_resource(collection):
+def post_resource(collection):
     """Return the appropriate *Response* based on adding a new resource to
     *collection*.
 
@@ -335,7 +332,7 @@ def delete_resource(collection, key):
 
 
 @app.route('/<collection>/<key>', methods=['GET'])
-def show_resource(collection, key):
+def get_resource(collection, key):
     """Return the appropriate *Response* for retrieving a single resource
 
     :param string collection: a :class:`sandman.model.Model` endpoint
@@ -346,10 +343,10 @@ def show_resource(collection, key):
     resource = retrieve_resource(collection, key)
     _validate(endpoint_class(collection), request.method, resource)
 
-    return resource_response(resource, request)
+    return resource_response(resource)
 
 @app.route('/<collection>', methods=['GET'])
-def show_collection(collection):
+def get_collection(collection):
     """Return the appropriate *Response* for retrieving a collection of
     resources.
 
