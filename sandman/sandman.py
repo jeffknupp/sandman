@@ -28,10 +28,10 @@ def _get_mimetype(current_request):
     if 'Accept' not in current_request.headers:
         return JSON
 
-    if 'json' in current_request.headers['Accept']:
-        return JSON
-    else:
+    if 'html' in current_request.headers['Accept']:
         return HTML
+    else:
+        return JSON
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
