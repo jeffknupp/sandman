@@ -241,6 +241,14 @@ class TestSandmanContentTypes(TestSandmanBase):
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)
 
+    def test_get_html_non_existant_resource(self):
+        """Test getting HTML version of a resource rather than JSON."""
+        response = self.get_response('/artists/99999',
+                404,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+
+
     def test_get_html_collection(self):
         """Test getting HTML version of a collection rather than JSON."""
         response = self.app.get('/artists',
@@ -265,6 +273,11 @@ class TestSandmanContentTypes(TestSandmanBase):
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
         assert 'Jeff Knupp' in response.data
+
+    def test_get_unknown_url(self):
+        """Test sending a GET request to a URL that would match the 
+        URL patterns of the API but is not a valid endpoint (e.g. 'foo/bar')."""
+        response = self.get_response('/foo/bar', 404)
 
 class TestSandmanAdmin(TestSandmanBase):
 
