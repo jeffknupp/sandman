@@ -1,7 +1,7 @@
 """Exception specifications for Sandman"""
 
 from werkzeug.exceptions import HTTPException
-from flask import jsonify, abort
+from flask import jsonify, abort, make_response, render_template
 
 class InvalidAPIUsage(Exception):
     """Excecption which generates a :class:`flask.Response` object whose
@@ -20,4 +20,5 @@ class InvalidAPIUsage(Exception):
         return as_dict
 
     def abort(self):
-        abort(self.code)
+        resp = make_response(render_template('error.html', error=self.code, message=self.message), self.code)
+        return resp

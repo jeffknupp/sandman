@@ -2,7 +2,7 @@
 
 from flask import (jsonify, request, g,
         current_app, Response, render_template,
-        make_response, abort)
+        make_response)
 from sqlalchemy.exc import IntegrityError
 from . import app, db
 from .exception import InvalidAPIUsage
@@ -35,12 +35,13 @@ def _get_mimetype(current_request):
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
+    print 'here'
     if _get_mimetype(request) == JSON:
         response = jsonify(error.to_dict())
         response.status_code = error.code
         return response
     else:
-        error.abort()
+        return error.abort()
 
 
 def _single_resource_json_response(resource):
@@ -125,6 +126,7 @@ def endpoint_class(collection):
             cls = current_app.endpoint_classes[collection]
         except KeyError:
             return None
+        return cls
 
 def retrieve_resource(collection, key):
     """Return the resource in *collection* identified by key *key*.
