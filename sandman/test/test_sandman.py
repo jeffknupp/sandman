@@ -6,6 +6,8 @@ import shutil
 import json
 
 class TestSandmanBase(object):
+    """Base class for all sandman test classes."""
+
     DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
 
     def setup_method(self, _):
@@ -275,15 +277,16 @@ class TestSandmanContentTypes(TestSandmanBase):
         assert 'Jeff Knupp' in response.data
 
     def test_get_unknown_url(self):
-        """Test sending a GET request to a URL that would match the 
+        """Test sending a GET request to a URL that would match the
         URL patterns of the API but is not a valid endpoint (e.g. 'foo/bar')."""
-        response = self.get_response('/foo/bar', 404)
+        self.get_response('/foo/bar', 404)
 
 class TestSandmanAdmin(TestSandmanBase):
+    """Test the admin GUI functionality."""
 
     def test_admin_index(self):
         """Ensure the main admin page is served correctly."""
-        response = self.get_response('/admin/', 200)
+        self.get_response('/admin/', 200)
 
     def test_admin_collection_view(self):
         """Ensure user-defined ``__str__`` implementations are being picked up

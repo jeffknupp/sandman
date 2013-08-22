@@ -35,12 +35,12 @@ def register(cls, use_admin=True):
             cls.use_admin = use_admin
     Model.prepare(db.engine)
 
-def prepare_relationships():
+def _prepare_relationships():
     """Enrich the registered Models with SQLAlchemy ``relationships``
     so that related tables are correctly processed up by the admin."""
     inspector = reflection.Inspector.from_engine(db.engine)
     with app.app_context():
-        for class_name, cls in current_app.classes_by_name.items():
+        for cls in current_app.classes_by_name.values():
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[foreign_key['referred_table']]
                 setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
@@ -48,7 +48,7 @@ def prepare_relationships():
 def activate_admin_classes():
     """Activate each registed Model in the admin if it was registered with
     *use_admin=True*."""
-    prepare_relationships()
+    _prepare_relationships()
     admin = Admin(app)
     with app.app_context():
         for cls in (cls for cls in current_app.classes_by_name.values() if cls.use_admin == True):
