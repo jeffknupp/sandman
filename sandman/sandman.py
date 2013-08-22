@@ -218,7 +218,10 @@ def patch_resource(collection, key):
     session = _get_session()
     cls = endpoint_class(collection)
 
-    resource = retrieve_resource(collection, key)
+    try:
+        resource = retrieve_resource(collection, key)
+    except InvalidAPIUsage:
+        resource = None
 
     _validate(cls, request.method, resource)
 
