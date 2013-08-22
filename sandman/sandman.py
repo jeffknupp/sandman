@@ -97,15 +97,14 @@ def _validate(cls, method, resource=None):
 
     """
     if not cls or not method in cls.__methods__:
-        return False
+        raise InvalidAPIUsage(403)
 
     class_validator_name = 'validate_' + method
 
     if hasattr(cls, class_validator_name):
         class_validator = getattr(cls, class_validator_name)
-        return class_validator(resource)
-
-    return True
+        if not class_validator(resource):
+            raise InvalidAPIUsage(403)
 
 def endpoint_class(collection):
     """Return the :class:`sandman.model.Model` associated with the endpoint
@@ -132,7 +131,10 @@ def retrieve_resource(collection, key):
     """
     session = _get_session()
     cls = endpoint_class(collection)
-    return session.query(cls).get(key)
+    resource = session.query(cls).get(key)
+    if resource is None:
+        raise InvalidAPIUsage(404)
+    return resource
 
 def resource_created_response(resource):
     """Return HTTP response with status code *201*, signaling a created
@@ -216,10 +218,9 @@ def patch_resource(collection, key):
     session = _get_session()
     cls = endpoint_class(collection)
 
-    resource = session.query(cls).get(key)
+    resource = retrieve_resource(collection, key)
 
-    if not _validate(cls, request.method, resource):
-        raise InvalidAPIUsage(403)
+    _validate(cls, request.method, resource)
 
     if resource is None:
         resource = cls()
@@ -244,8 +245,8 @@ def replace_resource(collection, key):
 
     if resource is None:
         raise InvalidAPIUsage(404, 'Requested resource not found')
-    elif not _validate(endpoint_class(collection), request.method, resource):
-        raise InvalidAPIUsage(403)
+
+    _validate(endpoint_class(collection), request.method, resource)
 
     resource.replace(request.json)
     session = _get_session()
@@ -271,8 +272,7 @@ def add_resource(collection):
     resource = cls()
     resource.from_dict(request.json)
 
-    if not _validate(cls, request.method, resource):
-        raise InvalidAPIUsage(403)
+    _validate(cls, request.method, resource)
 
     session = _get_session()
     session.add(resource)
@@ -292,12 +292,12 @@ def delete_resource(collection, key):
     cls = endpoint_class(collection)
     resource = cls()
     session = _get_session()
-    resource = session.query(cls).get(key)
+    resource = retrieve_resource(collection, key)
 
     if resource is None:
         raise InvalidAPIUsage(404, 'Requested resource not found')
-    elif not _validate(cls, request.method, resource):
-        raise InvalidAPIUsage(403)
+
+    _validate(cls, request.method, resource)
 
     try:
         session.delete(resource)
@@ -320,8 +320,8 @@ def show_resource(collection, key):
 
     if resource is None:
         raise InvalidAPIUsage(404, 'Requested resource not found')
-    elif not _validate(endpoint_class(collection), request.method, resource):
-        raise InvalidAPIUsage(403)
+
+    _validate(endpoint_class(collection), request.method, resource)
 
     return resource_response(resource, request)
 
@@ -339,8 +339,7 @@ def show_collection(collection):
     session = _get_session()
     resources = session.query(cls).all()
 
-    if not _validate(cls, request.method, resources):
-        raise InvalidAPIUsage(403)
+    _validate(cls, request.method, resources)
 
     if _get_mimetype() == JSON:
         return _collection_json_response(resources)
