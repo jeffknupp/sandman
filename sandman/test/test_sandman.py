@@ -281,6 +281,27 @@ class TestSandmanContentTypes(TestSandmanBase):
         URL patterns of the API but is not a valid endpoint (e.g. 'foo/bar')."""
         self.get_response('/foo/bar', 404)
 
+    def test_delete_resource_html(self):
+        """Test DELETEing a resource via HTML."""
+        response = self.app.delete('/artists/239',
+                headers={'Accept': 'text/html'})
+        assert response.status_code == 204
+        assert response.headers['Content-type'].startswith('text/html')
+        response = self.get_response('/artists/239',
+                404,
+                False,
+                headers={'Accept': 'text/html'})
+        assert response.headers['Content-type'].startswith('text/html')
+
+    def test_patch_new_resource_html(self):
+        """Send HTTP PATCH for a resource which doesn't exist (should be
+        created)."""
+        response = self.app.patch('/artists/276',
+                data={'Name': 'Jeff Knupp'},
+                headers={'Accept': 'text/html'})
+        assert response.status_code == 201
+        assert self.is_html_response(response)
+
 class TestSandmanAdmin(TestSandmanBase):
     """Test the admin GUI functionality."""
 

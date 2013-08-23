@@ -8,6 +8,8 @@ from . import app, db
 from .exception import InvalidAPIUsage
 
 JSON, HTML = range(2)
+JSON_CONTENT_TYPES = ('application/json')
+HTML_CONTENT_TYPES = ('text/html', 'application/x-www-form-urlencoded')
 
 FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
 
@@ -23,7 +25,7 @@ def _get_mimetype():
     if 'Accept' not in request.headers:
         return JSON
 
-    if 'html' in request.headers['Accept']:
+    if request.headers['Accept'] in HTML_CONTENT_TYPES:
         return HTML
     else:
         return JSON
@@ -107,6 +109,18 @@ def _validate(cls, method, resource=None):
         class_validator = getattr(cls, class_validator_name)
         if not class_validator(resource):
             raise InvalidAPIUsage(403)
+
+def get_resource_data(request):
+    if 'Content-type' not in request.headers:
+        return JSON
+    elif request.headers['Content-type'] in JSON_CONTENT_TYPES:
+        if request.json is None:
+            raise InvalidAPIUsage(403)
+        return request.json
+    elif request.headers['Content-type'] in HTML_CONTENT_TYPES:
+        if request.form is None:
+            raise InvalidAPIUsage(406)
+        return request.form
 
 def endpoint_class(collection):
     """Return the :class:`sandman.model.Model` associated with the endpoint
@@ -253,7 +267,7 @@ def patch_resource(collection, key):
 
     if resource is None:
         resource = cls()
-        resource.from_dict(request.json)
+        resource.from_dict(get_resource_data(request))
         setattr(resource, resource.primary_key(), key)
         session.add(resource)
         session.commit()
