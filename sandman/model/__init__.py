@@ -24,6 +24,7 @@ def register(cls, use_admin=True):
         if getattr(current_app, 'endpoint_classes', None) is None:
             current_app.endpoint_classes = {}
             current_app.classes_by_name = {}
+            current_app.table_to_endpoint = {}
         if isinstance(cls, (list, tuple)):
             for entry in cls:
                 _register_internal_data(entry)
