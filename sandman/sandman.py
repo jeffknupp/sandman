@@ -8,9 +8,10 @@ from . import app, db
 from .exception import InvalidAPIUsage
 
 JSON, HTML = range(2)
-JSON_CONTENT_TYPES = ('application/json',)
-HTML_CONTENT_TYPES = ('text/html', 'application/x-www-form-urlencoded')
-ACCEPTABLE_CONTENT_TYPES = JSON_CONTENT_TYPES + HTML_CONTENT_TYPES
+JSON_CONTENT_TYPES = set(['application/json',])
+HTML_CONTENT_TYPES = set(['text/html', 'application/x-www-form-urlencoded'])
+ALL_CONTENT_TYPES = set(['*/*'])
+ACCEPTABLE_CONTENT_TYPES = JSON_CONTENT_TYPES | HTML_CONTENT_TYPES | ALL_CONTENT_TYPES
 
 FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
 FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource type [{}].
@@ -32,11 +33,12 @@ def _perform_database_action(action, *args):
 
 def _get_acceptable_response_type():
     """Return the mimetype for this request."""
-    if 'Accept' not in request.headers:
+    if 'Accept' not in request.headers or request.headers['Accept'] in ALL_CONTENT_TYPES:
         return JSON
-    if request.headers['Accept'] in HTML_CONTENT_TYPES:
+    acceptable_content_types = set(request.headers['ACCEPT'].strip().split(','))
+    if acceptable_content_types & HTML_CONTENT_TYPES:
         return HTML
-    elif request.headers['Accept'] in JSON_CONTENT_TYPES:
+    elif acceptable_content_types & JSON_CONTENT_TYPES:
         return JSON
     else:
         # HTTP 406 Not Acceptable
@@ -58,6 +60,7 @@ def handle_exception(error):
         # type in the request's 'Accept' header, which is a more important
         # error, so return that instead of what was originally raised.
         response = jsonify(error.to_dict())
+        print request.headers, e, error
         response.status_code = 415
         return response
 
@@ -139,6 +142,7 @@ def get_resource_data(request):
         return request.form
     else:
         # HTTP 415: Unsupported Media Type 
+        print request.headers
         raise InvalidAPIUsage(415,
                 UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(
                     request.headers['Content-type']))

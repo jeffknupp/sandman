@@ -28,10 +28,10 @@ def register(cls, use_admin=True):
         if isinstance(cls, (list, tuple)):
             for entry in cls:
                 _register_internal_data(entry)
-                entry._use_admin = use_admin
+                entry.use_admin = use_admin
         else:
             _register_internal_data(cls)
-            cls._use_admin = use_admin
+            cls.use_admin = use_admin
     Model.prepare(db.engine)
 
 def _register_internal_data(cls):
@@ -40,14 +40,16 @@ def _register_internal_data(cls):
         current_app.table_to_endpoint[cls.__tablename__] = cls.endpoint()
         current_app.classes_by_name[cls.__name__] = cls
 
-def prepare_relationships():
+def _prepare_relationships():
+    """Enrich the registered Models with SQLAlchemy ``relationships``
+    so that related tables are correctly processed up by the admin."""
     inspector = reflection.Inspector.from_engine(db.engine)
     with app.app_context():
         for cls in current_app.classes_by_name.values():
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[foreign_key['referred_table']]
-                other.__related_tables__.append(cls)
-                cls.__related_tables__.append(other)
+                other.__related_tables__.add(cls)
+                cls.__related_tables__.add(other)
                 # Necessary to get Flask-Admin to register the relationship
                 setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
 
