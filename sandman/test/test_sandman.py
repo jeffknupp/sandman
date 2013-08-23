@@ -266,16 +266,6 @@ class TestSandmanContentTypes(TestSandmanBase):
                 headers={'Accept': 'application/json'})
         assert len(json.loads(response.data)[u'resources']) == 275
 
-    def test_post_html_response(self):
-        """Test POSTing a resource and requesting the response be HTML
-        formatted."""
-        response = self.app.post('/artists',
-                content_type='application/json',
-                headers={'Accept': 'text/html'},
-                data=json.dumps({u'Name': u'Jeff Knupp'}))
-        assert response.status_code == 201
-        assert 'Jeff Knupp' in response.data
-
     def test_get_unknown_url(self):
         """Test sending a GET request to a URL that would match the
         URL patterns of the API but is not a valid endpoint (e.g. 'foo/bar')."""
@@ -301,6 +291,56 @@ class TestSandmanContentTypes(TestSandmanBase):
                 headers={'Accept': 'text/html'})
         assert response.status_code == 201
         assert self.is_html_response(response)
+
+    def test_post_html_response(self):
+        """Test POSTing a resource via form parameters and requesting the 
+        response be HTML formatted."""
+        response = self.app.post('/artists',
+                headers={'Accept': 'text/html'},
+                data={u'Name': u'Jeff Knupp'})
+        assert response.status_code == 201
+        assert 'Jeff Knupp' in response.data
+
+    def test_post_no_json_data(self):
+        """Test POSTing a resource with no JSON data."""
+        response = self.app.post('/artists',
+                content_type='application/json',
+                data=dict())
+        assert response.status_code == 400
+
+    def test_post_no_html_form_data(self):
+        """Test POSTing a resource with no form data."""
+        response = self.app.post('/artists',
+                data=dict())
+        assert response.status_code == 400
+
+    def test_post_unsupported_content_type(self):
+        """Test POSTing with an unsupported Content-type."""
+        response = self.app.post('/artists',
+                content_type='foobar',
+                data={'Foo': 'bar'})
+        assert response.status_code == 415
+
+    def test_post_unsupported_accept_type(self):
+        """Test POSTing with an unsupported Accept content-type."""
+        response = self.app.post('/artists',
+                headers={'Accept': 'foo'},
+                data={'Foo': 'bar'})
+        assert response.status_code == 415
+
+    def test_put_unknown_resource_form_data(self):
+        """Test HTTP PUTing a resource that doesn't exist. Should give 404."""
+        response = self.app.put('/tracks/99999',
+                data={'Name': 'Some New Album',
+                      'AlbumId': 1,
+                      'GenreId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 99999,
+                      'UnitPrice': 0.99,})
+        assert response.status_code == 404
+
+
 
 class TestSandmanAdmin(TestSandmanBase):
     """Test the admin GUI functionality."""

@@ -9,3 +9,4 @@ Werkzeug==0.9.3
 itsdangerous==0.23
 markupsafe==0.18
 setuptools==1.0
+uritemplate==0.5.2
