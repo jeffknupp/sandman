@@ -328,6 +328,19 @@ class TestSandmanContentTypes(TestSandmanBase):
                 data={'Foo': 'bar'})
         assert response.status_code == 415
 
+    def test_put_unknown_resource_form_data(self):
+        """Test HTTP PUTing a resource that doesn't exist. Should give 404."""
+        response = self.app.put('/tracks/99999',
+                data={'Name': 'Some New Album',
+                      'AlbumId': 1,
+                      'GenreId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 99999,
+                      'UnitPrice': 0.99,})
+        assert response.status_code == 404
+
+
 
 class TestSandmanAdmin(TestSandmanBase):
     """Test the admin GUI functionality."""

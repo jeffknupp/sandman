@@ -25,6 +25,11 @@ def _get_session():
         session = g._session = db.session()
     return session
 
+def _perform_database_action(action, *args):
+    session = _get_session()
+    getattr(session, action)(*args)
+    session.commit()
+
 def _get_acceptable_response_type():
     """Return the mimetype for this request."""
     if 'Accept' not in request.headers:
@@ -246,9 +251,7 @@ def update_resource(resource, request):
 
     """
     resource.from_dict(get_resource_data(request))
-    session = _get_session()
-    session.merge(resource)
-    session.commit()
+    _perform_database_action('merge', resource)
     return no_content_response()
 
 
@@ -271,7 +274,6 @@ def patch_resource(collection, key):
     :rtype: :class:`flask.Response`
 
     """
-    session = _get_session()
     cls = endpoint_class(collection)
 
     try:
@@ -285,8 +287,7 @@ def patch_resource(collection, key):
         resource = cls()
         resource.from_dict(get_resource_data(request))
         setattr(resource, resource.primary_key(), key)
-        session.add(resource)
-        session.commit()
+        _perform_database_action('add', resource)
         return resource_created_response(resource)
     else:
         return update_resource(resource, request)
@@ -305,10 +306,8 @@ def put_resource(collection, key):
     _validate(endpoint_class(collection), request.method, resource)
 
     resource.replace(get_resource_data(request))
-    session = _get_session()
-    session.add(resource)
     try:
-        session.commit()
+        _perform_database_action('add', resource)
     except IntegrityError as exception:
         raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(exception.message))
     return no_content_response()
@@ -328,9 +327,7 @@ def post_resource(collection):
 
     _validate(cls, request.method, resource)
 
-    session = _get_session()
-    session.add(resource)
-    session.commit()
+    _perform_database_action('add', resource)
     return resource_created_response(resource)
 
 @app.route('/<collection>/<key>', methods=['DELETE'])
@@ -349,14 +346,11 @@ def delete_resource(collection, key):
 
     _validate(cls, request.method, resource)
 
-    session = _get_session()
     try:
-        session.delete(resource)
-        session.commit()
+        _perform_database_action('delete', resource)
     except IntegrityError as exception:
         raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(exception.message))
     return no_content_response()
-
 
 @app.route('/<collection>/<key>', methods=['GET'])
 def get_resource(collection, key):
