@@ -26,14 +26,18 @@ def register(cls, use_admin=True):
             current_app.classes_by_name = {}
         if isinstance(cls, (list, tuple)):
             for entry in cls:
-                current_app.endpoint_classes[entry.endpoint()] = entry
-                current_app.classes_by_name[entry.__name__] = entry
+                _register_internal_data(entry)
                 entry.use_admin = use_admin
         else:
-            current_app.endpoint_classes[cls.endpoint()] = cls
-            current_app.classes_by_name[cls.__name__] = cls
+            _register_internal_data(cls)
             cls.use_admin = use_admin
     Model.prepare(db.engine)
+
+def _register_internal_data(cls):
+    with app.app_context():
+        current_app.endpoint_classes[cls.endpoint()] = cls
+        current_app.table_to_endpoint[cls.__tablename__] = cls.endpoint()
+        current_app.classes_by_name[cls.__name__] = cls
 
 def _prepare_relationships():
     """Enrich the registered Models with SQLAlchemy ``relationships``
@@ -43,7 +47,10 @@ def _prepare_relationships():
         for cls in current_app.classes_by_name.values():
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[foreign_key['referred_table']]
-                setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
+                other.__related_tables__.add(cls)
+                cls.__related_tables__.add(other)
+                # Necessary to get Flask-Admin to register the relationship
+                setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
 
 def activate_admin_classes():
     """Activate each registed Model in the admin if it was registered with

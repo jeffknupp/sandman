@@ -33,6 +33,10 @@ class Model(object):
     __table__ = None
     """Will be populated by SQLAlchemy with the table's meta-information."""
 
+    __related_tables__ = set()
+    """List of Models for which this model has a foreign key relationship
+    with.""" 
+
     @classmethod
     def endpoint(cls):
         """Return the :class:`sandman.model.Model`'s endpoint.

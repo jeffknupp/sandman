@@ -6,7 +6,15 @@
     <ul>
         {% for attribute, value in resource.attributes.items() %}
             {% if attribute == 'links' %}
-                <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ value[0].rel }}</a></li>
+            <li>Links<ul>
+                {% for link in value %}
+                    {% if link.rel != 'self' %}
+                    <li>link_{{link.rel}}: <a href="{{ link.uri }}">{{ link.uri }}</a></li>
+                    {% else %}
+                    <li>{{link.rel}}: <a href="{{ link.uri }}">{{ link.uri }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul></li>
             {% else %}
                 <li>{{ attribute }}: {{ value }}</li>
             {% endif %}
