@@ -54,21 +54,21 @@
 <span id="exception-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">exception</span></tt> Module<a class="headerlink" href="#module-sandman.exception" title="Permalink to this headline">¶</a></h2>
 <p>Exception specifications for Sandman</p>
 <dl class="exception">
-<dt id="sandman.exception.JSONException">
-<em class="property">exception </em><tt class="descclassname">sandman.exception.</tt><tt class="descname">JSONException</tt><big>(</big><em>description=None</em>, <em>code=400</em>, <em>response=None</em><big>)</big><a class="reference internal" href="_modules/sandman/exception.html#JSONException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.exception.JSONException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">werkzeug.exceptions.HTTPException</span></tt></p>
+<dt id="sandman.exception.InvalidAPIUsage">
+<em class="property">exception </em><tt class="descclassname">sandman.exception.</tt><tt class="descname">InvalidAPIUsage</tt><big>(</big><em>code=400</em>, <em>message=None</em>, <em>payload=None</em><big>)</big><a class="reference internal" href="_modules/sandman/exception.html#InvalidAPIUsage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.exception.InvalidAPIUsage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
 <p>Excecption which generates a <tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt> object whose
 <em>data</em> is JSON rather than HTML</p>
 <dl class="method">
-<dt id="sandman.exception.JSONException.get_body">
-<tt class="descname">get_body</tt><big>(</big><em>environ=None</em><big>)</big><a class="reference internal" href="_modules/sandman/exception.html#JSONException.get_body"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.exception.JSONException.get_body" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the body of the <em>reponse</em> serialized as JSON</p>
+<dt id="sandman.exception.InvalidAPIUsage.abort">
+<tt class="descname">abort</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/exception.html#InvalidAPIUsage.abort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.exception.InvalidAPIUsage.abort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an HTML Response representation of the exception.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="sandman.exception.JSONException.get_headers">
-<tt class="descname">get_headers</tt><big>(</big><em>environ=None</em><big>)</big><a class="reference internal" href="_modules/sandman/exception.html#JSONException.get_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.exception.JSONException.get_headers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the appropriate content-type: <em>application/json</em></p>
+<dt id="sandman.exception.InvalidAPIUsage.to_dict">
+<tt class="descname">to_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/exception.html#InvalidAPIUsage.to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.exception.InvalidAPIUsage.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary representation of the exception.</p>
 </dd></dl>
 
 </dd></dl>
@@ -95,7 +95,9 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 </table>
 </dd></dl>
 
-<span class="target" id="module-sandman.model.models"></span><dl class="class">
+<span class="target" id="module-sandman.model.models"></span><p>The Model class is meant to be the base class for user Models. It represents
+a table in the database that should be modeled as a resource.</p>
+<dl class="class">
 <dt id="sandman.model.models.Model">
 <em class="property">class </em><tt class="descclassname">sandman.model.models.</tt><tt class="descname">Model</tt><a class="reference internal" href="_modules/sandman/model/models.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
@@ -169,8 +171,8 @@ an instance&#8217;s database columns.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictionary</strong> (<em>dict</em>) &#8211; A dictionary of attributes to set on the instance 
-whose keys are the column names of 
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictionary</strong> (<em>dict</em>) &#8211; A dictionary of attributes to set on the instance
+whose keys are the column names of
 the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s underlying database table.</td>
 </tr>
 </tbody>
@@ -236,15 +238,14 @@ instance whose keys are the column names of the
 <span id="sandman-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">sandman</span></tt> Module<a class="headerlink" href="#module-sandman.sandman" title="Permalink to this headline">¶</a></h2>
 <p>Sandman REST API creator for Flask and SQLAlchemy</p>
 <dl class="function">
-<dt id="sandman.sandman.add_resource">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">add_resource</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#add_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.add_resource" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the appropriate <em>Response</em> based on adding a new resource to
-<em>collection</em>.</p>
+<dt id="sandman.sandman.collection_response">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">collection_response</tt><big>(</big><em>resources</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#collection_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.collection_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a response for the <em>resources</em> of the appropriate content type.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resources</strong> &#8211; resources to be returned in request</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
 </tr>
@@ -292,6 +293,61 @@ instance whose keys are the column names of the
 </dd></dl>
 
 <dl class="function">
+<dt id="sandman.sandman.get_collection">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_collection</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the appropriate <em>Response</em> for retrieving a collection of
+resources.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.get_resource">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the appropriate <em>Response</em> for retrieving a single resource</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.get_resource_data">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource_data</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.handle_exception">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">handle_exception</tt><big>(</big><em>error</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#handle_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.handle_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a response with the appropriate status code, message, and content
+type when an <tt class="docutils literal"><span class="pre">InvalidAPIUsage</span></tt> exception is raised.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="sandman.sandman.no_content_response">
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">no_content_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#no_content_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.no_content_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the appropriate <em>Response</em> with status code <em>204</em>, signaling a
@@ -335,8 +391,25 @@ the data sent in the request and return a <a class="reference internal" href="#s
 </dd></dl>
 
 <dl class="function">
-<dt id="sandman.sandman.replace_resource">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">replace_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#replace_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.replace_resource" title="Permalink to this definition">¶</a></dt>
+<dt id="sandman.sandman.post_resource">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">post_resource</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#post_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.post_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the appropriate <em>Response</em> based on adding a new resource to
+<em>collection</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.put_resource">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">put_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.put_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the resource identified by the given key and return the
 appropriate response.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -353,7 +426,7 @@ appropriate response.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.resource_created_response">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_created_response</tt><big>(</big><em>resource</em>, <em>current_request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_created_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_created_response" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_created_response</tt><big>(</big><em>resource</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_created_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_created_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return HTTP response with status code <em>201</em>, signaling a created
 <em>resource</em></p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -370,21 +443,31 @@ appropriate response.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.resource_response">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_response</tt><big>(</big><em>resource</em>, <em>current_request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a response for the <em>resource</em> given the mimetype header value in
-the <em>current_request</em>.</p>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">resource_response</tt><big>(</big><em>resource</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#resource_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.resource_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a response for the <em>resource</em> of the appropriate content type.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>resource</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>) &#8211; resource created as a result of current request</li>
-<li><strong>current_request</strong> (<tt class="xref py py-class docutils literal"><span class="pre">flask.Request</span></tt>) &#8211; <tt class="xref py py-class docutils literal"><span class="pre">flask.Request</span></tt> request being handled</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>) &#8211; resource to be returned in request</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.retrieve_collection">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">retrieve_collection</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#retrieve_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.retrieve_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the resources in <em>collection</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">class:<cite>sandman.model.Model</cite></td>
 </tr>
 </tbody>
 </table>
@@ -412,67 +495,8 @@ the <em>current_request</em>.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="sandman.sandman.show_collection">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">show_collection</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#show_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.show_collection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the appropriate <em>Response</em> for retrieving a collection of
-resources.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="sandman.sandman.show_resource">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">show_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#show_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.show_resource" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the appropriate <em>Response</em> for retrieving a single resource</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
-<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="sandman.sandman.unsupported_method_response">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">unsupported_method_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#unsupported_method_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.unsupported_method_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the appropriate <em>Response</em> with status code <em>403</em>, signaling the
-HTTP method used
-in the request is not supported for the given endpoint.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="sandman.sandman.update_resource">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">update_resource</tt><big>(</big><em>resource</em>, <em>data</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#update_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.update_resource" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">update_resource</tt><big>(</big><em>resource</em>, <em>request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#update_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.update_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the contents of a resource with <em>data</em> and return an appropriate
 <em>Response</em>.</p>
 <table class="docutils field-list" frame="void" rules="none">
