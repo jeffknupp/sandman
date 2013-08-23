@@ -8,10 +8,15 @@ from . import app, db
 from .exception import InvalidAPIUsage
 
 JSON, HTML = range(2)
-JSON_CONTENT_TYPES = ('application/json')
+JSON_CONTENT_TYPES = ('application/json',)
 HTML_CONTENT_TYPES = ('text/html', 'application/x-www-form-urlencoded')
+ACCEPTABLE_CONTENT_TYPES = JSON_CONTENT_TYPES + HTML_CONTENT_TYPES
 
 FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
+FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource type [{}].
+Acceptable methods: [{}]"""
+UNSUPPORTED_CONTENT_TYPE_MESSAGE = """Content-type [{}] not supported.
+Supported values for 'Content-type': {}""".format(str(ACCEPTABLE_CONTENT_TYPES), '{}')
 
 def _get_session():
     """Return (and memoize) a database session"""
@@ -20,27 +25,36 @@ def _get_session():
         session = g._session = db.session()
     return session
 
-def _get_mimetype():
+def _get_acceptable_response_type():
     """Return the mimetype for this request."""
     if 'Accept' not in request.headers:
         return JSON
-
     if request.headers['Accept'] in HTML_CONTENT_TYPES:
         return HTML
-    else:
+    elif request.headers['Accept'] in JSON_CONTENT_TYPES:
         return JSON
+    else:
+        # HTTP 406 Not Acceptable
+        raise InvalidAPIUsage(406)
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
     """Return a response with the appropriate status code, message, and content
     type when an ``InvalidAPIUsage`` exception is raised."""
-    if _get_mimetype() == JSON:
+    try:
+        if _get_acceptable_response_type() == JSON:
+            response = jsonify(error.to_dict())
+            response.status_code = error.code
+            return response
+        else:
+            return error.abort()
+    except InvalidAPIUsage as e:
+        # In addition to the original exception, we don't support the content
+        # type in the request's 'Accept' header, which is a more important
+        # error, so return that instead of what was originally raised.
         response = jsonify(error.to_dict())
-        response.status_code = error.code
+        response.status_code = 415
         return response
-    else:
-        return error.abort()
-
 
 def _single_resource_json_response(resource):
     """Return the JSON representation of *resource*.
@@ -100,8 +114,9 @@ def _validate(cls, method, resource=None):
     :rtype: bool
 
     """
-    if not cls or not method in cls.__methods__:
-        raise InvalidAPIUsage(403)
+    if method not in cls.__methods__:
+        raise InvalidAPIUsage(403, FORBIDDEN_EXCEPTION_MESSAGE.format(method,
+            cls.endpoint(), cls.__methods__))
 
     class_validator_name = 'validate_' + method
 
@@ -111,16 +126,17 @@ def _validate(cls, method, resource=None):
             raise InvalidAPIUsage(403)
 
 def get_resource_data(request):
-    if 'Content-type' not in request.headers:
-        return JSON
-    elif request.headers['Content-type'] in JSON_CONTENT_TYPES:
-        if request.json is None:
-            raise InvalidAPIUsage(403)
+    if 'Content-type' not in request.headers or request.headers['Content-type'] in JSON_CONTENT_TYPES:
         return request.json
     elif request.headers['Content-type'] in HTML_CONTENT_TYPES:
-        if request.form is None:
-            raise InvalidAPIUsage(406)
+        if not request.form:
+            raise InvalidAPIUsage(400)
         return request.form
+    else:
+        # HTTP 415: Unsupported Media Type 
+        raise InvalidAPIUsage(415,
+                UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(
+                    request.headers['Content-type']))
 
 def endpoint_class(collection):
     """Return the :class:`sandman.model.Model` associated with the endpoint
@@ -174,7 +190,7 @@ def resource_created_response(resource):
     :rtype: :class:`flask.Response`
 
     """
-    if _get_mimetype() == JSON:
+    if _get_acceptable_response_type() == JSON:
         response = _single_resource_json_response(resource)
     else:
         response = _single_resource_html_response(resource)
@@ -191,7 +207,7 @@ def collection_response(resources):
     :rtype: :class:`flask.Response`
 
     """
-    if _get_mimetype() == JSON:
+    if _get_acceptable_response_type() == JSON:
         return _collection_json_response(resources)
     else:
         return _collection_html_response(resources)
@@ -205,7 +221,7 @@ def resource_response(resource):
     :rtype: :class:`flask.Response`
 
     """
-    if _get_mimetype() == JSON:
+    if _get_acceptable_response_type() == JSON:
         return _single_resource_json_response(resource)
     else:
         return _single_resource_html_response(resource)
@@ -221,7 +237,7 @@ def no_content_response():
     response.status_code = 204
     return response
 
-def update_resource(resource, data):
+def update_resource(resource, request):
     """Replace the contents of a resource with *data* and return an appropriate
     *Response*.
 
@@ -229,7 +245,7 @@ def update_resource(resource, data):
     :param data: New values for the fields in *resource*
 
     """
-    resource.from_dict(data)
+    resource.from_dict(get_resource_data(request))
     session = _get_session()
     session.merge(resource)
     session.commit()
@@ -273,7 +289,7 @@ def patch_resource(collection, key):
         session.commit()
         return resource_created_response(resource)
     else:
-        return update_resource(resource, request.json)
+        return update_resource(resource, request)
 
 @app.route('/<collection>/<key>', methods=['PUT'])
 def put_resource(collection, key):
@@ -288,7 +304,7 @@ def put_resource(collection, key):
 
     _validate(endpoint_class(collection), request.method, resource)
 
-    resource.replace(request.json)
+    resource.replace(get_resource_data(request))
     session = _get_session()
     session.add(resource)
     try:
@@ -308,7 +324,7 @@ def post_resource(collection):
     """
     cls = endpoint_class(collection)
     resource = cls()
-    resource.from_dict(request.json)
+    resource.from_dict(get_resource_data(request))
 
     _validate(cls, request.method, resource)
 
