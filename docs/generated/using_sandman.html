@@ -98,7 +98,7 @@ Even though the example above is short, let&#8217;s walk through it step by step
 <h2>Creating Models<a class="headerlink" href="#creating-models" title="Permalink to this headline">¶</a></h2>
 <p>A <tt class="docutils literal"><span class="pre">Model</span></tt> represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
-<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt>. The only attribute you must define in your
+<a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a>. The only attribute you must define in your
 class is the <tt class="docutils literal"><span class="pre">__tablename__</span></tt> attribute. sandman uses this to map your
 class to the corresponding database table. From there, sandman is able to divine
 all other properties of your tables. Specifically, sandman creates the
@@ -119,7 +119,7 @@ to various attributes of the object derived from the underlying database model</
 <h2>Customizing Your Resources<a class="headerlink" href="#customizing-your-resources" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="providing-a-custom-endpoint">
 <h3>Providing a custom endpoint<a class="headerlink" href="#providing-a-custom-endpoint" title="Permalink to this headline">¶</a></h3>
-<p>In the code above, we created 4 <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt> classes that
+<p>In the code above, we created 4 <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a> classes that
 correspond to tables in our database. If we wanted to change the endpoint for a
 class (the default endpoint is simply the class&#8217;s name pluralized), we would do
 so by setting the <tt class="docutils literal"><span class="pre">__endpoint__</span></tt> attribute in the definition of the class:</p>
