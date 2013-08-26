@@ -4,8 +4,7 @@ from setuptools.command.test import test as TestCommand
 import codecs
 import os
 import sys
-
-import sandman
+import re
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -36,7 +35,7 @@ class PyTest(TestCommand):
 
 setup(
     name='sandman',
-    version=sandman.__version__,
+    version=find_version('sandman', '__init__.py'),
     url='http://github.com/jeffknupp/sandman/',
     license='Apache Software License',
     author='Jeff Knupp',
