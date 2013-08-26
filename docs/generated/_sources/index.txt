@@ -12,7 +12,8 @@ Contents:
    :maxdepth: 2
 
    installation
-   quickstart
+   using_sandman
+   admin
    sandman
 
 

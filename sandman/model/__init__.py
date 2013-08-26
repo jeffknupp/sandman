@@ -6,8 +6,12 @@ from .models import Model
 from .. import db, app
 from flask import current_app
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
+from sqlalchemy.engine import reflection
+from sqlalchemy.orm import relationship
+from flask.ext.admin import Admin
+from flask.ext.admin.contrib.sqlamodel import ModelView
 
-def register(cls):
+def register(cls, use_admin=True):
     """Register with the API a :class:`sandman.model.Model` class and associated
     endpoint.
 
@@ -19,12 +23,33 @@ def register(cls):
     with app.app_context():
         if getattr(current_app, 'endpoint_classes', None) is None:
             current_app.endpoint_classes = {}
+            current_app.classes_by_name = {}
         if isinstance(cls, (list, tuple)):
             for entry in cls:
                 current_app.endpoint_classes[entry.endpoint()] = entry
+                current_app.classes_by_name[entry.__name__] = entry
+                entry._use_admin = use_admin
         else:
             current_app.endpoint_classes[cls.endpoint()] = cls
+            current_app.classes_by_name(cls.__name__, cls)
+            cls._use_admin = use_admin
     Model.prepare(db.engine)
+
+def prepare_relationships():
+    inspector = reflection.Inspector.from_engine(db.engine)
+    with app.app_context():
+        for class_name, cls in current_app.classes_by_name.items():
+            for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
+                other = current_app.classes_by_name[foreign_key['referred_table']]
+                setattr(other, cls.__tablename__, relationship(cls.__tablename__, backref=other.__tablename__))
+
+def activate_admin_classes():
+    prepare_relationships()
+    admin = Admin(app)
+    with app.app_context():
+        for cls in (cls for cls in current_app.classes_by_name.values() if cls._use_admin == True):
+            admin.add_view(ModelView(cls, db.session))
+
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
 # object which also derives from sandman.models.Model. The naming is done for

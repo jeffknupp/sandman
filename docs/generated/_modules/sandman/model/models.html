@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.model.models &mdash; sandman 0.3.0 documentation</title>
+    <title>sandman.model.models &mdash; sandman 0.4.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.3.0 documentation" href="../../../index.html" />
+    <link rel="top" title="sandman 0.4.0 documentation" href="../../../index.html" />
     <link rel="up" title="sandman.model" href="../model.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">sandman 0.3.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">sandman 0.4.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../model.html" accesskey="U">sandman.model</a> &raquo;</li> 
       </ul>
@@ -57,25 +57,28 @@
 <span class="sd">    from which user models are derived.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c"># override :attr:`__endpoint__` if you wish to configure the</span>
-    <span class="c"># :class:`sandman.model.Model`&#39;s endpoint.</span>
-    <span class="c">#</span>
-    <span class="c"># Default: __tablename__ in lowercase and pluralized</span>
     <span class="n">__endpoint__</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;override :attr:`__endpoint__` if you wish to configure the</span>
+<span class="sd">    :class:`sandman.model.Model`&#39;s endpoint.</span>
 
-    <span class="c"># The name of the database table this class should be mapped to</span>
-    <span class="c">#</span>
-    <span class="c"># Default: None</span>
+<span class="sd">    Default: __tablename__ in lowercase and pluralized</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The name of the database table this class should be mapped to</span>
 
-    <span class="c"># override :attr:`__methods__` if you wish to change the HTTP methods</span>
-    <span class="c"># this :class:`sandman.model.Model` supports.</span>
-    <span class="c">#</span>
-    <span class="c"># Default: ``(&#39;GET&#39;, &#39;POST&#39;, &#39;PATCH&#39;, &#39;DELETE&#39;, &#39;PUT&#39;)``</span>
+<span class="sd">    Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">__methods__</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;GET&#39;</span><span class="p">,</span> <span class="s">&#39;POST&#39;</span><span class="p">,</span> <span class="s">&#39;PATCH&#39;</span><span class="p">,</span> <span class="s">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s">&#39;PUT&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;override :attr:`__methods__` if you wish to change the HTTP methods</span>
+<span class="sd">    this :class:`sandman.model.Model` supports.</span>
 
-    <span class="c"># Will be populated by SQLAlchemy with the table&#39;s meta-information.</span>
+<span class="sd">    Default: ``(&#39;GET&#39;, &#39;POST&#39;, &#39;PATCH&#39;, &#39;DELETE&#39;, &#39;PUT&#39;)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">__table__</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;Will be populated by SQLAlchemy with the table&#39;s meta-information.&quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Model.endpoint"><a class="viewcode-back" href="../../../sandman.html#sandman.model.models.Model.endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">endpoint</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
@@ -154,7 +157,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_key</span><span class="p">()))</span></div>
 </pre></div>
 
           </div>
@@ -188,7 +194,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">sandman 0.3.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">sandman 0.4.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../model.html" >sandman.model</a> &raquo;</li> 
       </ul>

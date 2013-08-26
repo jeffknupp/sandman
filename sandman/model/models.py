@@ -7,25 +7,28 @@ class Model(object):
     from which user models are derived.
     """
 
-    # override :attr:`__endpoint__` if you wish to configure the
-    # :class:`sandman.model.Model`'s endpoint.
-    #
-    # Default: __tablename__ in lowercase and pluralized
     __endpoint__ = None
+    """override :attr:`__endpoint__` if you wish to configure the
+    :class:`sandman.model.Model`'s endpoint.
 
-    # The name of the database table this class should be mapped to
-    #
-    # Default: None
+    Default: __tablename__ in lowercase and pluralized
+    """
+
     __tablename__ = None
+    """The name of the database table this class should be mapped to
 
-    # override :attr:`__methods__` if you wish to change the HTTP methods
-    # this :class:`sandman.model.Model` supports.
-    #
-    # Default: ``('GET', 'POST', 'PATCH', 'DELETE', 'PUT')``
+    Default: None
+    """
+
     __methods__ = ('GET', 'POST', 'PATCH', 'DELETE', 'PUT')
+    """override :attr:`__methods__` if you wish to change the HTTP methods
+    this :class:`sandman.model.Model` supports.
 
-    # Will be populated by SQLAlchemy with the table's meta-information.
+    Default: ``('GET', 'POST', 'PATCH', 'DELETE', 'PUT')``
+    """
+
     __table__ = None
+    """Will be populated by SQLAlchemy with the table's meta-information."""
 
     @classmethod
     def endpoint(cls):
@@ -105,3 +108,6 @@ class Model(object):
         for column in self.__table__.columns.keys():
             setattr(self, column, None)
         self.from_dict(dictionary)
+
+    def __str__(self):
+        return str(getattr(self, self.primary_key()))
