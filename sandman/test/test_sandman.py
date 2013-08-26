@@ -6,6 +6,8 @@ import shutil
 import json
 
 class TestSandmanBase(object):
+    """Base class for all sandman test classes."""
+
     DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
 
     def setup_method(self, _):
@@ -52,8 +54,8 @@ class TestSandmanBase(object):
 
     @staticmethod
     def is_html_response(response):
-        """Return True if *response* is an HTML response (TODO: check
-        headers as well)."""
+        """Return True if *response* is an HTML response"""
+        assert 'text/html' in response.headers['Content-type']
         return '<!DOCTYPE html>' in response.data
 
 class TestSandmanBasicVerbs(TestSandmanBase):
@@ -112,9 +114,15 @@ class TestSandmanBasicVerbs(TestSandmanBase):
 
     def test_delete_resource(self):
         """Test DELETEing a resource."""
-        response = self.app.delete('/artists/275')
+        response = self.app.delete('/artists/239')
         assert response.status_code == 204
-        response = self.get_response('/artists/275', 404, False)
+        response = self.get_response('/artists/239', 404, False)
+
+    def test_delete_resource_violating_constraint(self):
+        """Test DELETEing a resource which violates a foreign key
+        constraint (i.e. the record is still referred to in another table)."""
+        response = self.app.delete('/artists/275')
+        assert response.status_code == 422
 
     def test_delete_non_existant_resource(self):
         """Test DELETEing a resource that doesn't exist."""
@@ -235,6 +243,14 @@ class TestSandmanContentTypes(TestSandmanBase):
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)
 
+    def test_get_html_non_existant_resource(self):
+        """Test getting HTML version of a resource rather than JSON."""
+        response = self.get_response('/artists/99999',
+                404,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+
+
     def test_get_html_collection(self):
         """Test getting HTML version of a collection rather than JSON."""
         response = self.app.get('/artists',
@@ -250,12 +266,105 @@ class TestSandmanContentTypes(TestSandmanBase):
                 headers={'Accept': 'application/json'})
         assert len(json.loads(response.data)[u'resources']) == 275
 
+    def test_get_unknown_url(self):
+        """Test sending a GET request to a URL that would match the
+        URL patterns of the API but is not a valid endpoint (e.g. 'foo/bar')."""
+        self.get_response('/foo/bar', 404)
+
+    def test_delete_resource_html(self):
+        """Test DELETEing a resource via HTML."""
+        response = self.app.delete('/artists/239',
+                headers={'Accept': 'text/html'})
+        assert response.status_code == 204
+        assert response.headers['Content-type'].startswith('text/html')
+        response = self.get_response('/artists/239',
+                404,
+                False,
+                headers={'Accept': 'text/html'})
+        assert response.headers['Content-type'].startswith('text/html')
+
+    def test_patch_new_resource_html(self):
+        """Send HTTP PATCH for a resource which doesn't exist (should be
+        created)."""
+        response = self.app.patch('/artists/276',
+                data={'Name': 'Jeff Knupp'},
+                headers={'Accept': 'text/html'})
+        assert response.status_code == 201
+        assert self.is_html_response(response)
+
     def test_post_html_response(self):
-        """Test POSTing a resource and requesting the response be HTML
-        formatted."""
+        """Test POSTing a resource via form parameters and requesting the 
+        response be HTML formatted."""
         response = self.app.post('/artists',
-                content_type='application/json',
                 headers={'Accept': 'text/html'},
-                data=json.dumps({u'Name': u'Jeff Knupp'}))
+                data={u'Name': u'Jeff Knupp'})
         assert response.status_code == 201
         assert 'Jeff Knupp' in response.data
+
+    def test_post_no_json_data(self):
+        """Test POSTing a resource with no JSON data."""
+        response = self.app.post('/artists',
+                content_type='application/json',
+                data=dict())
+        assert response.status_code == 400
+
+    def test_post_no_html_form_data(self):
+        """Test POSTing a resource with no form data."""
+        response = self.app.post('/artists',
+                data=dict())
+        assert response.status_code == 400
+
+    def test_post_unsupported_content_type(self):
+        """Test POSTing with an unsupported Content-type."""
+        response = self.app.post('/artists',
+                content_type='foobar',
+                data={'Foo': 'bar'})
+        assert response.status_code == 415
+
+    def test_post_unsupported_accept_type(self):
+        """Test POSTing with an unsupported Accept content-type."""
+        response = self.app.post('/artists',
+                headers={'Accept': 'foo'},
+                data={'Foo': 'bar'})
+        assert response.status_code == 415
+
+    def test_put_unknown_resource_form_data(self):
+        """Test HTTP PUTing a resource that doesn't exist. Should give 404."""
+        response = self.app.put('/tracks/99999',
+                data={'Name': 'Some New Album',
+                      'AlbumId': 1,
+                      'GenreId': 1,
+                      'MediaTypeId': 1,
+                      'Milliseconds': 343719,
+                      'TrackId': 99999,
+                      'UnitPrice': 0.99,})
+        assert response.status_code == 404
+
+
+
+class TestSandmanAdmin(TestSandmanBase):
+    """Test the admin GUI functionality."""
+
+    def test_admin_index(self):
+        """Ensure the main admin page is served correctly."""
+        self.get_response('/admin/', 200)
+
+    def test_admin_collection_view(self):
+        """Ensure user-defined ``__str__`` implementations are being picked up
+        by the admin."""
+
+        response = self.get_response('/admin/trackview/', 200)
+        # If related tables are being loaded correctly, Tracks will have a
+        # Mediatype column, at least one of which has the value 'MPEG audio
+        # file'.
+        assert 'MPEG audio file' in response.data
+
+    def test_admin_default_str_repr(self):
+        """Ensure default ``__str__`` implementations works in the admin."""
+
+        response = self.get_response('/admin/trackview/?page=3/', 200)
+        # If related tables are being loaded correctly, Tracks will have a
+        # Genre column, but should display the GenreId and not the name ('Jazz'
+        # is the genre for many results on the third page
+        assert 'Jazz' not in response.data
+

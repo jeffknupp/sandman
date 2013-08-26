@@ -1,7 +1,9 @@
 sandman
 =======
+
 [![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
 [![Coverage Status](https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop)](https://coveralls.io/r/jeffknupp/sandman?branch=develop)
+[![Stories in Ready](https://badge.waffle.io/jeffknupp/sandman.png)](http://waffle.io/jeffknupp/sandman)
 
 Documentation
 -------------

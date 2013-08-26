@@ -1,7 +1,7 @@
 sandman
 =======
 
-|Build Status| |Coverage Status|
+|Build Status| |Coverage Status| |Stories in Ready|
 
 Documentation
 -------------
@@ -41,7 +41,7 @@ database using **sandman**:
 
 Let's start our new service and make a request:
 
-.. code:: zsh
+.. code:: bash
 
     > python runserver.py &
     * Running on http://127.0.0.1:5000/
@@ -91,6 +91,7 @@ get access to this:
    :alt: improved admin interface screenshot
 
    improved admin interface screenshot
+
 With **sandman**, (almost) zero boilerplate code is required. Your
 existing database structure and schema is introspected and your database
 tables magically get a RESTful API and admin interface. For each table,
@@ -127,21 +128,34 @@ Quickstart
 You'll need to create one file with the following contents (which I call
 ``runserver.py``):
 
-.. code:: python
+\`\`\`python from sandman import app, db
+app.config['SQLALCHEMY\_DATABASE\_URI'] = '<your database connection
+string (using SQLAlchemy)'
 
-    from sandman.model import register, Model
+from sandman.model import register, Model
 
-    # Insert Models here
-    # Register models here 
-    # register((Model1, Model2, Model3)) 
-    # or
-    # register(Model1)
-    # register(Model2)
-    # register(Model3)
+Insert Models here
+==================
 
-    from sandman import app, db
-    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)>'
-    app.run()
+Register models here
+====================
+
+register((Model1, Model2, Model3))
+==================================
+
+or
+==
+
+register(Model1)
+================
+
+register(Model2)
+================
+
+register(Model3)
+================
+
+app.run()
 
 Then simply run
 
@@ -169,3 +183,5 @@ Coming Soon
    :target: https://travis-ci.org/jeffknupp/sandman
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop
    :target: https://coveralls.io/r/jeffknupp/sandman?branch=develop
+.. |Stories in Ready| image:: https://badge.waffle.io/jeffknupp/sandman.png
+   :target: http://waffle.io/jeffknupp/sandman

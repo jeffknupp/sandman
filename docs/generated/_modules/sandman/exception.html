@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.exception &mdash; sandman 0.4.0 documentation</title>
+    <title>sandman.exception &mdash; sandman 0.4.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.4.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.4.0 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.4.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -49,24 +49,29 @@
   <h1>Source code for sandman.exception</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;Exception specifications for Sandman&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">werkzeug.exceptions</span> <span class="kn">import</span> <span class="n">HTTPException</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">jsonify</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">make_response</span><span class="p">,</span> <span class="n">render_template</span>
 
-<div class="viewcode-block" id="JSONException"><a class="viewcode-back" href="../../sandman.html#sandman.exception.JSONException">[docs]</a><span class="k">class</span> <span class="nc">JSONException</span><span class="p">(</span><span class="n">HTTPException</span><span class="p">):</span>
+<div class="viewcode-block" id="InvalidAPIUsage"><a class="viewcode-back" href="../../sandman.html#sandman.exception.InvalidAPIUsage">[docs]</a><span class="k">class</span> <span class="nc">InvalidAPIUsage</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Excecption which generates a :class:`flask.Response` object whose</span>
 <span class="sd">    *data* is JSON rather than HTML&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">JSONException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
 
-<div class="viewcode-block" id="JSONException.get_headers"><a class="viewcode-back" href="../../sandman.html#sandman.exception.JSONException.get_headers">[docs]</a>    <span class="k">def</span> <span class="nf">get_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the appropriate content-type: *application/json*&quot;&quot;&quot;</span>
-        <span class="k">return</span><span class="p">[(</span><span class="s">&#39;Content-type&#39;</span><span class="p">,</span> <span class="s">&#39;application/json&#39;</span><span class="p">)]</span>
+<div class="viewcode-block" id="InvalidAPIUsage.to_dict"><a class="viewcode-back" href="../../sandman.html#sandman.exception.InvalidAPIUsage.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a dictionary representation of the exception.&quot;&quot;&quot;</span>
+        <span class="n">as_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">payload</span> <span class="ow">or</span> <span class="p">())</span>
+        <span class="n">as_dict</span><span class="p">[</span><span class="s">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
+        <span class="k">return</span> <span class="n">as_dict</span>
 </div>
-<div class="viewcode-block" id="JSONException.get_body"><a class="viewcode-back" href="../../sandman.html#sandman.exception.JSONException.get_body">[docs]</a>    <span class="k">def</span> <span class="nf">get_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the body of the *reponse* serialized as JSON&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s">&#39;result&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">})</span></div></div>
+<div class="viewcode-block" id="InvalidAPIUsage.abort"><a class="viewcode-back" href="../../sandman.html#sandman.exception.InvalidAPIUsage.abort">[docs]</a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an HTML Response representation of the exception.&quot;&quot;&quot;</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">make_response</span><span class="p">(</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;error.html&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span></div></div>
 </pre></div>
 
           </div>
@@ -100,7 +105,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
