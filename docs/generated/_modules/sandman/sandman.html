@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.sandman &mdash; sandman 0.4.0 documentation</title>
+    <title>sandman.sandman &mdash; sandman 0.4.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.4.0',
+        VERSION:     '0.4.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.4.0 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.4.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -57,9 +57,10 @@
 <span class="kn">from</span> <span class="nn">.exception</span> <span class="kn">import</span> <span class="n">InvalidAPIUsage</span>
 
 <span class="n">JSON</span><span class="p">,</span> <span class="n">HTML</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">JSON_CONTENT_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;application/json&#39;</span><span class="p">,)</span>
-<span class="n">HTML_CONTENT_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="s">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">)</span>
-<span class="n">ACCEPTABLE_CONTENT_TYPES</span> <span class="o">=</span> <span class="n">JSON_CONTENT_TYPES</span> <span class="o">+</span> <span class="n">HTML_CONTENT_TYPES</span>
+<span class="n">JSON_CONTENT_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;application/json&#39;</span><span class="p">,])</span>
+<span class="n">HTML_CONTENT_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="s">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">])</span>
+<span class="n">ALL_CONTENT_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;*/*&#39;</span><span class="p">])</span>
+<span class="n">ACCEPTABLE_CONTENT_TYPES</span> <span class="o">=</span> <span class="n">JSON_CONTENT_TYPES</span> <span class="o">|</span> <span class="n">HTML_CONTENT_TYPES</span> <span class="o">|</span> <span class="n">ALL_CONTENT_TYPES</span>
 
 <span class="n">FORWARDED_EXCEPTION_MESSAGE</span> <span class="o">=</span> <span class="s">&#39;Request could not be completed. Exception: [{}]&#39;</span>
 <span class="n">FORBIDDEN_EXCEPTION_MESSAGE</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;Method [{}] not acceptable for resource type [{}].</span>
@@ -81,11 +82,12 @@
 
 <span class="k">def</span> <span class="nf">_get_acceptable_response_type</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Return the mimetype for this request.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s">&#39;Accept&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s">&#39;Accept&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Accept&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ALL_CONTENT_TYPES</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">JSON</span>
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Accept&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">HTML_CONTENT_TYPES</span><span class="p">:</span>
+    <span class="n">acceptable_content_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;ACCEPT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">acceptable_content_types</span> <span class="o">&amp;</span> <span class="n">HTML_CONTENT_TYPES</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">HTML</span>
-    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Accept&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">JSON_CONTENT_TYPES</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">acceptable_content_types</span> <span class="o">&amp;</span> <span class="n">JSON_CONTENT_TYPES</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">JSON</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c"># HTTP 406 Not Acceptable</span>
@@ -107,6 +109,7 @@
         <span class="c"># type in the request&#39;s &#39;Accept&#39; header, which is a more important</span>
         <span class="c"># error, so return that instead of what was originally raised.</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+        <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">error</span>
         <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">415</span>
         <span class="k">return</span> <span class="n">response</span>
 </div>
@@ -188,6 +191,7 @@
         <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c"># HTTP 415: Unsupported Media Type </span>
+        <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
         <span class="k">raise</span> <span class="n">InvalidAPIUsage</span><span class="p">(</span><span class="mi">415</span><span class="p">,</span>
                 <span class="n">UNSUPPORTED_CONTENT_TYPE_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-type&#39;</span><span class="p">]))</span>
@@ -464,7 +468,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.4.0 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
