@@ -1,4 +1,4 @@
-from sandman.model import register, activate_admin_classes, Model
+from sandman.model import register, activate, Model
 
 class Track(Model):
     __tablename__ = 'Track'
@@ -35,4 +35,4 @@ class MediaType(Model):
         return self.Name
 
 register((Artist, Album, Playlist, Genre, Track, MediaType, PlaylistTrack))
-activate_admin_classes()
+activate(admin=True)

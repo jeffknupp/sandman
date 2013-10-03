@@ -25,6 +25,7 @@ def register(cls, use_admin=True):
             current_app.endpoint_classes = {}
             current_app.classes_by_name = {}
             current_app.table_to_endpoint = {}
+            current_app.classes = []
         if isinstance(cls, (list, tuple)):
             for entry in cls:
                 _register_internal_data(entry)
@@ -32,34 +33,42 @@ def register(cls, use_admin=True):
         else:
             _register_internal_data(cls)
             cls.use_admin = use_admin
-    Model.prepare(db.engine)
 
 def _register_internal_data(cls):
     with app.app_context():
         current_app.endpoint_classes[cls.endpoint()] = cls
         current_app.table_to_endpoint[cls.__tablename__] = cls.endpoint()
-        current_app.classes_by_name[cls.__name__] = cls
+        current_app.classes_by_name[cls.__tablename__] = cls
+        current_app.classes.append(cls)
 
 def _prepare_relationships():
     """Enrich the registered Models with SQLAlchemy ``relationships``
     so that related tables are correctly processed up by the admin."""
     inspector = reflection.Inspector.from_engine(db.engine)
     with app.app_context():
-        for cls in current_app.classes_by_name.values():
+        for cls in current_app.classes:
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[foreign_key['referred_table']]
                 other.__related_tables__.add(cls)
                 cls.__related_tables__.add(other)
+                print 'adding relationship {} to {}'.format(cls, other)
                 # Necessary to get Flask-Admin to register the relationship
                 setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
+
+def activate(admin=True):
+    """Activate each registered model for non-admin use"""
+    if admin:
+        return activate_admin_classes()
+    Model.prepare(db.engine)
 
 def activate_admin_classes():
     """Activate each registed Model in the admin if it was registered with
     *use_admin=True*."""
     _prepare_relationships()
+    Model.prepare(db.engine)
     admin = Admin(app)
     with app.app_context():
-        for cls in (cls for cls in current_app.classes_by_name.values() if cls.use_admin == True):
+        for cls in (cls for cls in current_app.classes if cls.use_admin == True):
             admin.add_view(ModelView(cls, db.session))
 
 
