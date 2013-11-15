@@ -1,4 +1,4 @@
-from sandman.model import register, activate_admin_classes, Model
+from sandman.model import register, activate, Model
 
 class Track(Model):
     __tablename__ = 'Track'
@@ -21,7 +21,7 @@ class Playlist(Model):
     def __str__(self):
         return self.Name
 
-class Genre(Model):
+class Type(Model):
     __tablename__ = 'Genre'
     def __str__(self):
         return self.Name
@@ -34,5 +34,5 @@ class MediaType(Model):
     def __str__(self):
         return self.Name
 
-register((Artist, Album, Playlist, Genre, Track, MediaType, PlaylistTrack))
-activate_admin_classes()
+register((Artist, Album, Playlist, Type, Track, MediaType, PlaylistTrack))
+activate(admin=True)
