@@ -368,3 +368,11 @@ class TestSandmanAdmin(TestSandmanBase):
         # is the genre for many results on the third page
         assert 'Jazz' not in response.data
 
+    def test_admin_default_str_repr_different_table_class_name(self):
+        """Ensure default ``__str__`` representation for classes where the
+        classname differs from the table name show up with the classname (not the
+        table name)."""
+
+        response = self.get_response('/admin/styleview/', 200)
+        assert 'Genre' not in response.data
+

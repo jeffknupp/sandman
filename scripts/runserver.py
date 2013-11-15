@@ -4,4 +4,4 @@ import os
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + os.path.abspath(os.path.dirname(__file__)) + '/chinook'
 app.secret_key = 's3cr3t'
 import models
-app.run(debug=True)
+app.run(host='0.0.0.0', debug=True)

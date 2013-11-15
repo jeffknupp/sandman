@@ -53,23 +53,18 @@ def _prepare_relationships():
                 cls.__related_tables__.add(other)
                 print 'adding relationship {} to {}'.format(cls, other)
                 # Necessary to get Flask-Admin to register the relationship
-                setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
+                #setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
+                setattr(other, cls.__name__, relationship(cls.__name__, backref=other.__name__))
 
 def activate(admin=True):
     """Activate each registered model for non-admin use"""
+    Model.prepare(db.engine)
     if admin:
-        return activate_admin_classes()
-    Model.prepare(db.engine)
-
-def activate_admin_classes():
-    """Activate each registed Model in the admin if it was registered with
-    *use_admin=True*."""
-    _prepare_relationships()
-    Model.prepare(db.engine)
-    admin = Admin(app)
-    with app.app_context():
-        for cls in (cls for cls in current_app.classes if cls.use_admin == True):
-            admin.add_view(ModelView(cls, db.session))
+        _prepare_relationships()
+        admin = Admin(app)
+        with app.app_context():
+            for cls in (cls for cls in current_app.classes if cls.use_admin == True):
+                admin.add_view(ModelView(cls, db.session))
 
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
