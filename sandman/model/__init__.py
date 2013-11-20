@@ -51,10 +51,8 @@ def _prepare_relationships():
                 other = current_app.classes_by_name[foreign_key['referred_table']]
                 other.__related_tables__.add(cls)
                 cls.__related_tables__.add(other)
-                print 'adding relationship {} to {}'.format(cls, other)
                 # Necessary to get Flask-Admin to register the relationship
-                #setattr(other, '_ref_' + cls.__tablename__.lower(), relationship(cls.__tablename__, backref='_fk_' + other.__tablename__.lower()))
-                setattr(other, cls.__name__, relationship(cls.__name__, backref=other.__name__))
+                setattr(other, cls.__name__.lower(), relationship(cls.__name__, backref=other.__name__.lower()))
 
 def activate(admin=True):
     """Activate each registered model for non-admin use"""
