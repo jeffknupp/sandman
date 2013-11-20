@@ -7,7 +7,7 @@ class InvalidAPIUsage(Exception):
     *data* is JSON rather than HTML"""
 
     def __init__(self, code=400, message=None, payload=None):
-        super(Exception, self).__init__(message)
+        super(InvalidAPIUsage, self).__init__(message)
         self.message = message
         self.payload = payload
         if code is not None:
