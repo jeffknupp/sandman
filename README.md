@@ -102,6 +102,7 @@ RESTful API and admin interface. For each table, Sandman creates:
     * PUT
     * DELETE
 * responses with appropriate `rel` links automatically
+  * foreign keys in your tables are represented by link
 * custom validation by simply defining `validate_<METHOD>` methods on your Model
 * explicitly list supported methods for a Model by setting the `__methods__` attribute
 * customize a Models endpoint by setting the `__endpoint__` method
@@ -150,4 +151,3 @@ use of the [Chinook](http://chinookdatabase.codeplex.com) sample SQL database.
 ### Coming Soon
 
 * Authentication
-* More `links` automatically generated (i.e. `links` to related objects)

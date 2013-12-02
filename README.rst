@@ -1,7 +1,7 @@
 sandman
 =======
 
-|Build Status| |Coverage Status|
+|Build Status| |Coverage Status| |Stories in Ready|
 
 Documentation
 -------------
@@ -106,6 +106,7 @@ Sandman creates:
    -  DELETE
 
 -  responses with appropriate ``rel`` links automatically
+-  foreign keys in your tables are represented by link
 -  custom validation by simply defining ``validate_<METHOD>`` methods on
    your Model
 -  explicitly list supported methods for a Model by setting the
@@ -162,10 +163,10 @@ Coming Soon
 ~~~~~~~~~~~
 
 -  Authentication
--  More ``links`` automatically generated (i.e. ``links`` to related
-   objects)
 
 .. |Build Status| image:: https://travis-ci.org/jeffknupp/sandman.png?branch=develop
    :target: https://travis-ci.org/jeffknupp/sandman
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop
    :target: https://coveralls.io/r/jeffknupp/sandman?branch=develop
+.. |Stories in Ready| image:: https://badge.waffle.io/jeffknupp/sandman.png
+   :target: http://waffle.io/jeffknupp/sandman
