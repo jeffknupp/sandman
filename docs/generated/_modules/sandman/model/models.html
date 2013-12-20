@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.model.models &mdash; sandman 0.4.1 documentation</title>
+    <title>sandman.model.models &mdash; sandman 0.5 documentation</title>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.1',
+        VERSION:     '0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.4.1 documentation" href="../../../index.html" />
+    <link rel="top" title="sandman 0.5 documentation" href="../../../index.html" />
     <link rel="up" title="sandman.model" href="../model.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">sandman 0.5 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../model.html" accesskey="U">sandman.model</a> &raquo;</li> 
       </ul>
@@ -114,10 +114,12 @@
         <span class="n">links</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">foreign_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">foreign_keys</span><span class="p">:</span>
             <span class="n">column</span> <span class="o">=</span> <span class="n">foreign_key</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">name</span>
-            <span class="n">table</span> <span class="o">=</span> <span class="n">foreign_key</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
-                <span class="n">endpoint</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">table_to_endpoint</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
-            <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;rel&#39;</span><span class="p">:</span> <span class="n">endpoint</span><span class="p">,</span> <span class="s">&#39;uri&#39;</span><span class="p">:</span> <span class="s">&#39;/{}/{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">))})</span>
+            <span class="n">column_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">column_value</span><span class="p">:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="n">foreign_key</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+                    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">table_to_endpoint</span><span class="p">[</span><span class="n">table</span><span class="p">]</span>
+                <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;rel&#39;</span><span class="p">:</span> <span class="n">endpoint</span><span class="p">,</span> <span class="s">&#39;uri&#39;</span><span class="p">:</span> <span class="s">&#39;/{}/{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">column_value</span><span class="p">)})</span>
         <span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;rel&#39;</span><span class="p">:</span> <span class="s">&#39;self&#39;</span><span class="p">,</span> <span class="s">&#39;uri&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_uri</span><span class="p">()})</span>
         <span class="k">return</span> <span class="n">links</span>
 </div>
@@ -209,7 +211,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">sandman 0.5 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../model.html" >sandman.model</a> &raquo;</li> 
       </ul>
