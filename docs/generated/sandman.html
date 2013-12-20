@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman API &mdash; sandman 0.4.1 documentation</title>
+    <title>sandman API &mdash; sandman 0.5 documentation</title>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.1',
+        VERSION:     '0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.4.1 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.5 documentation" href="index.html" />
     <link rel="prev" title="The sandman Admin Interface" href="admin.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.4.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -74,9 +74,9 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-sandman.model">
-<span id="model-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">model</span></tt> Module<a class="headerlink" href="#module-sandman.model" title="Permalink to this headline">¶</a></h2>
-<p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
+<div class="section" id="model-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">model</span></tt> Module<a class="headerlink" href="#model-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sandman.model"></span><p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
 from which user models should derive. It also makes the <a class="reference internal" href="#sandman.model.register" title="sandman.model.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a>
 function available, which maps endpoints to their associated classes.</p>
 <dl class="function">
@@ -93,13 +93,6 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="function">
-<dt id="sandman.model.activate_admin_classes">
-<tt class="descclassname">sandman.model.</tt><tt class="descname">activate_admin_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model.html#activate_admin_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.activate_admin_classes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Activate each registed Model in the admin if it was registered with
-<em>use_admin=True</em>.</p>
 </dd></dl>
 
 <span class="target" id="module-sandman.model.models"></span><p>The Model class is meant to be the base class for user Models. It represents
@@ -466,15 +459,21 @@ appropriate response.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.retrieve_collection">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">retrieve_collection</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#retrieve_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.retrieve_collection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the resources in <em>collection</em>.</p>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">retrieve_collection</tt><big>(</big><em>collection</em>, <em>query_arguments=None</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#retrieve_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.retrieve_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the resources in <em>collection</em>, possibly filtered by a series of
+values to use in a &#8216;where&#8217; clause search.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>query_arguments</strong> (<em>dict</em>) &#8211; a list of filter query arguments</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">class:<cite>sandman.model.Model</cite></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">class:<cite>sandman.model.Model</cite></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -533,7 +532,7 @@ appropriate response.</p>
   <ul>
 <li><a class="reference internal" href="#">sandman API</a><ul>
 <li><a class="reference internal" href="#module-sandman.exception"><tt class="docutils literal"><span class="pre">exception</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-sandman.model"><tt class="docutils literal"><span class="pre">model</span></tt> Module</a></li>
+<li><a class="reference internal" href="#model-module"><tt class="docutils literal"><span class="pre">model</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-sandman.sandman"><tt class="docutils literal"><span class="pre">sandman</span></tt> Module</a></li>
 </ul>
 </li>
@@ -576,7 +575,7 @@ appropriate response.</p>
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.4.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

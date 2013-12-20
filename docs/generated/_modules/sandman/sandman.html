@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.sandman &mdash; sandman 0.4.1 documentation</title>
+    <title>sandman.sandman &mdash; sandman 0.5 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.4.1',
+        VERSION:     '0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.4.1 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.5 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.5 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -211,16 +211,24 @@
             <span class="k">raise</span> <span class="n">InvalidAPIUsage</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span>
 </div>
-<div class="viewcode-block" id="retrieve_collection"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.retrieve_collection">[docs]</a><span class="k">def</span> <span class="nf">retrieve_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the resources in *collection*.</span>
+<div class="viewcode-block" id="retrieve_collection"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.retrieve_collection">[docs]</a><span class="k">def</span> <span class="nf">retrieve_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">query_arguments</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the resources in *collection*, possibly filtered by a series of</span>
+<span class="sd">    values to use in a &#39;where&#39; clause search.</span>
 
 <span class="sd">    :param string collection: a :class:`sandman.model.Model` endpoint</span>
+<span class="sd">    :param dict query_arguments: a list of filter query arguments</span>
 <span class="sd">    :rtype: class:`sandman.model.Model`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">session</span> <span class="o">=</span> <span class="n">_get_session</span><span class="p">()</span>
     <span class="n">cls</span> <span class="o">=</span> <span class="n">endpoint_class</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-    <span class="n">resources</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">query_arguments</span><span class="p">:</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">query_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">==</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">*</span><span class="n">filters</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">resources</span>
 
 </div>
@@ -430,7 +438,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cls</span> <span class="o">=</span> <span class="n">endpoint_class</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-    <span class="n">resources</span> <span class="o">=</span> <span class="n">retrieve_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+
+    <span class="n">resources</span> <span class="o">=</span> <span class="n">retrieve_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
 
     <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resources</span><span class="p">)</span>
 
@@ -468,7 +477,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.4.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.5 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
