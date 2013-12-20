@@ -39,49 +39,37 @@ database using **sandman**:
 
     app.run()
 
-Let's start our new service and make a request:
+Let's start our new service and make a request. While we're at it, lets
+make use of Sandman's awesome filtering capability by specifying a
+filter term:
 
 .. code:: zsh
 
     > python runserver.py &
     * Running on http://127.0.0.1:5000/
 
-    > curl GET http://localhost:5000/artists
+    > curl GET "http://localhost:5000/artists?Name=AC/DC"
 
 .. code:: json
 
     ...
     {
-        "ArtistId": 273,
-        "Name": "C. Monteverdi, Nigel Rogers - Chiaroscuro; London Baroque; London Cornett & Sackbu",
-        "links": [
-        {
-            "rel": "self",
-            "uri": "/artists/ArtistId"
-        }
-        ]
-    },
-    {
-        "ArtistId": 274,
-        "Name": "Nash Ensemble",
-        "links": [
-        {
-            "rel": "self",
-            "uri": "/artists/ArtistId"
-        }
-        ]
-    },
-    {
-        "ArtistId": 275,
-        "Name": "Philip Glass Ensemble",
-        "links": [
-        {
-            "rel": "self",
-            "uri": "/artists/ArtistId"
-        }
+        "resources": [
+            {
+                "ArtistId": 1,
+                "Name": "AC/DC",
+                "links": [
+                    {
+                        "rel": "self",
+                        "uri": "/artists/1"
+                    }
+                ]
+            }
         ]
     }
-    ]
+
+All of that, including filtering/searching, is automagically available
+from those 10 measly lines of code.
 
 Oh, that's not enough? You also want a Django-style admin interface
 built automatically? Fine. Add one more line to the list of models to
