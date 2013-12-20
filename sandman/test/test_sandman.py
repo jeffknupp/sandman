@@ -31,12 +31,12 @@ class TestSandmanBase(object):
         os.unlink(self.DB_LOCATION)
         self.app = None
 
-    def get_response(self, uri, status_code, has_data=True, headers=None):
+    def get_response(self, uri, status_code, params=None, has_data=True, headers=None):
         """Return the response generated from a generic GET request. Do basic
         validation on the response."""
         if headers is None:
             headers = {}
-        response = self.app.get(uri, headers=headers)
+        response = self.app.get(uri, query_string=params, headers=headers)
         assert response.status_code == status_code
         if has_data:
             assert response.data
@@ -60,6 +60,11 @@ class TestSandmanBase(object):
 
 class TestSandmanBasicVerbs(TestSandmanBase):
     def test_get(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
+        assert len(json.loads(response.data)[u'resources']) == 1
+
+    def test_get_with_filter(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200)
         assert len(json.loads(response.data)[u'resources']) == 275
