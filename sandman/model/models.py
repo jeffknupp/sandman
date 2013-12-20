@@ -64,10 +64,12 @@ class Model(object):
         links = []
         for foreign_key in self.__table__.foreign_keys:
             column = foreign_key.column.name
-            table = foreign_key.column.table.name
-            with app.app_context():
-                endpoint = current_app.table_to_endpoint[table]
-            links.append({'rel': endpoint, 'uri': '/{}/{}'.format(endpoint, getattr(self, column))})
+            column_value = getattr(self, column, None)
+            if column_value:
+                table = foreign_key.column.table.name
+                with app.app_context():
+                    endpoint = current_app.table_to_endpoint[table]
+                links.append({'rel': endpoint, 'uri': '/{}/{}'.format(endpoint, column_value)})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
