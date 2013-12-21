@@ -49,14 +49,30 @@ def _prepare_relationships():
         for cls in current_app.classes:
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[foreign_key['referred_table']]
+                if other==cls:
+                    continue
                 other.__related_tables__.add(cls)
                 cls.__related_tables__.add(other)
                 # Necessary to get Flask-Admin to register the relationship
-                setattr(other, cls.__name__.lower(), relationship(cls.__name__, backref=other.__name__.lower()))
+                setattr(other, '__' + cls.__name__.lower(), relationship(cls.__name__, backref=other.__name__.lower()))
 
 def activate(admin=True):
     """Activate each registered model for non-admin use"""
-    Model.prepare(db.engine)
+    with app.app_context():
+        if getattr(current_app, 'endpoint_classes', None) is None:
+            current_app.endpoint_classes = {}
+            current_app.classes_by_name = {}
+            current_app.table_to_endpoint = {}
+            current_app.classes = []
+        if not current_app.endpoint_classes:
+            db.metadata.reflect(bind=db.engine)
+            for name, table in db.metadata.tables.items():
+                try:
+                    cls = type(str(name), (sandman_model, db.Model), {'__tablename__': name})
+                    register(cls)
+                except:
+                    print name + ' unable to be registered'
+
     if admin:
         _prepare_relationships()
         admin = Admin(app)
@@ -72,4 +88,5 @@ def activate(admin=True):
 # as "Model" in models.py. It caused confusion in the documentation, however,
 # since it wasn't clear that the Model class and the Resource class were
 # actually the same thing.
+sandman_model = Model
 Model = declarative_base(cls=(Model, DeferredReflection))
