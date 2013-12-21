@@ -8,7 +8,7 @@ Documentation
 
 `Sandman documentation <https://sandman.readthedocs.org/en/latest/>`__
 
-**sandman** "makes things REST". Have an existing database you'd like to
+``sandman`` "makes things REST". Have an existing database you'd like to
 expose via a REST API? Normally, you'd have to write a ton of
 boilerplate code for the ORM you're using, then integrate that into some
 web framework.
@@ -16,28 +16,23 @@ web framework.
 I don't want to write boilerplate.
 
 Here's what's required to create a RESTful API service from an existing
-database using **sandman**:
+database using ``sandman``:
 
 .. code:: python
 
-    from sandman import app, db
+    from `sandman` import app
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
-    from sandman.model import register, Model
+    from sandman.model import activate
 
-    class Artist(Model):
-        __tablename__ = 'Artist'
-
-    class Album(Model):
-        __tablename__ = 'Album'
-
-    class Playlist(Model):
-        __tablename__ = 'Playlist'
-
-    register((Artist, Album, Playlist))
+    activate()
 
     app.run()
+
+That's it! **You don't even need to tell ``sandman`` what tables your
+database contains.** Just point sandman at your database and let it do
+all the heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets
 make use of Sandman's awesome filtering capability by specifying a
@@ -72,17 +67,77 @@ All of that, including filtering/searching, is automagically available
 from those 10 measly lines of code.
 
 Oh, that's not enough? You also want a Django-style admin interface
-built automatically? Fine. Add one more line to the list of models to
-get access to this:
+built automatically? Fine. You may have noticed that when you ran
+``runserver.py`` that a browser window popped up. Now's the time to go
+check that out. You'll find it's that Django-style admin interface
+you've been bugging me about, looking something like this:
 
 .. figure:: /docs/images/admin_tracks_improved.jpg
-   :alt: improved admin interface screenshot
+   :alt: admin interface awesomesauce screenshot
 
-   improved admin interface screenshot
-With **sandman**, (almost) zero boilerplate code is required. Your
+   admin interface awesomesauce screenshot
+If you wanted to specify specific tables that ``sandman`` should make
+available, how do you do that? With this little ditty:
+
+.. code:: python
+
+    from sandman import app, db
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
+
+    from sandman.model import register, Model
+
+    class Artist(Model):
+        __tablename__ = 'Artist'
+
+    class Album(Model):
+        __tablename__ = 'Album'
+
+    class Playlist(Model):
+        __tablename__ = 'Playlist'
+
+    register((Artist, Album, Playlist))
+
+    app.run()
+
+And if you wanted to add custom logic for an endpoint? Or change the
+endpoint name? Or add validation? All supported. Here's a "fancy" class
+definition:
+
+.. code:: python
+
+    class Style(Model):
+        """Model mapped to the "Genre" table
+
+        Has a custom endpoint ("styles" rather than the default, "genres").
+        Only supports HTTP methods specified.
+        Has a custom validator for the GET method.
+
+        """
+
+        __tablename__ = 'Genre'
+        __endpoint__ = 'styles'
+        __methods__ = ('GET', 'DELETE')
+
+        @staticmethod
+        def validate_GET(resource=None):
+            """Return False if the request should not be processed.
+
+            :param resource: resource related to current request
+            :type resource: :class:`sandman.model.Model` or None
+
+            """
+
+            if isinstance(resource, list):
+                return True
+            elif resource and resource.GenreId == 1:
+                return False
+            return True
+
+With ``sandman``, (almost) zero boilerplate code is required. Your
 existing database structure and schema is introspected and your database
 tables magically get a RESTful API and admin interface. For each table,
-Sandman creates:
+``sandman`` creates:
 
 -  proper endpoints
 -  support for a configurable set of HTTP verbs
@@ -102,8 +157,14 @@ Sandman creates:
 -  customize a Models endpoint by setting the ``__endpoint__`` method
 -  essentially a HATEOAS-based service sitting in front of your database
 
-*Warning: Sandman is still very much a work in progress. Use it at your
-own risk. It's also often changing in backwards incompatible ways.*
+Sandman is under active development but should be usable in any
+envrionment due to one simple fact:
+
+**Sandman never alters your database unless you add or change a record
+yourself. It adds no extra tables to your existing database and requires
+no changes to any of your existing tables. If you start sandman, use it
+to browse your database via cURL, then stop sandman, your database will
+be in exactly the same state as it was before you began.**
 
 Installation
 ~~~~~~~~~~~~
@@ -118,7 +179,7 @@ You'll need to create one file with the following contents (which I call
 
 .. code:: python
 
-    from sandman.model import register, Model
+    from sandman.model import register, activate, Model
 
     # Insert Models here
     # Register models here 
@@ -127,6 +188,8 @@ You'll need to create one file with the following contents (which I call
     # register(Model1)
     # register(Model2)
     # register(Model3)
+
+    # activate(admin=True)
 
     from sandman import app, db
     app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)>'
