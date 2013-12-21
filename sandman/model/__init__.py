@@ -2,6 +2,8 @@
 from which user models should derive. It also makes the :func:`register`
 function available, which maps endpoints to their associated classes."""
 
+import webbrowser
+
 from .models import Model
 from .. import db, app
 from flask import current_app
@@ -80,6 +82,7 @@ def activate(admin=True):
         with app.app_context():
             for cls in (cls for cls in current_app.classes if cls.use_admin == True):
                 admin.add_view(ModelView(cls, db.session))
+    webbrowser.open('http://localhost:5000/admin')
 
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
