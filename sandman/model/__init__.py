@@ -82,7 +82,7 @@ def activate(admin=True):
         with app.app_context():
             for cls in (cls for cls in current_app.classes if cls.use_admin == True):
                 admin.add_view(ModelView(cls, db.session))
-        webbrowser.open('http://localhost:5000/admin')
+        webbrowser.open('http://127.0.0.1:5000/admin')
 
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
