@@ -88,5 +88,4 @@ def activate(admin=True):
 # as "Model" in models.py. It caused confusion in the documentation, however,
 # since it wasn't clear that the Model class and the Resource class were
 # actually the same thing.
-sandman_model = Model
 Model = declarative_base(cls=(Model, DeferredReflection))
