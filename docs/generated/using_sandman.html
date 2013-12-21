@@ -58,7 +58,7 @@
 <h2>The Simplest Application<a class="headerlink" href="#the-simplest-application" title="Permalink to this headline">¶</a></h2>
 <p>We&#8217;ll be using a subset of the Chinook test database as an example.
 Create one file with the following contents (which I&#8217;ll call <tt class="docutils literal"><span class="pre">runserver.py</span></tt>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">Model</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">activate</span><span class="p">,</span> <span class="n">Model</span>
 
 <span class="k">class</span> <span class="nc">Artist</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;Artist&#39;</span>
@@ -74,6 +74,7 @@ Create one file with the following contents (which I&#8217;ll call <tt class="do
 
 <span class="n">register</span><span class="p">((</span><span class="n">Artist</span><span class="p">,</span> <span class="n">Album</span><span class="p">,</span> <span class="n">Playlist</span><span class="p">))</span>
 <span class="n">register</span><span class="p">(</span><span class="n">Genre</span><span class="p">)</span>
+<span class="n">activate</span><span class="p">()</span>
 
 <span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
 <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;your database connection string (using SQLAlchemy)&#39;</span>
@@ -84,6 +85,10 @@ Create one file with the following contents (which I&#8217;ll call <tt class="do
 <div class="highlight-python"><pre>python runserver.py</pre>
 </div>
 <p>and try curling your new REST API service!</p>
+<p>Of course, you don&#8217;t actually need to tell sandman about your tables; it&#8217;s
+perfectly capable of introspecting all of them. To use introspection to make
+<em>all</em> of your database tables available via the admin and REST API, simply
+remove all model code and call <cite>activate()</cite> without ever registering a model.</p>
 <div class="section" id="a-quick-guide-to-rest-apis">
 <h3>A Quick Guide to REST APIs<a class="headerlink" href="#a-quick-guide-to-rest-apis" title="Permalink to this headline">¶</a></h3>
 <p>Before we discuss the example code above in more detail, we should discuss some

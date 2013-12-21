@@ -21,12 +21,12 @@ the creation and editing forms, objects related via foreign key (e.g. a
 available values. This ensures that all database constraints are honored when
 making changes via the admin.
 
-To activate the admin interface (which adds an ``/admin`` endpoint to your
-service, accessible via a browser), you'll need to call one additional function:
-``model.activate_admin_classes``. By default, calling this function will make _all_
-Models accessible in the admin. If you'd like to prevent this, simply call
-``register()`` with ``use_admin=False`` for whichever Model/Models you don't 
-want to appear.
+The admin interface (which adds an ``/admin`` endpoint to your
+service, accessible via a browser), is enabled by default. To disable it, pass
+`admin=False` as an argument in your call to `activate`.
+By default, calling this function will make _all_ Models accessible in the admin. 
+If you'd like to prevent this, simply call ``register()`` with ``use_admin=False`` 
+for whichever Model/Models you don't want to appear.
 
 Getting Richer Information for Related Objects
 ----------------------------------------------
@@ -38,7 +38,7 @@ associated table. Currently, ``__str__`` simply returns the value of a Model's
 ``primary_key()`` attribute. By overriding ``__str__``, however, we can display
 more useful information. After making the changes below::
 
-    from sandman.model import register, activate_admin_classes, Model
+    from sandman.model import register, Model
 
     class Track(Model):
         __tablename__ = 'Track'
@@ -77,7 +77,6 @@ more useful information. After making the changes below::
             return self.Name
 
     register((Artist, Album, Playlist, Genre, Track, MediaType))
-    activate_admin_classes()
 
 Now, we get much more useful information in the columns mentioned, as you can
 see here:

@@ -107,7 +107,7 @@
                 <span class="c"># Necessary to get Flask-Admin to register the relationship</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;__&#39;</span> <span class="o">+</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">relationship</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
 
-<span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="activate"><a class="viewcode-back" href="../../sandman.html#sandman.model.activate">[docs]</a><span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Activate each registered model for non-admin use&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_app</span><span class="p">,</span> <span class="s">&#39;endpoint_classes&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -131,7 +131,7 @@
         <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cls</span> <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">current_app</span><span class="o">.</span><span class="n">classes</span> <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">use_admin</span> <span class="o">==</span> <span class="bp">True</span><span class="p">):</span>
                 <span class="n">admin</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">ModelView</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="p">))</span>
-    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;http://localhost:5000/admin&#39;</span><span class="p">)</span>
+        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;http://localhost:5000/admin&#39;</span><span class="p">)</span>
 
 
 <span class="c"># Redefine &#39;Model&#39; to be a sqlalchemy.ext.declarative.api.DeclarativeMeta</span>
@@ -140,7 +140,7 @@
 <span class="c"># from DeferredReflection and &quot;Resource&quot;, which was the exact same class</span>
 <span class="c"># as &quot;Model&quot; in models.py. It caused confusion in the documentation, however,</span>
 <span class="c"># since it wasn&#39;t clear that the Model class and the Resource class were</span>
-<span class="c"># actually the same thing.</span>
+<span class="c"># actually the same thing.</span></div>
 <span class="n">sandman_model</span> <span class="o">=</span> <span class="n">Model</span>
 <span class="n">Model</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">DeferredReflection</span><span class="p">))</span>
 </pre></div>

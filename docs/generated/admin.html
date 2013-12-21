@@ -68,12 +68,12 @@ the creation and editing forms, objects related via foreign key (e.g. a
 <tt class="docutils literal"><span class="pre">Track</span></tt>&#8216;s associated <tt class="docutils literal"><span class="pre">Album</span></tt>) are auto-populated in a dropdown based on
 available values. This ensures that all database constraints are honored when
 making changes via the admin.</p>
-<p>To activate the admin interface (which adds an <tt class="docutils literal"><span class="pre">/admin</span></tt> endpoint to your
-service, accessible via a browser), you&#8217;ll need to call one additional function:
-<tt class="docutils literal"><span class="pre">model.activate_admin_classes</span></tt>. By default, calling this function will make _all_
-Models accessible in the admin. If you&#8217;d like to prevent this, simply call
-<tt class="docutils literal"><span class="pre">register()</span></tt> with <tt class="docutils literal"><span class="pre">use_admin=False</span></tt> for whichever Model/Models you don&#8217;t
-want to appear.</p>
+<p>The admin interface (which adds an <tt class="docutils literal"><span class="pre">/admin</span></tt> endpoint to your
+service, accessible via a browser), is enabled by default. To disable it, pass
+<cite>admin=False</cite> as an argument in your call to <cite>activate</cite>.
+By default, calling this function will make _all_ Models accessible in the admin.
+If you&#8217;d like to prevent this, simply call <tt class="docutils literal"><span class="pre">register()</span></tt> with <tt class="docutils literal"><span class="pre">use_admin=False</span></tt>
+for whichever Model/Models you don&#8217;t want to appear.</p>
 </div>
 <div class="section" id="getting-richer-information-for-related-objects">
 <h2>Getting Richer Information for Related Objects<a class="headerlink" href="#getting-richer-information-for-related-objects" title="Permalink to this headline">¶</a></h2>
@@ -83,7 +83,7 @@ value that will be shown is the value returned by <tt class="docutils literal"><
 associated table. Currently, <tt class="docutils literal"><span class="pre">__str__</span></tt> simply returns the value of a Model&#8217;s
 <tt class="docutils literal"><span class="pre">primary_key()</span></tt> attribute. By overriding <tt class="docutils literal"><span class="pre">__str__</span></tt>, however, we can display
 more useful information. After making the changes below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">activate_admin_classes</span><span class="p">,</span> <span class="n">Model</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">Model</span>
 
 <span class="k">class</span> <span class="nc">Track</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;Track&#39;</span>
@@ -122,7 +122,6 @@ more useful information. After making the changes below:</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Name</span>
 
 <span class="n">register</span><span class="p">((</span><span class="n">Artist</span><span class="p">,</span> <span class="n">Album</span><span class="p">,</span> <span class="n">Playlist</span><span class="p">,</span> <span class="n">Genre</span><span class="p">,</span> <span class="n">Track</span><span class="p">,</span> <span class="n">MediaType</span><span class="p">))</span>
-<span class="n">activate_admin_classes</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Now, we get much more useful information in the columns mentioned, as you can

@@ -74,9 +74,9 @@
 </dd></dl>
 
 </div>
-<div class="section" id="model-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">model</span></tt> Module<a class="headerlink" href="#model-module" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-sandman.model"></span><p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
+<div class="section" id="module-sandman.model">
+<span id="model-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">model</span></tt> Module<a class="headerlink" href="#module-sandman.model" title="Permalink to this headline">¶</a></h2>
+<p>The model module is repsonsible exposes the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class,
 from which user models should derive. It also makes the <a class="reference internal" href="#sandman.model.register" title="sandman.model.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a>
 function available, which maps endpoints to their associated classes.</p>
 <dl class="function">
@@ -93,6 +93,12 @@ registered with the endpoint returned by <tt class="xref py py-func docutils lit
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.model.activate">
+<tt class="descclassname">sandman.model.</tt><tt class="descname">activate</tt><big>(</big><em>admin=True</em><big>)</big><a class="reference internal" href="_modules/sandman/model.html#activate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.activate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Activate each registered model for non-admin use</p>
 </dd></dl>
 
 <span class="target" id="module-sandman.model.models"></span><p>The Model class is meant to be the base class for user Models. It represents
@@ -532,7 +538,7 @@ values to use in a &#8216;where&#8217; clause search.</p>
   <ul>
 <li><a class="reference internal" href="#">sandman API</a><ul>
 <li><a class="reference internal" href="#module-sandman.exception"><tt class="docutils literal"><span class="pre">exception</span></tt> Module</a></li>
-<li><a class="reference internal" href="#model-module"><tt class="docutils literal"><span class="pre">model</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-sandman.model"><tt class="docutils literal"><span class="pre">model</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-sandman.sandman"><tt class="docutils literal"><span class="pre">sandman</span></tt> Module</a></li>
 </ul>
 </li>

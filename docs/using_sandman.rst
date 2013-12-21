@@ -8,7 +8,7 @@ The Simplest Application
 We'll be using a subset of the Chinook test database as an example. 
 Create one file with the following contents (which I'll call ``runserver.py``)::
 
-    from sandman.model import register, Model
+    from sandman.model import register, activate, Model
    
     class Artist(Model):
         __tablename__ = 'Artist'
@@ -24,6 +24,7 @@ Create one file with the following contents (which I'll call ``runserver.py``)::
 
     register((Artist, Album, Playlist))
     register(Genre)
+    activate()
 
     from sandman import app, db
     app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
@@ -34,6 +35,11 @@ Then simply run::
     python runserver.py
 
 and try curling your new REST API service!
+
+Of course, you don't actually need to tell sandman about your tables; it's
+perfectly capable of introspecting all of them. To use introspection to make
+*all* of your database tables available via the admin and REST API, simply
+remove all model code and call `activate()` without ever registering a model.
 
 A Quick Guide to REST APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
