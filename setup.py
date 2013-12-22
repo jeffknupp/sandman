@@ -49,6 +49,7 @@ setup(
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=long_description,
+    scripts=['scripts/sandmanctl'],
     packages=['sandman', 'sandman.model'],
     include_package_data=True,
     platforms='any',

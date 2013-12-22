@@ -18,6 +18,26 @@ I don't want to write boilerplate.
 Here's what's required to create a RESTful API service from an existing
 database using ``sandman``:
 
+.. code:: bash
+
+    $ sandmanctl sqlite:////tmp/my_database.db
+
+*That's it.* ``sandman`` will then do the following:
+
+-  connect to your database and introspect it's contents
+-  create and launch a REST API service
+-  create an HTML admin interface
+-  *open your browser to the admin interface*
+
+That's right. Given a legacy database, ``sandman`` not only gives you a
+REST API, it gives you a beautiful admin page and *opens your browser to
+the admin page*. It truly does everything for you.
+
+Behind the Scenes
+-----------------
+
+``sandmanctl`` is really just a simple wrapper around the following:
+
 .. code:: python
 
     from `sandman` import app
@@ -30,9 +50,9 @@ database using ``sandman``:
 
     app.run()
 
-That's it! **You don't even need to tell ``sandman`` what tables your
-database contains.** Just point sandman at your database and let it do
-all the heavy lifting
+**You don't even need to tell ``sandman`` what tables your database
+contains.** Just point sandman at your database and let it do all the
+heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets
 make use of Sandman's awesome filtering capability by specifying a
@@ -64,7 +84,7 @@ filter term:
     }
 
 All of that, including filtering/searching, is automagically available
-from those 10 measly lines of code.
+from those *five* measly lines of code.
 
 Oh, that's not enough? You also want a Django-style admin interface
 built automatically? Fine. You may have noticed that when you ran
@@ -134,10 +154,11 @@ definition:
                 return False
             return True
 
-With ``sandman``, (almost) zero boilerplate code is required. Your
-existing database structure and schema is introspected and your database
-tables magically get a RESTful API and admin interface. For each table,
-``sandman`` creates:
+With ``sandman``, zero boilerplate code is required. In fact, using
+``sandmanctl``, **no code is required at all**. Your existing database
+structure and schema is introspected and your database tables magically
+get a RESTful API and admin interface. For each table, ``sandman``
+creates:
 
 -  proper endpoints
 -  support for a configurable set of HTTP verbs
@@ -171,44 +192,18 @@ Installation
 
 ``pip install sandman``
 
-Quickstart
-~~~~~~~~~~
-
-You'll need to create one file with the following contents (which I call
-``runserver.py``):
-
-.. code:: python
-
-    from sandman.model import register, activate, Model
-
-    # Insert Models here
-    # Register models here 
-    # register((Model1, Model2, Model3)) 
-    # or
-    # register(Model1)
-    # register(Model2)
-    # register(Model3)
-
-    # activate(admin=True)
-
-    from sandman import app, db
-    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)>'
-    app.run()
-
-Then simply run
-
-.. code:: bash
-
-    python runserver.py
-
-and try curling your new RESTful API!
-
 Example Application
 ~~~~~~~~~~~~~~~~~~~
 
 Take a look in the ``sandman/test`` directory. The application found
 there makes use of the `Chinook <http://chinookdatabase.codeplex.com>`__
 sample SQL database.
+
+Contact Me
+----------
+
+Questions or comments about ``sandman``? Hit me up at
+jeff@jeffknupp.com.
 
 Coming Soon
 ~~~~~~~~~~~

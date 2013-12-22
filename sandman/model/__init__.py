@@ -11,7 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.engine import reflection
 from sqlalchemy.orm import relationship
 from flask.ext.admin import Admin
-from flask.ext.admin.contrib.sqlamodel import ModelView
+from flask.ext.admin.contrib.sqla import ModelView
 
 def register(cls, use_admin=True):
     """Register with the API a :class:`sandman.model.Model` class and associated
