@@ -13,7 +13,7 @@ sandman API
 -------------------
 
 .. automodule:: sandman.model
-    :members: register
+    :members: register, activate
 
 .. automodule:: sandman.model.models
     :members:

@@ -162,16 +162,24 @@ def endpoint_class(collection):
             raise InvalidAPIUsage(404)
         return cls
 
-def retrieve_collection(collection):
-    """Return the resources in *collection*.
+def retrieve_collection(collection, query_arguments=None):
+    """Return the resources in *collection*, possibly filtered by a series of
+    values to use in a 'where' clause search.
 
     :param string collection: a :class:`sandman.model.Model` endpoint
+    :param dict query_arguments: a list of filter query arguments
     :rtype: class:`sandman.model.Model`
 
     """
     session = _get_session()
     cls = endpoint_class(collection)
-    resources = session.query(cls).all()
+    if query_arguments:
+        filters = []
+        for key, value in query_arguments.items():
+            filters.append(getattr(cls, key)==value)
+        resources = session.query(cls).filter(*filters)
+    else:
+        resources = session.query(cls).all()
     return resources
 
 
@@ -381,7 +389,8 @@ def get_collection(collection):
 
     """
     cls = endpoint_class(collection)
-    resources = retrieve_collection(collection)
+
+    resources = retrieve_collection(collection, request.args)
 
     _validate(cls, request.method, resources)
 

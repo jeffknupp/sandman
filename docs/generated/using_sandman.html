@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Sandman &mdash; sandman 0.4.1 documentation</title>
+    <title>Using Sandman &mdash; sandman 0.6.2 documentation</title>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.1',
+        VERSION:     '0.6.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.4.1 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.6.2 documentation" href="index.html" />
     <link rel="next" title="The sandman Admin Interface" href="admin.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.4.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,7 +58,7 @@
 <h2>The Simplest Application<a class="headerlink" href="#the-simplest-application" title="Permalink to this headline">¶</a></h2>
 <p>We&#8217;ll be using a subset of the Chinook test database as an example.
 Create one file with the following contents (which I&#8217;ll call <tt class="docutils literal"><span class="pre">runserver.py</span></tt>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">Model</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">activate</span><span class="p">,</span> <span class="n">Model</span>
 
 <span class="k">class</span> <span class="nc">Artist</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;Artist&#39;</span>
@@ -74,6 +74,7 @@ Create one file with the following contents (which I&#8217;ll call <tt class="do
 
 <span class="n">register</span><span class="p">((</span><span class="n">Artist</span><span class="p">,</span> <span class="n">Album</span><span class="p">,</span> <span class="n">Playlist</span><span class="p">))</span>
 <span class="n">register</span><span class="p">(</span><span class="n">Genre</span><span class="p">)</span>
+<span class="n">activate</span><span class="p">()</span>
 
 <span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
 <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;your database connection string (using SQLAlchemy)&#39;</span>
@@ -84,6 +85,10 @@ Create one file with the following contents (which I&#8217;ll call <tt class="do
 <div class="highlight-python"><pre>python runserver.py</pre>
 </div>
 <p>and try curling your new REST API service!</p>
+<p>Of course, you don&#8217;t actually need to tell sandman about your tables; it&#8217;s
+perfectly capable of introspecting all of them. To use introspection to make
+<em>all</em> of your database tables available via the admin and REST API, simply
+remove all model code and call <cite>activate()</cite> without ever registering a model.</p>
 <div class="section" id="a-quick-guide-to-rest-apis">
 <h3>A Quick Guide to REST APIs<a class="headerlink" href="#a-quick-guide-to-rest-apis" title="Permalink to this headline">¶</a></h3>
 <p>Before we discuss the example code above in more detail, we should discuss some
@@ -98,7 +103,7 @@ Even though the example above is short, let&#8217;s walk through it step by step
 <h2>Creating Models<a class="headerlink" href="#creating-models" title="Permalink to this headline">¶</a></h2>
 <p>A <tt class="docutils literal"><span class="pre">Model</span></tt> represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
-<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt>. The only attribute you must define in your
+<a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a>. The only attribute you must define in your
 class is the <tt class="docutils literal"><span class="pre">__tablename__</span></tt> attribute. sandman uses this to map your
 class to the corresponding database table. From there, sandman is able to divine
 all other properties of your tables. Specifically, sandman creates the
@@ -119,7 +124,7 @@ to various attributes of the object derived from the underlying database model</
 <h2>Customizing Your Resources<a class="headerlink" href="#customizing-your-resources" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="providing-a-custom-endpoint">
 <h3>Providing a custom endpoint<a class="headerlink" href="#providing-a-custom-endpoint" title="Permalink to this headline">¶</a></h3>
-<p>In the code above, we created 4 <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt> classes that
+<p>In the code above, we created 4 <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a> classes that
 correspond to tables in our database. If we wanted to change the endpoint for a
 class (the default endpoint is simply the class&#8217;s name pluralized), we would do
 so by setting the <tt class="docutils literal"><span class="pre">__endpoint__</span></tt> attribute in the definition of the class:</p>
@@ -253,12 +258,12 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.4.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jeff Knupp.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
     </div>
   </body>
 </html>

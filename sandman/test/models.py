@@ -1,6 +1,6 @@
 """Models for unit testing sandman"""
 
-from sandman.model import register, Model, activate_admin_classes
+from sandman.model import register, Model, activate
 
 class Artist(Model):
     """Model mapped to the "Artist" table"""
@@ -52,7 +52,7 @@ class Playlist(Model):
     __tablename__ = 'Playlist'
     __methods__ = ('POST', 'PATCH')
 
-class Genre(Model):
+class Style(Model):
     """Model mapped to the "Genre" table
 
     Has a custom endpoint ("styles" rather than the default, "genres").
@@ -81,5 +81,5 @@ class Genre(Model):
         return True
 
 register((Artist, Album, Playlist, Track, MediaType))
-register(Genre)
-activate_admin_classes()
+register(Style)
+activate()

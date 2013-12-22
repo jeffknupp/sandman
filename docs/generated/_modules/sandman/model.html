@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sandman.model &mdash; sandman 0.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="sandman 0.6.2 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">sandman 0.6.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sandman.model</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;The model module is repsonsible exposes the :class:`sandman.model.Model` class,</span>
+<span class="sd">from which user models should derive. It also makes the :func:`register`</span>
+<span class="sd">function available, which maps endpoints to their associated classes.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span><span class="p">,</span> <span class="n">DeferredReflection</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.engine</span> <span class="kn">import</span> <span class="n">reflection</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">relationship</span>
+<span class="kn">from</span> <span class="nn">flask.ext.admin</span> <span class="kn">import</span> <span class="n">Admin</span>
+<span class="kn">from</span> <span class="nn">flask.ext.admin.contrib.sqla</span> <span class="kn">import</span> <span class="n">ModelView</span>
+
+<div class="viewcode-block" id="register"><a class="viewcode-back" href="../../sandman.html#sandman.model.register">[docs]</a><span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">use_admin</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Register with the API a :class:`sandman.model.Model` class and associated</span>
+<span class="sd">    endpoint.</span>
+
+<span class="sd">    :param cls: User-defined class derived from :class:`sandman.model.Model` to be</span>
+<span class="sd">                registered with the endpoint returned by :func:`endpoint()`</span>
+<span class="sd">    :type cls: :class:`sandman.model.Model` or tuple</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_app</span><span class="p">,</span> <span class="s">&#39;endpoint_classes&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">classes_by_name</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">table_to_endpoint</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">cls</span><span class="p">:</span>
+                <span class="n">_register_internal_data</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">use_admin</span> <span class="o">=</span> <span class="n">use_admin</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_register_internal_data</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">use_admin</span> <span class="o">=</span> <span class="n">use_admin</span>
+</div>
+<span class="k">def</span> <span class="nf">_register_internal_data</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()]</span> <span class="o">=</span> <span class="n">cls</span>
+        <span class="n">current_app</span><span class="o">.</span><span class="n">table_to_endpoint</span><span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">endpoint</span><span class="p">()</span>
+        <span class="n">current_app</span><span class="o">.</span><span class="n">classes_by_name</span><span class="p">[</span><span class="n">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span>
+        <span class="n">current_app</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_prepare_relationships</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Enrich the registered Models with SQLAlchemy ``relationships``</span>
+<span class="sd">    so that related tables are correctly processed up by the admin.&quot;&quot;&quot;</span>
+    <span class="n">inspector</span> <span class="o">=</span> <span class="n">reflection</span><span class="o">.</span><span class="n">Inspector</span><span class="o">.</span><span class="n">from_engine</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">current_app</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">foreign_key</span> <span class="ow">in</span> <span class="n">inspector</span><span class="o">.</span><span class="n">get_foreign_keys</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__tablename__</span><span class="p">):</span>
+                <span class="n">other</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">classes_by_name</span><span class="p">[</span><span class="n">foreign_key</span><span class="p">[</span><span class="s">&#39;referred_table&#39;</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="n">other</span><span class="o">==</span><span class="n">cls</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">other</span><span class="o">.</span><span class="n">__related_tables__</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">__related_tables__</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+                <span class="c"># Necessary to get Flask-Admin to register the relationship</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&#39;__&#39;</span> <span class="o">+</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">relationship</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
+
+<div class="viewcode-block" id="activate"><a class="viewcode-back" href="../../sandman.html#sandman.model.activate">[docs]</a><span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">admin</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Activate each registered model for non-admin use&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_app</span><span class="p">,</span> <span class="s">&#39;endpoint_classes&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">classes_by_name</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">table_to_endpoint</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">current_app</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_app</span><span class="o">.</span><span class="n">endpoint_classes</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="p">(</span><span class="n">sandman_model</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">),</span> <span class="p">{</span><span class="s">&#39;__tablename__&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+                    <span class="n">register</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&#39; unable to be registered&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Model</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">admin</span><span class="p">:</span>
+        <span class="n">_prepare_relationships</span><span class="p">()</span>
+        <span class="n">admin</span> <span class="o">=</span> <span class="n">Admin</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cls</span> <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">current_app</span><span class="o">.</span><span class="n">classes</span> <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">use_admin</span> <span class="o">==</span> <span class="bp">True</span><span class="p">):</span>
+                <span class="n">admin</span><span class="o">.</span><span class="n">add_view</span><span class="p">(</span><span class="n">ModelView</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="p">))</span>
+        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;http://localhost:5000/admin&#39;</span><span class="p">)</span>
+
+
+<span class="c"># Redefine &#39;Model&#39; to be a sqlalchemy.ext.declarative.api.DeclarativeMeta</span>
+<span class="c"># object which also derives from sandman.models.Model. The naming is done for</span>
+<span class="c"># documentation/clarity purposes. Previously the line below had Model deriving</span>
+<span class="c"># from DeferredReflection and &quot;Resource&quot;, which was the exact same class</span>
+<span class="c"># as &quot;Model&quot; in models.py. It caused confusion in the documentation, however,</span>
+<span class="c"># since it wasn&#39;t clear that the Model class and the Resource class were</span>
+<span class="c"># actually the same thing.</span></div>
+<span class="n">sandman_model</span> <span class="o">=</span> <span class="n">Model</span>
+<span class="n">Model</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">(</span><span class="n">cls</span><span class="o">=</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="n">DeferredReflection</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">sandman 0.6.2 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jeff Knupp.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>
