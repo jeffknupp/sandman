@@ -1,5 +1,5 @@
 *.py[cod]
-
+*.py-e
 *.swp
 chinook
 runserver.py
