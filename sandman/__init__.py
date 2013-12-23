@@ -10,4 +10,4 @@ app = Flask(__name__)
 db = SQLAlchemy(app)
 from . import sandman
 
-__version__ = '0.6.5'
+__version__ = '0.6.5a1'
