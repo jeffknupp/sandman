@@ -5,6 +5,94 @@ Using Sandman
 The Simplest Application
 ------------------------
 
+Here's what's required to create a RESTful API service from an existing database using
+`sandman`:
+
+```bash
+$ sandmanctl sqlite:////tmp/my_database.db
+```
+
+*That's it.* `sandman` will then do the following:
+
+* connect to your database and introspect it's contents
+* create and launch a REST API service
+* create an HTML admin interface
+* *open your browser to the admin interface*
+
+That's right. Given a legacy database, `sandman` not only gives you a REST API,
+it gives you a beautiful admin page and *opens your browser to the admin page*.
+It truly does everything for you.
+
+Supported Databases
+------------------
+
+`sandman`, by default, supports connections to the same set of databases as
+[SQLAlchemy](http://www.sqlalchemy.org). As of this writing, that includes:
+
+* MySQL (MariaDB)
+* PostgreSQL
+* SQLite
+* Oracle
+* Microsoft SQL Server
+* Firebird
+* Drizzle
+* Sybase
+* IBM DB2
+* SAP Sybase SQL Anywhere
+* MonetDB
+
+Behind the Scenes
+-----------------
+
+`sandmanctl` is really just a simple wrapper around the following:
+
+```python
+from `sandman` import app
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
+
+from sandman.model import activate
+
+activate()
+
+app.run()
+```
+
+**You don't even need to tell `sandman` what tables your database contains.** 
+Just point `sandman` at your database and let it do all the heavy lifting
+
+Let's start our new service and make a request. While we're at it, lets make use
+of `sandman`'s awesome filtering capability by specifying a filter term:
+
+```zsh
+> python runserver.py &
+* Running on http://127.0.0.1:5000/
+
+> curl GET "http://localhost:5000/artists?Name=AC/DC"
+```
+
+```json
+...
+{
+    "resources": [
+        {
+            "ArtistId": 1,
+            "Name": "AC/DC",
+            "links": [
+                {
+                    "rel": "self",
+                    "uri": "/artists/1"
+                }
+            ]
+        }
+    ]
+}
+```
+
+All of that, including filtering/searching, is automagically available from
+those *five* measly lines of code.
+
+
 We'll be using a subset of the Chinook test database as an example. 
 Create one file with the following contents (which I'll call ``runserver.py``)::
 
@@ -22,12 +110,13 @@ Create one file with the following contents (which I'll call ``runserver.py``)::
     class Genre(Model):
         __tablename__ = 'Genre'
 
+    # register can be called with an iterable or a single class
     register((Artist, Album, Playlist))
     register(Genre)
     activate()
 
     from sandman import app, db
-    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database connection string (using SQLAlchemy)'
+    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database URI'
     app.run()
 
 Then simply run::
@@ -40,6 +129,8 @@ Of course, you don't actually need to tell sandman about your tables; it's
 perfectly capable of introspecting all of them. To use introspection to make
 *all* of your database tables available via the admin and REST API, simply
 remove all model code and call `activate()` without ever registering a model.
+To stop a browser window from automatically popping up on sandman
+initialization, call `activate()` with `browser=False`.
 
 A Quick Guide to REST APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
