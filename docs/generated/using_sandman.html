@@ -58,9 +58,8 @@
 <h2>The Simplest Application<a class="headerlink" href="#the-simplest-application" title="Permalink to this headline">¶</a></h2>
 <p>Here&#8217;s what&#8217;s required to create a RESTful API service from an existing database using
 <cite>sandman</cite>:</p>
-<p><tt class="docutils literal"><span class="pre">`bash</span>
-<span class="pre">$</span> <span class="pre">sandmanctl</span> <span class="pre">sqlite:////tmp/my_database.db</span>
-<span class="pre">`</span></tt></p>
+<div class="highlight-python"><pre>$ sandmanctl sqlite:////tmp/my_database.db</pre>
+</div>
 <p><em>That&#8217;s it.</em> <cite>sandman</cite> will then do the following:</p>
 <ul class="simple">
 <li>connect to your database and introspect it&#8217;s contents</li>
@@ -93,56 +92,54 @@ It truly does everything for you.</p>
 <div class="section" id="behind-the-scenes">
 <h2>Behind the Scenes<a class="headerlink" href="#behind-the-scenes" title="Permalink to this headline">¶</a></h2>
 <p><cite>sandmanctl</cite> is really just a simple wrapper around the following:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a><cite>python
-from `sandman</cite> import app</p>
-<p>app.config[&#8216;SQLALCHEMY_DATABASE_URI&#8217;] = &#8216;sqlite:///chinook&#8217;</p>
-<p>from sandman.model import activate</p>
-<p>activate()</p>
-<p>app.run()
-<a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+<div class="highlight-python"><pre>from `sandman` import app
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
+
+from sandman.model import activate
+
+activate()
+
+app.run()</pre>
+</div>
 <p><strong>You don&#8217;t even need to tell `sandman` what tables your database contains.</strong>
 Just point <cite>sandman</cite> at your database and let it do all the heavy lifting</p>
 <p>Let&#8217;s start our new service and make a request. While we&#8217;re at it, lets make use
 of <cite>sandman</cite>&#8216;s awesome filtering capability by specifying a filter term:</p>
-<p><a href="#id7"><span class="problematic" id="id8">``</span></a><a href="#id9"><span class="problematic" id="id10">`</span></a>zsh
-&gt; python runserver.py &amp;
-* Running on <a class="reference external" href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a></p>
-<p>&gt; curl GET &#8220;<a class="reference external" href="http://localhost:5000/artists?Name=AC/DC">http://localhost:5000/artists?Name=AC/DC</a>&#8221;
-<a href="#id11"><span class="problematic" id="id12">``</span></a><a href="#id13"><span class="problematic" id="id14">`</span></a></p>
-<p><a href="#id15"><span class="problematic" id="id16">``</span></a><a href="#id17"><span class="problematic" id="id18">`</span></a>json
-...
-{</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>&#8220;resources&#8221;: [</dt>
-<dd><dl class="first docutils">
-<dt>{</dt>
-<dd><p class="first">&#8220;ArtistId&#8221;: 1,
-&#8220;Name&#8221;: &#8220;AC/DC&#8221;,
-&#8220;links&#8221;: [</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>{</dt>
-<dd>&#8220;rel&#8221;: &#8220;self&#8221;,
-&#8220;uri&#8221;: &#8220;/artists/1&#8221;</dd>
-</dl>
-<p>}</p>
-</div></blockquote>
-<p class="last">]</p>
-</dd>
-</dl>
-<p class="last">}</p>
-</dd>
-</dl>
-<p>]</p>
-</div></blockquote>
-<div class="section" id="id19">
-<h3>}<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>$ python runserver.py &amp;
+* Running on http://127.0.0.1:5000/
+
+&gt; curl GET "http://localhost:5000/artists?Name=AC/DC"</pre>
+</div>
+<p>and we get:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;ArtistId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&quot;Name&quot;</span><span class="p">:</span> <span class="s">&quot;AC/DC&quot;</span><span class="p">,</span>
+            <span class="s">&quot;links&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s">&quot;rel&quot;</span><span class="p">:</span> <span class="s">&quot;self&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;uri&quot;</span><span class="p">:</span> <span class="s">&quot;/artists/1&quot;</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>All of that, including filtering/searching, is automagically available from
 those <em>five</em> measly lines of code.</p>
 <p>We&#8217;ll be using a subset of the Chinook test database as an example.
 Create one file with the following contents (which I&#8217;ll call <tt class="docutils literal"><span class="pre">runserver.py</span></tt>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">activate</span><span class="p">,</span> <span class="n">Model</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;sqlite:////Users/jknupp/code/github_code/sandman/scripts/chinook&#39;</span>
+
+<span class="c"># The SQLALCHEMY_DATABASE_URI must be defined before your models.</span>
+<span class="c"># Normally, this is done by importing your models, but here</span>
+<span class="c"># we show them inline.</span>
+
+<span class="kn">from</span> <span class="nn">sandman.model</span> <span class="kn">import</span> <span class="n">register</span><span class="p">,</span> <span class="n">activate</span><span class="p">,</span> <span class="n">Model</span>
 
 <span class="k">class</span> <span class="nc">Artist</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;Artist&#39;</span>
@@ -159,10 +156,9 @@ Create one file with the following contents (which I&#8217;ll call <tt class="do
 <span class="c"># register can be called with an iterable or a single class</span>
 <span class="n">register</span><span class="p">((</span><span class="n">Artist</span><span class="p">,</span> <span class="n">Album</span><span class="p">,</span> <span class="n">Playlist</span><span class="p">))</span>
 <span class="n">register</span><span class="p">(</span><span class="n">Genre</span><span class="p">)</span>
+<span class="c"># activate must be called *after* register</span>
 <span class="n">activate</span><span class="p">()</span>
 
-<span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
-<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&lt;your database URI&#39;</span>
 <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -177,14 +173,13 @@ remove all model code and call <cite>activate()</cite> without ever registering 
 To stop a browser window from automatically popping up on sandman
 initialization, call <cite>activate()</cite> with <cite>browser=False</cite>.</p>
 <div class="section" id="a-quick-guide-to-rest-apis">
-<h4>A Quick Guide to REST APIs<a class="headerlink" href="#a-quick-guide-to-rest-apis" title="Permalink to this headline">¶</a></h4>
+<h3>A Quick Guide to REST APIs<a class="headerlink" href="#a-quick-guide-to-rest-apis" title="Permalink to this headline">¶</a></h3>
 <p>Before we discuss the example code above in more detail, we should discuss some
 REST API basics first. The most important concept is that of a <em>resource</em>.
 Resources are sources of information, and the API is an interface to this information.
 That is, resources are the actual &#8220;objects&#8221; manipulated by the API. In sandman, each
 row in a database table is considered a resource.
 Even though the example above is short, let&#8217;s walk through it step by step.</p>
-</div>
 </div>
 </div>
 <div class="section" id="creating-models">
@@ -210,6 +205,8 @@ to various attributes of the object derived from the underlying database model</
 </div>
 <div class="section" id="customizing-your-resources">
 <h2>Customizing Your Resources<a class="headerlink" href="#customizing-your-resources" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="providing-a-custom-endpoint">
+<h3>Providing a custom endpoint<a class="headerlink" href="#providing-a-custom-endpoint" title="Permalink to this headline">¶</a></h3>
 <p>In the code above, we created 4 <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a> classes that
 correspond to tables in our database. If we wanted to change the endpoint for a
 class (the default endpoint is simply the class&#8217;s name pluralized), we would do
@@ -221,6 +218,9 @@ so by setting the <tt class="docutils literal"><span class="pre">__endpoint__</s
 </div>
 <p>Now we would point our browser (or <tt class="docutils literal"><span class="pre">curl</span></tt>) to <tt class="docutils literal"><span class="pre">localhost:5000/styles</span></tt> to
 retrieve the resources in the <tt class="docutils literal"><span class="pre">Genre</span></tt> table.</p>
+</div>
+<div class="section" id="restricting-allowable-methods-on-a-resource">
+<h3>Restricting allowable methods on a resource<a class="headerlink" href="#restricting-allowable-methods-on-a-resource" title="Permalink to this headline">¶</a></h3>
 <p>Many times, we&#8217;d like to specify that certain actions can only be carried out
 against certain types of resources. If we wanted to prevent API users from
 deleting any <tt class="docutils literal"><span class="pre">Genre</span></tt> resources, for example, we could specify this implicitly
@@ -233,6 +233,9 @@ by defining the <tt class="docutils literal"><span class="pre">__methods__</span
 </div>
 <p>For each call into the API, the HTTP method used is validated against the
 acceptable methods for that resource.</p>
+</div>
+<div class="section" id="performing-custom-validation-on-a-resource">
+<h3>Performing custom validation on a resource<a class="headerlink" href="#performing-custom-validation-on-a-resource" title="Permalink to this headline">¶</a></h3>
 <p>Specifying which HTTP methods are acceptable gives rather coarse control over
 how a user of the API can interact with our resources. For more granular
 control, custom validation functions can be specified. To do so, simply define a
@@ -261,6 +264,7 @@ based on the resource itself.</p>
 collection of resources, so it&#8217;s usually necessary to check which type you&#8217;re
 dealing with. This will likely change in a future version of sandman.</p>
 </div>
+</div>
 <div class="section" id="project-layout">
 <h2>Project Layout<a class="headerlink" href="#project-layout" title="Permalink to this headline">¶</a></h2>
 <p>In a &#8220;real&#8221; project, you should divide the code into at least two files: one with the
@@ -281,14 +285,16 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
 <li><a class="reference internal" href="#the-simplest-application">The Simplest Application</a></li>
 <li><a class="reference internal" href="#supported-databases">Supported Databases</a></li>
 <li><a class="reference internal" href="#behind-the-scenes">Behind the Scenes</a><ul>
-<li><a class="reference internal" href="#id19">}</a><ul>
 <li><a class="reference internal" href="#a-quick-guide-to-rest-apis">A Quick Guide to REST APIs</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#creating-models">Creating Models</a></li>
+<li><a class="reference internal" href="#customizing-your-resources">Customizing Your Resources</a><ul>
+<li><a class="reference internal" href="#providing-a-custom-endpoint">Providing a custom endpoint</a></li>
+<li><a class="reference internal" href="#restricting-allowable-methods-on-a-resource">Restricting allowable methods on a resource</a></li>
+<li><a class="reference internal" href="#performing-custom-validation-on-a-resource">Performing custom validation on a resource</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#creating-models">Creating Models</a></li>
-<li><a class="reference internal" href="#customizing-your-resources">Customizing Your Resources</a></li>
 <li><a class="reference internal" href="#project-layout">Project Layout</a></li>
 </ul>
 </li>

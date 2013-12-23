@@ -58,7 +58,7 @@ Behind the Scenes
 `sandmanctl` is really just a simple wrapper around the following:
 
 ```python
-from `sandman` import app
+from sandman import app
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
@@ -118,10 +118,6 @@ If you wanted to specify specific tables that `sandman` should make available,
 how do you do that? With this little ditty:
 
 ```python
-from sandman import app, db
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
-
 from sandman.model import register, Model
 
 class Artist(Model):
@@ -134,8 +130,6 @@ class Playlist(Model):
     __tablename__ = 'Playlist'
 
 register((Artist, Album, Playlist))
-
-app.run()
 ```
 
 And if you wanted to add custom logic for an endpoint? Or change the endpoint

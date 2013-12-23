@@ -6,11 +6,9 @@ The Simplest Application
 ------------------------
 
 Here's what's required to create a RESTful API service from an existing database using
-`sandman`:
+`sandman`::
 
-```bash
-$ sandmanctl sqlite:////tmp/my_database.db
-```
+    $ sandmanctl sqlite:////tmp/my_database.db
 
 *That's it.* `sandman` will then do the following:
 
@@ -24,7 +22,7 @@ it gives you a beautiful admin page and *opens your browser to the admin page*.
 It truly does everything for you.
 
 Supported Databases
-------------------
+-------------------
 
 `sandman`, by default, supports connections to the same set of databases as
 [SQLAlchemy](http://www.sqlalchemy.org). As of this writing, that includes:
@@ -44,50 +42,45 @@ Supported Databases
 Behind the Scenes
 -----------------
 
-`sandmanctl` is really just a simple wrapper around the following:
+`sandmanctl` is really just a simple wrapper around the following::
 
-```python
-from `sandman` import app
+    from `sandman` import app
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
-from sandman.model import activate
+    from sandman.model import activate
 
-activate()
+    activate()
 
-app.run()
-```
+    app.run()
 
 **You don't even need to tell `sandman` what tables your database contains.** 
 Just point `sandman` at your database and let it do all the heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets make use
-of `sandman`'s awesome filtering capability by specifying a filter term:
+of `sandman`'s awesome filtering capability by specifying a filter term::
 
-```zsh
-> python runserver.py &
-* Running on http://127.0.0.1:5000/
+    $ python runserver.py &
+    * Running on http://127.0.0.1:5000/
 
-> curl GET "http://localhost:5000/artists?Name=AC/DC"
-```
+    > curl GET "http://localhost:5000/artists?Name=AC/DC"
 
-```json
-...
-{
-    "resources": [
-        {
-            "ArtistId": 1,
-            "Name": "AC/DC",
-            "links": [
-                {
-                    "rel": "self",
-                    "uri": "/artists/1"
-                }
-            ]
-        }
-    ]
-}
-```
+and we get::
+
+    {
+        "resources": [
+            {
+                "ArtistId": 1,
+                "Name": "AC/DC",
+                "links": [
+                    {
+                        "rel": "self",
+                        "uri": "/artists/1"
+                    }
+                ]
+            }
+        ]
+    }
 
 All of that, including filtering/searching, is automagically available from
 those *five* measly lines of code.
@@ -96,8 +89,15 @@ those *five* measly lines of code.
 We'll be using a subset of the Chinook test database as an example. 
 Create one file with the following contents (which I'll call ``runserver.py``)::
 
+    from sandman import app, db
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/jknupp/code/github_code/sandman/scripts/chinook'
+
+    # The SQLALCHEMY_DATABASE_URI must be defined before your models.
+    # Normally, this is done by importing your models, but here 
+    # we show them inline.
+
     from sandman.model import register, activate, Model
-   
+    
     class Artist(Model):
         __tablename__ = 'Artist'
 
@@ -113,10 +113,9 @@ Create one file with the following contents (which I'll call ``runserver.py``)::
     # register can be called with an iterable or a single class
     register((Artist, Album, Playlist))
     register(Genre)
+    # activate must be called *after* register
     activate()
 
-    from sandman import app, db
-    app.config['SQLALCHEMY_DATABASE_URI'] = '<your database URI'
     app.run()
 
 Then simply run::

@@ -59,7 +59,7 @@ Behind the Scenes
 
 .. code:: python
 
-    from `sandman` import app
+    from sandman import app
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
@@ -123,10 +123,6 @@ available, how do you do that? With this little ditty:
 
 .. code:: python
 
-    from sandman import app, db
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
-
     from sandman.model import register, Model
 
     class Artist(Model):
@@ -139,8 +135,6 @@ available, how do you do that? With this little ditty:
         __tablename__ = 'Playlist'
 
     register((Artist, Album, Playlist))
-
-    app.run()
 
 And if you wanted to add custom logic for an endpoint? Or change the
 endpoint name? Or add validation? All supported. Here's a "fancy" class
