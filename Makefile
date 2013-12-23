@@ -1,4 +1,4 @@
-.PHONY: docs release clean
+.PHONY: docs release clean build
 
 clean:
 	rm -rf sandman_env htmlcov
