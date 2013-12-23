@@ -58,7 +58,7 @@ def _prepare_relationships():
                 # Necessary to get Flask-Admin to register the relationship
                 setattr(other, '__' + cls.__name__.lower(), relationship(cls.__name__, backref=other.__name__.lower()))
 
-def activate(admin=True):
+def activate(admin=True, browser=True):
     """Activate each registered model for non-admin use"""
     with app.app_context():
         if getattr(current_app, 'endpoint_classes', None) is None:
@@ -82,7 +82,8 @@ def activate(admin=True):
         with app.app_context():
             for cls in (cls for cls in current_app.classes if cls.use_admin == True):
                 admin.add_view(ModelView(cls, db.session))
-        webbrowser.open('http://localhost:5000/admin')
+        if browser:
+            webbrowser.open('http://localhost:5000/admin')
 
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
