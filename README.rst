@@ -33,6 +33,25 @@ That's right. Given a legacy database, ``sandman`` not only gives you a
 REST API, it gives you a beautiful admin page and *opens your browser to
 the admin page*. It truly does everything for you.
 
+Supported Databases
+-------------------
+
+``sandman``, by default, supports connections to the same set of
+databases as `SQLAlchemy <http://www.sqlalchemy.org>`__. As of this
+writing, that includes:
+
+-  MySQL (MariaDB)
+-  PostgreSQL
+-  SQLite
+-  Oracle
+-  Microsoft SQL Server
+-  Firebird
+-  Drizzle
+-  Sybase
+-  IBM DB2
+-  SAP Sybase SQL Anywhere
+-  MonetDB
+
 Behind the Scenes
 -----------------
 
