@@ -52,10 +52,10 @@ app.run()
 ```
 
 **You don't even need to tell `sandman` what tables your database contains.** 
-Just point sandman at your database and let it do all the heavy lifting
+Just point `sandman` at your database and let it do all the heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets make use
-of Sandman's awesome filtering capability by specifying a filter term:
+of `sandman`'s awesome filtering capability by specifying a filter term:
 
 ```zsh
 > python runserver.py &
@@ -92,6 +92,9 @@ it's that Django-style admin interface you've been bugging me about, looking
 something like this:
 
 ![admin interface awesomesauce screenshot](/docs/images/admin_tracks_improved.jpg)
+
+(If you want to disable the browser from opening automatically each time `sandman`
+starts, call `activate` with `browser=False`)
 
 If you wanted to specify specific tables that `sandman` should make available,
 how do you do that? With this little ditty:
@@ -169,10 +172,10 @@ RESTful API and admin interface. For each table, `sandman` creates:
 * customize a Models endpoint by setting the `__endpoint__` method
 * essentially a HATEOAS-based service sitting in front of your database
 
-Sandman is under active development but should be usable in any envrionment due
+`sandman` is under active development but should be usable in any envrionment due
 to one simple fact:
 
-**Sandman never alters your database unless you add or change a record yourself.  It adds no extra tables to your existing database and requires no changes to any of your existing tables. If you start sandman, use it to browse your database via cURL, then stop sandman, your database will be in exactly the same state as it was before you began.** 
+**`sandman` never alters your database unless you add or change a record yourself.  It adds no extra tables to your existing database and requires no changes to any of your existing tables. If you start `sandman`, use it to browse your database via cURL, then stop `sandman`, your database will be in exactly the same state as it was before you began.** 
 
 ### Installation
 
