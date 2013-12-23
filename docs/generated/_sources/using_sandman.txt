@@ -44,7 +44,7 @@ Behind the Scenes
 
 `sandmanctl` is really just a simple wrapper around the following::
 
-    from `sandman` import app
+    from sandman import app
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
@@ -54,7 +54,7 @@ Behind the Scenes
 
     app.run()
 
-**You don't even need to tell `sandman` what tables your database contains.** 
+**You don't even need to tell sandman what tables your database contains.** 
 Just point `sandman` at your database and let it do all the heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets make use
