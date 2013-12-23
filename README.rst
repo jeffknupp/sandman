@@ -77,7 +77,7 @@ Let's start our new service and make a request. While we're at it, lets
 make use of ``sandman``'s awesome filtering capability by specifying a
 filter term:
 
-.. code:: zsh
+.. code:: bash
 
     > python runserver.py &
     * Running on http://127.0.0.1:5000/
@@ -114,7 +114,7 @@ you've been bugging me about, looking something like this:
 .. figure:: /docs/images/admin_tracks_improved.jpg
    :alt: admin interface awesomesauce screenshot
 
-   admin interface awesomesauce screenshot
+
 (If you want to disable the browser from opening automatically each time
 ``sandman`` starts, call ``activate`` with ``browser=False``)
 
