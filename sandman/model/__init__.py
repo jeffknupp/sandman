@@ -43,6 +43,7 @@ def _register_internal_data(cls):
         current_app.table_to_endpoint[cls.__tablename__] = cls.endpoint()
         current_app.classes_by_name[cls.__tablename__] = cls
         current_app.classes.append(cls)
+        cls.__related_tables__ = set()
 
 def _prepare_relationships():
     """Enrich the registered Models with SQLAlchemy ``relationships``
@@ -53,16 +54,14 @@ def _prepare_relationships():
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[
                         foreign_key['referred_table']]
-                if other == cls:
+                if other == cls or other in cls.__related_tables__:
                     continue
-                other.__related_tables__.add(cls)
                 cls.__related_tables__.add(other)
-                # Add a SQLAlchemy relationship as an attribute on the class as
-                # well as a backref on the referring class
-                setattr(other, cls.__name__.lower(), relationship(cls.__name__,
-                    backref=other.__name__.lower()))
+                # Add a SQLAlchemy relationship as an attribute on the class
+                setattr(cls, other.__name__.lower(), relationship(
+                    other.__name__, backref=cls.__name__))
 
-def activate(admin=True, browser=True):
+def activate(admin=True, browser=True, relationships=True):
     """Activate each registered model for non-admin use"""
     with app.app_context():
         if getattr(current_app, 'endpoint_classes', None) is None:
@@ -81,13 +80,14 @@ def activate(admin=True, browser=True):
                     print name + ' unable to be registered'
         else:
             Model.prepare(db.engine)
-    if admin:
+    if relationships:
         _prepare_relationships()
-        admin = Admin(app)
+    if admin:
+        admin_view = Admin(app)
         with app.app_context():
             for cls in (cls for cls in current_app.classes if
                     cls.use_admin == True):
-                admin.add_view(ModelView(cls, db.session))
+                admin_view.add_view(ModelView(cls, db.session))
         if browser:
             webbrowser.open('http://127.0.0.1:5000/admin')
 
