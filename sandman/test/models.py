@@ -86,4 +86,4 @@ class Style(Model):
 
 register((Artist, Album, Playlist, Track, MediaType))
 register(Style)
-activate()
+activate(browser=True)

@@ -74,6 +74,11 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         response = self.get_response('/artists', 200)
         assert len(json.loads(response.data)[u'resources']) == 275
 
+    def test_get_attribute(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists/1/Name', 200)
+        assert json.loads(response.data)[u'Name'] == 'AC/DC'
+
     def test_post(self):
         """Test simple HTTP POST"""
         response = self.post_response()
@@ -249,6 +254,13 @@ class TestSandmanContentTypes(TestSandmanBase):
     def test_get_html(self):
         """Test getting HTML version of a resource rather than JSON."""
         response = self.get_response('/artists/1',
+                200,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+
+    def test_get_html_attribute(self):
+        """Test getting HTML version of a resource rather than JSON."""
+        response = self.get_response('/artists/1/Name',
                 200,
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)

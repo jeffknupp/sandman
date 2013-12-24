@@ -1,9 +1,10 @@
 """Test foreign key edge cases."""
-
-from sandman import app
 import os
 import shutil
 import json
+
+from sandman import app
+
 
 class TestSandmanForeignKeysBase(object):
     """Class to test edge-case foreign key conditions, using a database

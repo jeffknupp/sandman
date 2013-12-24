@@ -23,11 +23,6 @@ def register(cls, use_admin=True):
 
     """
     with app.app_context():
-        if getattr(current_app, 'endpoint_classes', None) is None:
-            current_app.endpoint_classes = {}
-            current_app.classes_by_name = {}
-            current_app.table_to_endpoint = {}
-            current_app.classes = []
         if isinstance(cls, (list, tuple)):
             for entry in cls:
                 _register_internal_data(entry)
@@ -54,8 +49,6 @@ def _prepare_relationships():
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
                 other = current_app.classes_by_name[
                         foreign_key['referred_table']]
-                if other == cls or other in cls.__related_tables__:
-                    continue
                 cls.__related_tables__.add(other)
                 # Add a SQLAlchemy relationship as an attribute on the class
                 setattr(cls, other.__name__.lower(), relationship(
@@ -72,12 +65,9 @@ def activate(admin=True, browser=True, relationships=True):
         if not current_app.endpoint_classes:
             db.metadata.reflect(bind=db.engine)
             for name, _ in db.metadata.tables.items():
-                try:
-                    cls = type(str(name), (sandman_model, db.Model),
-                            {'__tablename__': name})
-                    register(cls)
-                except KeyError:
-                    print name + ' unable to be registered'
+                cls = type(str(name), (sandman_model, db.Model),
+                        {'__tablename__': name})
+                register(cls)
         else:
             Model.prepare(db.engine)
     if relationships:
