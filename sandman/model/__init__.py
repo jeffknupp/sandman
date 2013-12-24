@@ -17,8 +17,8 @@ def register(cls, use_admin=True):
     """Register with the API a :class:`sandman.model.Model` class and associated
     endpoint.
 
-    :param cls: User-defined class derived from :class:`sandman.model.Model` to be
-                registered with the endpoint returned by :func:`endpoint()`
+    :param cls: User-defined class derived from :class:`sandman.model.Model` to
+                be registered with the endpoint returned by :func:`endpoint()`
     :type cls: :class:`sandman.model.Model` or tuple
 
     """
@@ -37,6 +37,7 @@ def register(cls, use_admin=True):
             cls.use_admin = use_admin
 
 def _register_internal_data(cls):
+    """Register a new class, *cls*, with internal data structures."""
     with app.app_context():
         current_app.endpoint_classes[cls.endpoint()] = cls
         current_app.table_to_endpoint[cls.__tablename__] = cls.endpoint()
@@ -50,13 +51,16 @@ def _prepare_relationships():
     with app.app_context():
         for cls in current_app.classes:
             for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
-                other = current_app.classes_by_name[foreign_key['referred_table']]
-                if other==cls:
+                other = current_app.classes_by_name[
+                        foreign_key['referred_table']]
+                if other == cls:
                     continue
                 other.__related_tables__.add(cls)
                 cls.__related_tables__.add(other)
-                # Necessary to get Flask-Admin to register the relationship
-                setattr(other, '__' + cls.__name__.lower(), relationship(cls.__name__, backref=other.__name__.lower()))
+                # Add a SQLAlchemy relationship as an attribute on the class as
+                # well as a backref on the referring class
+                setattr(other, cls.__name__.lower(), relationship(cls.__name__,
+                    backref=other.__name__.lower()))
 
 def activate(admin=True, browser=True):
     """Activate each registered model for non-admin use"""
@@ -68,11 +72,12 @@ def activate(admin=True, browser=True):
             current_app.classes = []
         if not current_app.endpoint_classes:
             db.metadata.reflect(bind=db.engine)
-            for name, table in db.metadata.tables.items():
+            for name, _ in db.metadata.tables.items():
                 try:
-                    cls = type(str(name), (sandman_model, db.Model), {'__tablename__': name})
+                    cls = type(str(name), (sandman_model, db.Model),
+                            {'__tablename__': name})
                     register(cls)
-                except:
+                except KeyError:
                     print name + ' unable to be registered'
         else:
             Model.prepare(db.engine)
@@ -80,7 +85,8 @@ def activate(admin=True, browser=True):
         _prepare_relationships()
         admin = Admin(app)
         with app.app_context():
-            for cls in (cls for cls in current_app.classes if cls.use_admin == True):
+            for cls in (cls for cls in current_app.classes if
+                    cls.use_admin == True):
                 admin.add_view(ModelView(cls, db.session))
         if browser:
             webbrowser.open('http://127.0.0.1:5000/admin')

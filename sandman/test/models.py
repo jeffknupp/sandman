@@ -11,6 +11,7 @@ class MediaType(Model):
     __tablename__ = 'MediaType'
 
     def __str__(self):
+        """Return string representation of *self*."""
         return self.Name
 
 class Track(Model):
@@ -18,6 +19,7 @@ class Track(Model):
     __tablename__ = 'Track'
 
     @staticmethod
+    # pylint: disable=invalid-name
     def validate_PUT(resource=None):
         """Return False if request should not be processed.
 
@@ -40,6 +42,7 @@ class Album(Model):
     __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')
 
     def __str__(self):
+        """Return string representation of *self*."""
         return self.Title
 
 class Playlist(Model):
@@ -66,6 +69,7 @@ class Style(Model):
     __methods__ = ('GET', 'DELETE')
 
     @staticmethod
+    # pylint: disable=invalid-name
     def validate_GET(resource=None):
         """Return False if the request should not be processed.
 

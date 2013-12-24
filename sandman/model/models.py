@@ -37,7 +37,7 @@ class Model(object):
 
     __related_tables__ = set()
     """List of Models for which this model has a foreign key relationship
-    with.""" 
+    with."""
 
     @classmethod
     def endpoint(cls):
@@ -69,7 +69,8 @@ class Model(object):
                 table = foreign_key.column.table.name
                 with app.app_context():
                     endpoint = current_app.table_to_endpoint[table]
-                links.append({'rel': endpoint, 'uri': '/{}/{}'.format(endpoint, column_value)})
+                links.append({'rel': endpoint, 'uri': '/{}/{}'.format(
+                    endpoint, column_value)})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
@@ -102,8 +103,8 @@ class Model(object):
         """Set a set of attributes which correspond to the
         :class:`sandman.model.Model`'s columns.
 
-        :param dict dictionary: A dictionary of attributes to set on the instance
-            whose keys are the column names of
+        :param dict dictionary: A dictionary of attributes to set on the
+            instance whose keys are the column names of
             the :class:`sandman.model.Model`'s underlying database table.
 
         """

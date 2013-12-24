@@ -24,14 +24,18 @@ class TestSandmanBase(object):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['TESTING'] = True
         self.app = app.test_client()
+        #pylint: disable=unused-variable
         from . import models
 
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
+        #pylint: disable=attribute-defined-outside-init
         self.app = None
 
-    def get_response(self, uri, status_code, params=None, has_data=True, headers=None):
+    #pylint: disable=too-many-arguments
+    def get_response(self, uri, status_code, params=None, has_data=True,
+            headers=None):
         """Return the response generated from a generic GET request. Do basic
         validation on the response."""
         if headers is None:
@@ -59,6 +63,7 @@ class TestSandmanBase(object):
         return '<!DOCTYPE html>' in response.data
 
 class TestSandmanBasicVerbs(TestSandmanBase):
+    """Test the basic HTTP verbs (e.g. "PUT", "GET", etc.)"""
     def test_get(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
@@ -298,7 +303,7 @@ class TestSandmanContentTypes(TestSandmanBase):
         assert self.is_html_response(response)
 
     def test_post_html_response(self):
-        """Test POSTing a resource via form parameters and requesting the 
+        """Test POSTing a resource via form parameters and requesting the
         response be HTML formatted."""
         response = self.app.post('/artists',
                 headers={'Accept': 'text/html'},
@@ -373,6 +378,7 @@ class TestSandmanAdmin(TestSandmanBase):
         # is the genre for many results on the third page
         assert 'Jazz' not in response.data
 
+    #pylint: disable=invalid-name
     def test_admin_default_str_repr_different_table_class_name(self):
         """Ensure default ``__str__`` representation for classes where the
         classname differs from the table name show up with the classname (not the
@@ -380,4 +386,3 @@ class TestSandmanAdmin(TestSandmanBase):
 
         response = self.get_response('/admin/styleview/', 200)
         assert 'Genre' not in response.data
-

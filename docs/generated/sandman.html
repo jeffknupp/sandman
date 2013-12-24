@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman API &mdash; sandman 0.6.5a1 documentation</title>
+    <title>sandman API &mdash; sandman 0.6.6 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6.5a1',
+        VERSION:     '0.6.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.6.5a1 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.6.6 documentation" href="index.html" />
     <link rel="prev" title="The sandman Admin Interface" href="admin.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.6.5a1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.6.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -88,8 +88,8 @@ endpoint.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> or tuple) &#8211; User-defined class derived from <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> to be
-registered with the endpoint returned by <tt class="xref py py-func docutils literal"><span class="pre">endpoint()</span></tt></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cls</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> or tuple) &#8211; User-defined class derived from <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> to
+be registered with the endpoint returned by <tt class="xref py py-func docutils literal"><span class="pre">endpoint()</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -177,8 +177,8 @@ an instance&#8217;s database columns.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictionary</strong> (<em>dict</em>) &#8211; A dictionary of attributes to set on the instance
-whose keys are the column names of
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictionary</strong> (<em>dict</em>) &#8211; A dictionary of attributes to set on the
+instance whose keys are the column names of
 the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>&#8216;s underlying database table.</td>
 </tr>
 </tbody>
@@ -243,6 +243,22 @@ instance whose keys are the column names of the
 <div class="section" id="module-sandman.sandman">
 <span id="sandman-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">sandman</span></tt> Module<a class="headerlink" href="#module-sandman.sandman" title="Permalink to this headline">¶</a></h2>
 <p>Sandman REST API creator for Flask and SQLAlchemy</p>
+<dl class="function">
+<dt id="sandman.sandman.attribute_response">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">attribute_response</tt><big>(</big><em>resource</em>, <em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#attribute_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.attribute_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a response for the <em>resource</em> of the appropriate content type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt>) &#8211; resource to be returned in request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="sandman.sandman.collection_response">
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">collection_response</tt><big>(</big><em>resources</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#collection_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.collection_response" title="Permalink to this definition">¶</a></dt>
@@ -323,7 +339,29 @@ resources.</p>
 <dl class="function">
 <dt id="sandman.sandman.get_resource">
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the appropriate <em>Response</em> for retrieving a single resource</p>
+<dd><p>Return the appropriate <em>Response</em> for retrieving a single resource.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>collection</strong> (<em>string</em>) &#8211; a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> endpoint</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; the primary key for the <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-class docutils literal"><span class="pre">flask.Response</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.get_resource_attribute">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource_attribute</tt><big>(</big><em>collection</em>, <em>key</em>, <em>attribute</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the appropriate <em>Response</em> for retrieving an attribute of
+a single resource.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -343,8 +381,9 @@ resources.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.get_resource_data">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource_data</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource_data</tt><big>(</big><em>incoming_request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the data from the incoming <em>request</em> based on the Content-type.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="sandman.sandman.handle_exception">
@@ -508,7 +547,7 @@ values to use in a &#8216;where&#8217; clause search.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.update_resource">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">update_resource</tt><big>(</big><em>resource</em>, <em>request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#update_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.update_resource" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">update_resource</tt><big>(</big><em>resource</em>, <em>incoming_request</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#update_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.update_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the contents of a resource with <em>data</em> and return an appropriate
 <em>Response</em>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -581,7 +620,7 @@ values to use in a &#8216;where&#8217; clause search.</p>
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.6.5a1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.6.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

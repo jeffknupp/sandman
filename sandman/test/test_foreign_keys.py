@@ -25,6 +25,7 @@ class TestSandmanForeignKeysBase(object):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['TESTING'] = True
         self.app = app.test_client()
+        # pylint: disable=unused-variable
         from . import foreign_key_models
 
     def test_get(self):
@@ -35,4 +36,5 @@ class TestSandmanForeignKeysBase(object):
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
+        # pylint: disable=attribute-defined-outside-init
         self.app = None
