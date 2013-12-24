@@ -44,12 +44,17 @@ setup(
                       'Flask-SQLAlchemy>=1.0',
                       'SQLAlchemy>=0.8.2',
                       'Flask-Admin>=1.0.6',
+                      'docopt>=0.6.1',
                       ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=long_description,
-    scripts=['scripts/sandmanctl'],
+    entry_points={
+        'console_scripts': [
+            'sandmanctl = sandman.sandmanctl:main',
+            ],
+        },
     packages=['sandman', 'sandman.model'],
     include_package_data=True,
     platforms='any',

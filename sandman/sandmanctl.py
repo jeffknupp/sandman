@@ -1,17 +1,16 @@
-#! /usr/bin/env python
 """Script to run sandman via command line
 
 Usage:
-    sandmanctl.py [URI]
-    
+    sandmanctl.py URI
+
 Start sandman and connect to database at URI
 
 Supported database dialects:
 
 [PostgreSQL]
 [MySQL]
-[Oracle] 
-[Microsoft SQL Server] 
+[Oracle]
+[Microsoft SQL Server]
 [SQLite]
 [Drizzle]
 [Firebird]
@@ -28,18 +27,15 @@ Arguments:
 
 Options:
     -h --help   Show this screen.
-    
+
 'postgresql+psycopg2://scott:tiger@localhost/test'
 
 """
-
-import argparse
-import os
-import sys
+from __future__ import absolute_import
 
 from docopt import docopt
 
-from sandman import app, db
+from sandman import app
 from sandman.model import activate
 
 def main():
@@ -47,6 +43,3 @@ def main():
     app.config['SQLALCHEMY_DATABASE_URI'] = options['URI']
     activate(admin=True)
     app.run('0.0.0.0', debug=True)
-
-if __name__ == '__main__':
-    sys.exit(main())
