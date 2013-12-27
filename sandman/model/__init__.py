@@ -2,6 +2,7 @@
 from which user models should derive. It also makes the :func:`register`
 function available, which maps endpoints to their associated classes."""
 
+from itertools import ifilter
 import webbrowser
 
 from .models import Model
@@ -75,8 +76,7 @@ def activate(admin=True, browser=True, relationships=True):
     if admin:
         admin_view = Admin(app)
         with app.app_context():
-            for cls in (cls for cls in current_app.classes if
-                    cls.use_admin == True):
+            for cls in ifilter(lambda cls: cls.use_admin, current_app.classes):
                 admin_view.add_view(ModelView(cls, db.session))
         if browser:
             webbrowser.open('http://127.0.0.1:5000/admin')
