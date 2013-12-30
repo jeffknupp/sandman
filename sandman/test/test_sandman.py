@@ -1,9 +1,12 @@
 """Main test class for sandman"""
 
-from sandman import app
 import os
 import shutil
 import json
+import datetime
+
+from sandman import app
+from sandman.model import activate
 
 class TestSandmanBase(object):
     """Base class for all sandman test classes."""
@@ -22,11 +25,13 @@ class TestSandmanBase(object):
                     'chinook'),
                 self.DB_LOCATION)
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
+        app.config['SANDMAN_SHOW_PKS'] = False
+        app.config['SANDMAN_ALL_PRIMARY'] = False
         app.config['TESTING'] = True
         self.app = app.test_client()
         #pylint: disable=unused-variable
         from . import models
-
+ 
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)

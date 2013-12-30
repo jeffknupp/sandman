@@ -128,15 +128,16 @@ def _collection_json_response(resources):
         result_list.append(resource.as_dict())
     return jsonify(resources=result_list)
 
-def _collection_html_response(resources):
+def _collection_html_response(resources, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
     :rtype: :class:`flask.Response`
 
     """
+    print start, stop
     return make_response(render_template('collection.html',
-        resources=resources))
+        resources=resources[start:stop]))
 
 def _validate(cls, method, resource=None):
     """Return ``True`` if the the given *cls* supports the HTTP *method* found
@@ -206,6 +207,8 @@ def retrieve_collection(collection, query_arguments=None):
     if query_arguments:
         filters = []
         for key, value in query_arguments.items():
+            if key=='page':
+                continue
             filters.append(getattr(cls, key) == value)
         resources = session.query(cls).filter(*filters)
     else:
@@ -246,7 +249,7 @@ def resource_created_response(resource):
             resource.resource_uri())
     return response
 
-def collection_response(resources):
+def collection_response(resources, start=None, stop=None):
     """Return a response for the *resources* of the appropriate content type.
 
     :param resources: resources to be returned in request
@@ -257,7 +260,7 @@ def collection_response(resources):
     if _get_acceptable_response_type() == JSON:
         return _collection_json_response(resources)
     else:
-        return _collection_html_response(resources)
+        return _collection_html_response(resources, start, stop)
 
 
 def resource_response(resource):
@@ -457,4 +460,10 @@ def get_collection(collection):
 
     _validate(cls, request.method, resources)
 
-    return collection_response(resources)
+    start, stop = 1, 20
+
+    if request.args and 'page' in request.args:
+        page = int(request.args['page'])
+        results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
+        start, stop = page * results_per_page, (page * results_per_page) + 1
+    return collection_response(resources, start, stop)

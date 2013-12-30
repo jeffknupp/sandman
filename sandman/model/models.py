@@ -2,8 +2,12 @@
 a table in the database that should be modeled as a resource."""
 
 from decimal import Decimal
-from sandman import app
+
 from flask import current_app
+from flask.ext.admin.contrib.sqla import ModelView
+
+from sandman import app
+
 
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
@@ -125,3 +129,7 @@ class Model(object):
 
     def __str__(self):
         return str(getattr(self, self.primary_key()))
+
+class AdminModelViewWithPK(ModelView):
+    """Mixin admin view class that displays primary keys on the admin form"""
+    column_display_pk = True

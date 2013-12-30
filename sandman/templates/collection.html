@@ -1,20 +1,28 @@
 {% extends "base.html" %}
 {% block body %}
 
-<h3>{{ resources[0].__tablename__ }}</h3>
-<ol>
+<div class="col-md-8">
+<h2>{{ resources[0].__tablename__ }}</h2>
+<table class="table table-condensed table-striped">
+    <thead>
+        {% for name in resources[0].as_dict() %}
+        <th>{{ name }}</th>
+        {% endfor %}
+    </thead>
+    <tbody>
     {% for resource in resources %}
-        <li>
-            <ul>
-                {% for attribute, value in resource.as_dict().items() %}
-                    {% if attribute == 'links' %}
-                    <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ value[0].rel }}</a></li>
+        <tr>
+            {% for attribute, value in resource.as_dict().items() %}
+                {% if attribute == 'links' %}
+                <td><ul>
+                    {% for link in value %}
+                        <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ value[0].rel }}</a></li>
+                    {% endfor %}
+            </ul></td>
                     {% else %}
-                        <li>{{ attribute }}: {{ value }}</li>
+                    <td>{{ value }}</td>
                     {% endif %}
                 {% endfor %}
-            </ul>
-        </li>
     {% endfor %}
-</ol>
+</table>
 {% endblock %}
