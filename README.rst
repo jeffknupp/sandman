@@ -6,7 +6,7 @@ sandman
 Homepage
 --------
 
-Visit the home of ``sandman`` on the web
+Visit the home of ``sandman`` on the web:
 `sandman.io <http://www.sandman.io>`__
 
 Documentation

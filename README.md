@@ -8,7 +8,7 @@ sandman
 Homepage
 --------
 
-Visit the home of `sandman` on the web [sandman.io](http://www.sandman.io)
+Visit the home of `sandman` on the web: [sandman.io](http://www.sandman.io)
 
 Documentation
 -------------
