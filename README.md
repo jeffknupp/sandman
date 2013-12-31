@@ -5,6 +5,11 @@ sandman
 [![Coverage Status](https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop)](https://coveralls.io/r/jeffknupp/sandman?branch=develop)
 [![Stories in Ready](https://badge.waffle.io/jeffknupp/sandman.png)](http://waffle.io/jeffknupp/sandman)
 
+Homepage
+--------
+
+Visit the home of `sandman` on the web [sandman.io](http://www.sandman.io)
+
 Documentation
 -------------
 
