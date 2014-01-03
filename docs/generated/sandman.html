@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman API &mdash; sandman 0.6.6 documentation</title>
+    <title>sandman API &mdash; sandman 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6.6',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.6.6 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.7.0 documentation" href="index.html" />
     <link rel="prev" title="The sandman Admin Interface" href="admin.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.6.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -81,7 +81,7 @@ from which user models should derive. It also makes the <a class="reference inte
 function available, which maps endpoints to their associated classes.</p>
 <dl class="function">
 <dt id="sandman.model.register">
-<tt class="descclassname">sandman.model.</tt><tt class="descname">register</tt><big>(</big><em>cls</em>, <em>use_admin=True</em><big>)</big><a class="reference internal" href="_modules/sandman/model.html#register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.register" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.model.</tt><tt class="descname">register</tt><big>(</big><em>cls</em>, <em>use_admin=True</em><big>)</big><a class="headerlink" href="#sandman.model.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register with the API a <tt class="xref py py-class docutils literal"><span class="pre">sandman.model.Model</span></tt> class and associated
 endpoint.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -97,12 +97,85 @@ be registered with the endpoint returned by <tt class="xref py py-func docutils 
 
 <dl class="function">
 <dt id="sandman.model.activate">
-<tt class="descclassname">sandman.model.</tt><tt class="descname">activate</tt><big>(</big><em>admin=True</em>, <em>browser=True</em><big>)</big><a class="reference internal" href="_modules/sandman/model.html#activate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.activate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Activate each registered model for non-admin use</p>
+<tt class="descclassname">sandman.model.</tt><tt class="descname">activate</tt><big>(</big><em>admin=True</em>, <em>browser=True</em>, <em>name='admin'</em><big>)</big><a class="headerlink" href="#sandman.model.activate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Activate each pre-registered model or generate the model classes and
+(possibly) register them for the admin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>admin</strong> (<em>bool</em>) &#8211; should we generate the admin interface?</li>
+<li><strong>browser</strong> (<em>bool</em>) &#8211; should we open the browser for the user?</li>
+<li><strong>name</strong> &#8211; name to use for blueprint created by the admin interface. Set
+this to avoid naming conflicts with other blueprints (if trying
+to use sandman to connect to multiple databases simultaneously)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <span class="target" id="module-sandman.model.models"></span><p>The Model class is meant to be the base class for user Models. It represents
 a table in the database that should be modeled as a resource.</p>
+<dl class="class">
+<dt id="sandman.model.models.AdminModelViewWithPK">
+<em class="property">class </em><tt class="descclassname">sandman.model.models.</tt><tt class="descname">AdminModelViewWithPK</tt><big>(</big><em>model</em>, <em>session</em>, <em>name=None</em>, <em>category=None</em>, <em>endpoint=None</em>, <em>url=None</em><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#AdminModelViewWithPK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">flask_admin.contrib.sqla.view.ModelView</span></tt></p>
+<p>Mixin admin view class that displays primary keys on the admin form</p>
+<dl class="attribute">
+<dt id="sandman.model.models.AdminModelViewWithPK._default_view">
+<tt class="descname">_default_view</tt><em class="property"> = 'index_view'</em><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK._default_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sandman.model.models.AdminModelViewWithPK._urls">
+<tt class="descname">_urls</tt><em class="property"> = [('/action/', 'action_view', ('POST',)), ('/ajax/lookup/', 'ajax_lookup', ('GET',)), ('/new/', 'create_view', ('GET', 'POST')), ('/delete/', 'delete_view', ('POST',)), ('/edit/', 'edit_view', ('GET', 'POST')), ('/', 'index_view', ('GET',))]</em><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK._urls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.AdminModelViewWithPK.action_view">
+<tt class="descname">action_view</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.action_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mass-model action view.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.AdminModelViewWithPK.ajax_lookup">
+<tt class="descname">ajax_lookup</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.ajax_lookup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sandman.model.models.AdminModelViewWithPK.column_display_pk">
+<tt class="descname">column_display_pk</tt><em class="property"> = True</em><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.column_display_pk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.AdminModelViewWithPK.create_view">
+<tt class="descname">create_view</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.create_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create model view</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.AdminModelViewWithPK.delete_view">
+<tt class="descname">delete_view</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.delete_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete model view. Only POST method is allowed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.AdminModelViewWithPK.edit_view">
+<tt class="descname">edit_view</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.edit_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit model view</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sandman.model.models.AdminModelViewWithPK.index_view">
+<tt class="descname">index_view</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#sandman.model.models.AdminModelViewWithPK.index_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>List view</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="sandman.model.models.Model">
 <em class="property">class </em><tt class="descclassname">sandman.model.models.</tt><tt class="descname">Model</tt><a class="reference internal" href="_modules/sandman/model/models.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model" title="Permalink to this definition">¶</a></dt>
@@ -261,7 +334,7 @@ instance whose keys are the column names of the
 
 <dl class="function">
 <dt id="sandman.sandman.collection_response">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">collection_response</tt><big>(</big><em>resources</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#collection_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.collection_response" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">collection_response</tt><big>(</big><em>resources</em>, <em>start=None</em>, <em>stop=None</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#collection_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.collection_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a response for the <em>resources</em> of the appropriate content type.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -620,7 +693,7 @@ values to use in a &#8216;where&#8217; clause search.</p>
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.6.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.7.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

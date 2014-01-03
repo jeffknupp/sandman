@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.sandman &mdash; sandman 0.6.6 documentation</title>
+    <title>sandman.sandman &mdash; sandman 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.6.6',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.6.6 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.7.0 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.6.6 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.7.0 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -177,15 +177,16 @@
         <span class="n">result_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="n">result_list</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_collection_html_response</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_collection_html_response</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the HTML representation of the collection *resources*.</span>
 
 <span class="sd">    :param list resources: list of :class:`sandman.model.Model`s to render</span>
 <span class="sd">    :rtype: :class:`flask.Response`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span>
     <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;collection.html&#39;</span><span class="p">,</span>
-        <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">))</span>
+        <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]))</span>
 
 <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return ``True`` if the the given *cls* supports the HTTP *method* found</span>
@@ -255,6 +256,8 @@
     <span class="k">if</span> <span class="n">query_arguments</span><span class="p">:</span>
         <span class="n">filters</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">query_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">==</span><span class="s">&#39;page&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="n">filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span><span class="p">)</span>
         <span class="n">resources</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">*</span><span class="n">filters</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -295,7 +298,7 @@
             <span class="n">resource</span><span class="o">.</span><span class="n">resource_uri</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">response</span>
 </div>
-<div class="viewcode-block" id="collection_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.collection_response">[docs]</a><span class="k">def</span> <span class="nf">collection_response</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
+<div class="viewcode-block" id="collection_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.collection_response">[docs]</a><span class="k">def</span> <span class="nf">collection_response</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a response for the *resources* of the appropriate content type.</span>
 
 <span class="sd">    :param resources: resources to be returned in request</span>
@@ -306,7 +309,7 @@
     <span class="k">if</span> <span class="n">_get_acceptable_response_type</span><span class="p">()</span> <span class="o">==</span> <span class="n">JSON</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_collection_json_response</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_collection_html_response</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_collection_html_response</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="resource_response"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.resource_response">[docs]</a><span class="k">def</span> <span class="nf">resource_response</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
@@ -506,7 +509,13 @@
 
     <span class="n">_validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">resources</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">collection_response</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span></div>
+    <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span> <span class="ow">and</span> <span class="s">&#39;page&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;page&#39;</span><span class="p">])</span>
+        <span class="n">results_per_page</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;RESULTS_PER_PAGE&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">page</span> <span class="o">*</span> <span class="n">results_per_page</span><span class="p">,</span> <span class="p">(</span><span class="n">page</span> <span class="o">*</span> <span class="n">results_per_page</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">collection_response</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -540,7 +549,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.6.6 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.7.0 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
