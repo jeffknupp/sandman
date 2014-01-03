@@ -188,7 +188,7 @@ def endpoint_class(collection):
     """
     with app.app_context():
         try:
-            cls = current_app.endpoint_classes[collection]
+            cls = current_app.class_references[collection]
         except KeyError:
             raise InvalidAPIUsage(404)
         return cls

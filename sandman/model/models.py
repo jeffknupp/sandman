@@ -68,8 +68,8 @@ class Model(object):
             if column_value:
                 table = foreign_key.column.table.name
                 with app.app_context():
-                    endpoint = current_app.table_to_endpoint[table]
-                links.append({'rel': endpoint, 'uri': '/{}/{}'.format(
+                    endpoint = current_app.class_references[table]
+                links.append({'rel': endpoint.__name__, 'uri': '/{}/{}'.format(
                     endpoint, column_value)})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
