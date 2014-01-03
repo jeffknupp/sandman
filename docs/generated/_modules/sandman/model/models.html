@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.model.models &mdash; sandman 0.6.6 documentation</title>
+    <title>sandman.model.models &mdash; sandman 0.7.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.6.6',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.6.6 documentation" href="../../../index.html" />
+    <link rel="top" title="sandman 0.7.0 documentation" href="../../../index.html" />
     <link rel="up" title="sandman.model" href="../model.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">sandman 0.6.6 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">sandman 0.7.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../model.html" accesskey="U">sandman.model</a> &raquo;</li> 
       </ul>
@@ -52,8 +52,12 @@
 <span class="sd">a table in the database that should be modeled as a resource.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
-<span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span>
+
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">current_app</span>
+<span class="kn">from</span> <span class="nn">flask.ext.admin.contrib.sqla</span> <span class="kn">import</span> <span class="n">ModelView</span>
+
+<span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span>
+
 
 <div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../sandman.html#sandman.model.models.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A mixin class containing the majority of the RESTful API functionality.</span>
@@ -84,10 +88,6 @@
 
     <span class="n">__table__</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="sd">&quot;&quot;&quot;Will be populated by SQLAlchemy with the table&#39;s meta-information.&quot;&quot;&quot;</span>
-
-    <span class="n">__related_tables__</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="sd">&quot;&quot;&quot;List of Models for which this model has a foreign key relationship</span>
-<span class="sd">    with.&quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Model.endpoint"><a class="viewcode-back" href="../../../sandman.html#sandman.model.models.Model.endpoint">[docs]</a>    <span class="k">def</span> <span class="nf">endpoint</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
@@ -178,7 +178,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
 </div>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_key</span><span class="p">()))</span></div>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_key</span><span class="p">()))</span>
+</div>
+<div class="viewcode-block" id="AdminModelViewWithPK"><a class="viewcode-back" href="../../../sandman.html#sandman.model.models.AdminModelViewWithPK">[docs]</a><span class="k">class</span> <span class="nc">AdminModelViewWithPK</span><span class="p">(</span><span class="n">ModelView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mixin admin view class that displays primary keys on the admin form&quot;&quot;&quot;</span>
+    <span class="n">column_display_pk</span> <span class="o">=</span> <span class="bp">True</span></div>
 </pre></div>
 
           </div>
@@ -212,7 +216,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">sandman 0.6.6 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">sandman 0.7.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li>
           <li><a href="../model.html" >sandman.model</a> &raquo;</li> 
       </ul>
