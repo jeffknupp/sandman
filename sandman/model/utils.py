@@ -12,7 +12,7 @@ from sqlalchemy.schema import Table
 from sandman import app, db
 from sandman.model.models import Model, AdminModelViewWithPK
 
-def generate_endpoint_classes():
+def generate_endpoint_classes(db, generate_pks=False):
     """Return a list of model classes generated for each reflected database
     table."""
     seen_classes = set()
@@ -21,49 +21,52 @@ def generate_endpoint_classes():
         for name, table in db.metadata.tables.items():
             if not name in seen_classes:
                 seen_classes.add(name)
-                if not table.primary_key and current_app.config['SANDMAN_ALL_PRIMARY']:
-                    cls = generate_primary_key(table)
+                if not table.primary_key and generate_pks:
+                    cls = add_pk_if_required(db, table, name)
                 else:
                     cls = type(str(name), (sandman_model, db.Model),
                             {'__tablename__': name})
                 register(cls)
 
-def generate_primary_key(table):
+def add_pks_if_required(db, known_tables=None):
+    for name, table in db.metadata.tables.items():
+        if known_tables is None or table in known_tables:
+            cls = add_pk_if_required(db, table, name)
+            register(cls)
+
+def add_pk_if_required(db, table, name):
     """Return a class deriving from our Model class as well as the SQLAlchemy
     model.
 
     :param `sqlalchemy.schema.Table` table: table to create primary key for
+    :param  table: table to create primary key for
 
     """
-    with app.app_context():
-        db.metadata.reflect(bind=db.engine)
-        for name, table in db.metadata.tables.items():
-            cls_dict = {'__tablename__': name}
-            if not table.primary_key and current_app.config['SANDMAN_ALL_PRIMARY']:
-                for column in table.columns:
-                    column.primary_key = True
-                Table(name, db.metadata, *table.columns, extend_existing=True)
-                cls_dict['__table__'] = table
-                db.metadata.create_all(bind=db.engine)
+    db.metadata.reflect(bind=db.engine)
+    cls_dict = {'__tablename__': name}
+    if not table.primary_key:
+        for column in table.columns:
+            column.primary_key = True
+        Table(name, db.metadata, *table.columns, extend_existing=True)
+        cls_dict['__table__'] = table
+        db.metadata.create_all(bind=db.engine)
 
-            return type(str(name), (sandman_model, db.Model), cls_dict)
+    return type(str(name), (sandman_model, db.Model), cls_dict)
 
-def prepare_relationships():
+def prepare_relationships(db, known_tables):
     """Enrich the registered Models with SQLAlchemy ``relationships``
     so that related tables are correctly processed up by the admin.
 
     """
     inspector = reflection.Inspector.from_engine(db.engine)
-    with app.app_context():
-        for cls in set(current_app.class_references.values()):
-            for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
-                other = current_app.class_references[foreign_key['referred_table']]
-                if other not in cls.__related_tables__ and cls not in other.__related_tables__:
-                    cls.__related_tables__.add(other)
-                    # Add a SQLAlchemy relationship as an attribute on the class
-                    if cls != other:
-                        setattr(cls, other.__name__.lower(), relationship(
-                            other.__name__, backref=cls.__name__.lower()))
+    for cls in set(known_tables.values()):
+        for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
+            other = known_tables[foreign_key['referred_table']]
+            if other not in cls.__related_tables__ and cls not in other.__related_tables__ and other != cls:
+                cls.__related_tables__.add(other)
+                # Add a SQLAlchemy relationship as an attribute on the class
+                setattr(cls, other.__name__.lower(), relationship(
+                        other.__name__, backref=cls.__name__.lower()))
 
 
 def register(cls, use_admin=True):
@@ -110,8 +113,8 @@ def register_classes_for_admin(db_session, show_pks=True,
 
     """
 
-    admin_view = Admin(app, name=name)
     with app.app_context():
+        admin_view = Admin(current_app, name=name)
         for cls in set(cls for cls in current_app.class_references.values() if
                 cls.use_admin == True):
             if show_pks:
@@ -138,17 +141,23 @@ def activate(admin=True, browser=True, name='admin'):
 
     """
     with app.app_context():
-        if 'SANDMAN_SHOW_PKS' not in current_app.config:
-            current_app.config['SANDMAN_SHOW_PKS'] = False
         if getattr(current_app, 'class_references', None) is None:
-            generate_endpoint_classes()
+            current_app.class_references = {}
+            try:
+                generate_pks = current_app.config['SANDMAN_GENERATE_PKS']
+            except KeyError:
+                generate_pks = False
+            generate_endpoint_classes(db, generate_pks)
         else:
             Model.prepare(db.engine)
-        prepare_relationships()
+        prepare_relationships(db, current_app.class_references)
         if admin:
-            register_classes_for_admin(db.session,
-                current_app.config['SANDMAN_SHOW_PKS'] or False,
-                name)
+            try:
+                show_pks = current_app.config['SANDMAN_SHOW_PKS']
+            except KeyError:
+                show_pks = False
+            register_classes_for_admin(db.session, show_pks, name)
+        print current_app.url_map
     if browser:
         webbrowser.open('http://127.0.0.1:5000/admin')
 
