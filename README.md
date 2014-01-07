@@ -189,7 +189,7 @@ RESTful API and admin interface. For each table, `sandman` creates:
 * customize a Models endpoint by setting the `__endpoint__` method
 * essentially a HATEOAS-based service sitting in front of your database
 
-`sandman` is under active development but should be usable in any envrionment due
+`sandman` is under active development but should be usable in any environment due
 to one simple fact:
 
 **`sandman` never alters your database unless you add or change a record yourself.  It adds no extra tables to your existing database and requires no changes to any of your existing tables. If you start `sandman`, use it to browse your database via cURL, then stop `sandman`, your database will be in exactly the same state as it was before you began.** 
