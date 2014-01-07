@@ -201,7 +201,7 @@ creates:
 -  essentially a HATEOAS-based service sitting in front of your database
 
 ``sandman`` is under active development but should be usable in any
-envrionment due to one simple fact:
+environment due to one simple fact:
 
 **``sandman`` never alters your database unless you add or change a
 record yourself. It adds no extra tables to your existing database and

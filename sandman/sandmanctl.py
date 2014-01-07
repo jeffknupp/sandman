@@ -1,7 +1,7 @@
 """Script to run sandman via command line
 
 Usage:
-    sandmanctl.py URI [--primary-keys --all-columns-primary]
+    sandmanctl.py URI [--show-primary-keys --generate-pks]
 
 Start sandman and connect to database at URI
 
@@ -27,9 +27,9 @@ Arguments:
 
 Options:
     -h --help                   Show this screen.
-    -p --primary-keys           Display primary key columns in the admin
+    -s --show-primary-keys           Display primary key columns in the admin
                                 interface
-    -a --all-columns-primary    Use the combination of all columns as the
+    -g --generate-pks           Use the combination of all columns as the
                                 primary key for tables without primary keys
                                 (primary keys are required by the mapping
                                 engine). Implies --primary-keys
@@ -49,11 +49,11 @@ def main(test_options=None):
     """Main entry point for script."""
     options = test_options or docopt(__doc__)
     app.config['SQLALCHEMY_DATABASE_URI'] = options['URI']
-    if '--all-columns-primary' in options:
-        app.config['SANDMAN_ALL_PRIMARY'] = True
+    if '--generate-pks' in options:
+        app.config['SANDMAN_GENERATE_PKS'] = True
         app.config['SANDMAN_SHOW_PKS'] = True
     else:
-        app.config['SANDMAN_ALL_PRIMARY'] = False
-        app.config['SANDMAN_SHOW_PKS'] = '--primary-keys' in options
+        app.config['SANDMAN_GENERATE_PKS'] = False
+        app.config['SANDMAN_SHOW_PKS'] = '--show-primary-keys' in options
     activate(name='sandmanctl')
     app.run('0.0.0.0', debug=True)

@@ -6,7 +6,6 @@ import json
 import datetime
 
 from sandman import app
-from sandman.model import activate
 
 class TestSandmanBase(object):
     """Base class for all sandman test classes."""
