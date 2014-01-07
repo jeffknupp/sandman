@@ -3,6 +3,8 @@ sandman
 
 |Build Status| |Coverage Status| |Stories in Ready|
 
+|Analytics|
+
 Homepage
 --------
 
@@ -239,3 +241,5 @@ Coming Soon
    :target: https://coveralls.io/r/jeffknupp/sandman?branch=develop
 .. |Stories in Ready| image:: https://badge.waffle.io/jeffknupp/sandman.png
    :target: http://waffle.io/jeffknupp/sandman
+.. |Analytics| image:: https://ga-beacon.appspot.com/UA-12615441-7/sandman/home
+   :target: https://github.com/jeffknupp/sandman
