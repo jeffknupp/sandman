@@ -119,7 +119,7 @@ def register_classes_for_admin(db_session, show_pks=True,
                 cls.use_admin == True):
             column_list = [column.name for column in
                     cls.__table__.columns.values()]
-            if cls.__view__ is not None:
+            if hasattr(cls, '__view__'):
                 # allow ability for model classes to specify model views
                 admin_view_class = type('AdminView', (cls.__view__,),
                         {'form_columns': column_list})
