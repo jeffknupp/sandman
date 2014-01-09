@@ -32,7 +32,7 @@ database using ``sandman``:
 
 *That's it.* ``sandman`` will then do the following:
 
--  connect to your database and introspect it's contents
+-  connect to your database and introspect its contents
 -  create and launch a REST API service
 -  create an HTML admin interface
 -  *open your browser to the admin interface*
