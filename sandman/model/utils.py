@@ -117,17 +117,20 @@ def register_classes_for_admin(db_session, show_pks=True,
         admin_view = Admin(current_app, name=name)
         for cls in set(cls for cls in current_app.class_references.values() if
                 cls.use_admin == True):
-            if show_pks:
+            column_list = [column.name for column in
+                    cls.__table__.columns.values()]
+            if hasattr(cls, '__view__'):
+                # allow ability for model classes to specify model views
+                admin_view_class = type('AdminView', (cls.__view__,),
+                        {'form_columns': column_list})
+            elif show_pks:
                 # the default of Flask-SQLAlchemy is to not show primary
                 # classes, which obviously isn't acceptable in some cases
-                column_list = [
-                        column.name for column in
-                        cls.__table__.columns.values()]
                 admin_view_class = type('AdminView', (AdminModelViewWithPK,),
                         {'form_columns': column_list})
-                admin_view.add_view(admin_view_class(cls, db_session))
             else:
-                admin_view.add_view(ModelView(cls, db_session))
+                admin_view_class = ModelView
+            admin_view.add_view(admin_view_class(cls, db_session))
 
 def activate(admin=True, browser=True, name='admin'):
     """Activate each pre-registered model or generate the model classes and
