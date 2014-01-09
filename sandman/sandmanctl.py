@@ -1,7 +1,7 @@
 """Script to run sandman via command line
 
 Usage:
-    sandmanctl.py URI [--show-primary-keys --generate-pks]
+    sandmanctl.py URI [--show-pks --generate-pks] [--host=host] [--port=port]
 
 Start sandman and connect to database at URI
 
@@ -33,6 +33,8 @@ Options:
                                 primary key for tables without primary keys
                                 (primary keys are required by the mapping
                                 engine). Implies --primary-keys
+    --host=host                 Host to run sandmanctl on
+    --port=port                 Port to run sandmanctl on
 
 'postgresql+psycopg2://scott:tiger@localhost/test'
 'postgresql+psycopg2://scott:tiger@localhost/test' --all-columns-primary
@@ -49,11 +51,11 @@ def main(test_options=None):
     """Main entry point for script."""
     options = test_options or docopt(__doc__)
     app.config['SQLALCHEMY_DATABASE_URI'] = options['URI']
-    if '--generate-pks' in options:
-        app.config['SANDMAN_GENERATE_PKS'] = True
-        app.config['SANDMAN_SHOW_PKS'] = True
-    else:
-        app.config['SANDMAN_GENERATE_PKS'] = False
-        app.config['SANDMAN_SHOW_PKS'] = '--show-primary-keys' in options
+    app.config['SANDMAN_GENERATE_PKS'] = options['--generate-pks'] or False
+    app.config['SANDMAN_SHOW_PKS'] = options['--show-pks'] or False
+    host = options.get('--host') or '0.0.0.0'
+    port = options.get('--port') or 5000
+    app.config['SERVER_HOST'] = host
+    app.config['SERVER_PORT'] = port
     activate(name='sandmanctl')
-    app.run('0.0.0.0', debug=True)
+    app.run(host=host, port=int(port), debug=True)
