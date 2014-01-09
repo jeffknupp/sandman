@@ -37,7 +37,9 @@ Options:
     --port=port                 Port to run sandmanctl on
 
 'postgresql+psycopg2://scott:tiger@localhost/test'
-'postgresql+psycopg2://scott:tiger@localhost/test' --all-columns-primary
+'postgresql+psycopg2://scott:tiger@localhost/test' --generate-pks --host localhost --port 8080
+'sqlite+pysqlite:///relative/path/to/db.db'
+'sqlite:////absolute/path/to/db.db'
 
 """
 from __future__ import absolute_import
@@ -50,6 +52,7 @@ from sandman.model import activate
 def main(test_options=None):
     """Main entry point for script."""
     options = test_options or docopt(__doc__)
+    URI = options['URI']
     app.config['SQLALCHEMY_DATABASE_URI'] = options['URI']
     app.config['SANDMAN_GENERATE_PKS'] = options['--generate-pks'] or False
     app.config['SANDMAN_SHOW_PKS'] = options['--show-pks'] or False
