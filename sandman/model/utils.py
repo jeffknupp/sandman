@@ -157,9 +157,10 @@ def activate(admin=True, browser=True, name='admin'):
             except KeyError:
                 show_pks = False
             register_classes_for_admin(db.session, show_pks, name)
-        print current_app.url_map
     if browser:
-        webbrowser.open('http://127.0.0.1:5000/admin')
+        host = app.config.get('SERVER_HOST', None) or '127.0.0.1'
+        port = app.config.get('SERVER_PORT', None) or 5000
+        webbrowser.open('http://{}:{}/admin'.format(host, port))
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
 # object which also derives from sandman.models.Model. The naming is done for

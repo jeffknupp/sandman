@@ -1,7 +1,7 @@
 """Script to run sandman via command line
 
 Usage:
-    sandmanctl.py URI [--show-pks --generate-pks --host --port]
+    sandmanctl.py URI [--show-pks --generate-pks] [--host=host] [--port=port]
 
 Start sandman and connect to database at URI
 
@@ -53,7 +53,9 @@ def main(test_options=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = options['URI']
     app.config['SANDMAN_GENERATE_PKS'] = options['--generate-pks'] or False
     app.config['SANDMAN_SHOW_PKS'] = options['--show-pks'] or False
-    host = options.get('host') or '0.0.0.0'
-    port = options.get('port') or 5000
+    host = options.get('--host') or '0.0.0.0'
+    port = options.get('--port') or 5000
+    app.config['SERVER_HOST'] = host
+    app.config['SERVER_PORT'] = port
     activate(name='sandmanctl')
-    app.run(host=host, port=port, debug=True)
+    app.run(host=host, port=int(port), debug=True)
