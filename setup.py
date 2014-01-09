@@ -59,6 +59,7 @@ setup(
     include_package_data=True,
     platforms='any',
     test_suite='sandman.test.test_sandman',
+    zip_safe=False,
     classifiers = [
         'Programming Language :: Python',
         'Development Status :: 4 - Beta',
