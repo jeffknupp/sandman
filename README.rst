@@ -235,6 +235,8 @@ Coming Soon
 
 -  Authentication
 
+|Bitdeli Badge|
+
 .. |Build Status| image:: https://travis-ci.org/jeffknupp/sandman.png?branch=develop
    :target: https://travis-ci.org/jeffknupp/sandman
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop
@@ -243,3 +245,5 @@ Coming Soon
    :target: http://waffle.io/jeffknupp/sandman
 .. |Analytics| image:: https://ga-beacon.appspot.com/UA-12615441-7/sandman/home
    :target: https://github.com/jeffknupp/sandman
+.. |Bitdeli Badge| image:: https://d2weczhvl823v0.cloudfront.net/jeffknupp/sandman/trend.png
+   :target: https://bitdeli.com/free
