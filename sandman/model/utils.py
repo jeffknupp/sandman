@@ -140,11 +140,9 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False):
 
     """
     with app.app_context():
-        generate_pks = current_app.config.get('SANDMAN_GENERATE_PKS', None) or False
-        if getattr(current_app, 'class_references', None) is None:
-            current_app.class_references = {}
-            generate_endpoint_classes(db, generate_pks)
-        elif reflect_all:
+        generate_pks = app.config.get('SANDMAN_GENERATE_PKS', None) or False
+        if getattr(app, 'class_references', None) is None or reflect_all:
+            app.class_references = {}
             generate_endpoint_classes(db, generate_pks)
         else:
             Model.prepare(db.engine)

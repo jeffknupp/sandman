@@ -24,7 +24,7 @@ class TestSandmanForeignKeysBase(object):
                 self.DB_LOCATION)
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['SANDMAN_SHOW_PKS'] = False
-        app.config['SANDMAN_GENERATE_PKS'] = False
+        app.config['SANDMAN_GENERATE_PKS'] = True
         app.config['TESTING'] = True
         self.app = app.test_client()
         # pylint: disable=unused-variable
