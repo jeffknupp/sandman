@@ -10,7 +10,7 @@ class TestSandmanForeignKeysBase(object):
     """Class to test edge-case foreign key conditions, using a database
     explicitly built to contain these cases."""
 
-    DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'foreign_key')
+    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'foreign_key')
 
     def setup_method(self, _):
         """Grab the database file from the *data* directory and configure the
@@ -18,8 +18,7 @@ class TestSandmanForeignKeysBase(object):
         shutil.copy(
                 os.path.join(
                     os.getcwd(),
-                    'sandman',
-                    'test',
+                    'tests',
                     'data',
                     'foreign_key'),
                 self.DB_LOCATION)

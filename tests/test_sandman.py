@@ -10,7 +10,7 @@ from sandman import app
 class TestSandmanBase(object):
     """Base class for all sandman test classes."""
 
-    DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
+    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'chinook')
 
     def setup_method(self, _):
         """Grab the database file from the *data* directory and configure the
@@ -18,8 +18,7 @@ class TestSandmanBase(object):
         shutil.copy(
                 os.path.join(
                     os.getcwd(),
-                    'sandman',
-                    'test',
+                    'tests',
                     'data',
                     'chinook'),
                 self.DB_LOCATION)
