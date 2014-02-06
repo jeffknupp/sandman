@@ -48,7 +48,10 @@ class Model(object):
         """
         if cls.__endpoint__ is not None:
             return cls.__endpoint__
-        return cls.__tablename__.lower() + 's'
+        value = cls.__tablename__.lower()
+        if not value.endswith('s'):
+            value += 's'
+        return value
 
     def resource_uri(self):
         """Return the URI at which the resource can be found.
