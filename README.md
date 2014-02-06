@@ -212,3 +212,5 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 ### Coming Soon
 
 * Authentication
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jeffknupp/sandman/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
