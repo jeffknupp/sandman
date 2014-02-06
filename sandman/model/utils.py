@@ -16,6 +16,8 @@ def generate_endpoint_classes(db, generate_pks=False):
     """Return a list of model classes generated for each reflected database
     table."""
     seen_classes = set()
+    for cls in current_app.class_references.values():
+        seen_classes.add(cls.__tablename__)
     with app.app_context():
         db.metadata.reflect(bind=db.engine)
         for name, table in db.metadata.tables.items():
@@ -27,12 +29,6 @@ def generate_endpoint_classes(db, generate_pks=False):
                     cls = type(str(name), (sandman_model, db.Model),
                             {'__tablename__': name})
                 register(cls)
-
-def add_pks_if_required(db, known_tables=None):
-    for name, table in db.metadata.tables.items():
-        if known_tables is None or table in known_tables:
-            cls = add_pk_if_required(db, table, name)
-            register(cls)
 
 def add_pk_if_required(db, table, name):
     """Return a class deriving from our Model class as well as the SQLAlchemy
@@ -132,7 +128,7 @@ def register_classes_for_admin(db_session, show_pks=True,
                 admin_view_class = ModelView
             admin_view.add_view(admin_view_class(cls, db_session))
 
-def activate(admin=True, browser=True, name='admin'):
+def activate(admin=True, browser=True, name='admin', reflect_all=False):
     """Activate each pre-registered model or generate the model classes and
     (possibly) register them for the admin.
 
@@ -144,12 +140,11 @@ def activate(admin=True, browser=True, name='admin'):
 
     """
     with app.app_context():
+        generate_pks = current_app.config.get('SANDMAN_GENERATE_PKS', None) or False
         if getattr(current_app, 'class_references', None) is None:
             current_app.class_references = {}
-            try:
-                generate_pks = current_app.config['SANDMAN_GENERATE_PKS']
-            except KeyError:
-                generate_pks = False
+            generate_endpoint_classes(db, generate_pks)
+        elif reflect_all:
             generate_endpoint_classes(db, generate_pks)
         else:
             Model.prepare(db.engine)
@@ -161,9 +156,8 @@ def activate(admin=True, browser=True, name='admin'):
                 show_pks = False
             register_classes_for_admin(db.session, show_pks, name)
     if browser:
-        host = app.config.get('SERVER_HOST', None) or '127.0.0.1'
         port = app.config.get('SERVER_PORT', None) or 5000
-        webbrowser.open('http://{}:{}/admin'.format(host, port))
+        webbrowser.open('http://localhost:{}/admin'.format(port))
 
 # Redefine 'Model' to be a sqlalchemy.ext.declarative.api.DeclarativeMeta
 # object which also derives from sandman.models.Model. The naming is done for
