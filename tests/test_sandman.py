@@ -10,7 +10,7 @@ from sandman import app
 class TestSandmanBase(object):
     """Base class for all sandman test classes."""
 
-    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'chinook')
+    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'chinook.sqlite3')
 
     def setup_method(self, _):
         """Grab the database file from the *data* directory and configure the
@@ -20,7 +20,7 @@ class TestSandmanBase(object):
                     os.getcwd(),
                     'tests',
                     'data',
-                    'chinook'),
+                    'chinook.sqlite3'),
                 self.DB_LOCATION)
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['SANDMAN_SHOW_PKS'] = False

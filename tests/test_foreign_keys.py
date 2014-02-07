@@ -10,7 +10,7 @@ class TestSandmanForeignKeysBase(object):
     """Class to test edge-case foreign key conditions, using a database
     explicitly built to contain these cases."""
 
-    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'foreign_key')
+    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'foreign_key.sqlite3')
 
     def setup_method(self, _):
         """Grab the database file from the *data* directory and configure the
@@ -20,7 +20,7 @@ class TestSandmanForeignKeysBase(object):
                     os.getcwd(),
                     'tests',
                     'data',
-                    'foreign_key'),
+                    'foreign_key.sqlite3'),
                 self.DB_LOCATION)
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
         app.config['SANDMAN_SHOW_PKS'] = False
