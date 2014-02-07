@@ -60,6 +60,7 @@ setup(
     platforms='any',
     test_suite='sandman.test.test_sandman',
     zip_safe=False,
+    package_data={'sandman': ['templates/**', 'static/*/*']},
     classifiers = [
         'Programming Language :: Python',
         'Development Status :: 4 - Beta',
