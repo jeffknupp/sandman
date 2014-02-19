@@ -73,7 +73,7 @@ class Model(object):
                 with app.app_context():
                     endpoint = current_app.class_references[table]
                 links.append({'rel': endpoint.__name__, 'uri': '/{}/{}'.format(
-                    endpoint, column_value)})
+                    endpoint.__name__, column_value)})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links
 
