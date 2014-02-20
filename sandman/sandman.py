@@ -6,6 +6,7 @@ from flask import (jsonify, request, g,
 from sqlalchemy.exc import IntegrityError
 from . import app, db
 from .exception import InvalidAPIUsage
+from .model.models import Model
 
 JSON, HTML = range(2)
 JSON_CONTENT_TYPES = set(['application/json',])
@@ -135,7 +136,6 @@ def _collection_html_response(resources, start=0, stop=20):
     :rtype: :class:`flask.Response`
 
     """
-    print start, stop
     return make_response(render_template('collection.html',
         resources=resources[start:stop]))
 
@@ -440,8 +440,10 @@ def get_resource_attribute(collection, key, attribute):
     resource = retrieve_resource(collection, key)
     _validate(endpoint_class(collection), request.method, resource)
     value = getattr(resource, attribute)
-
-    return attribute_response(resource, attribute, value)
+    if isinstance(value, Model):
+        return resource_response(value)
+    else:
+        return attribute_response(resource, attribute, value)
 
 
 @app.route('/<collection>', methods=['GET'])

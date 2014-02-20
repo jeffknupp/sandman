@@ -82,6 +82,13 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         response = self.get_response('/artists/1/Name', 200)
         assert json.loads(response.data)[u'Name'] == 'AC/DC'
 
+    def test_get_object_attribute(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/tracks/347', 200)
+        response = self.get_response('/tracks/347/style', 200)
+        assert json.loads(response.data)[u'Name'] == 'Rock'
+
+
     def test_post(self):
         """Test simple HTTP POST"""
         response = self.post_response()
