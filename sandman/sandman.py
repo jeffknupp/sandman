@@ -206,14 +206,17 @@ def retrieve_collection(collection, query_arguments=None):
     cls = endpoint_class(collection)
     if query_arguments:
         filters = []
+        order = []
         for key, value in query_arguments.items():
             if key == 'page':
                 continue
             if value.startswith('%'):
                 filters.append(getattr(cls, key).like(str(value), escape='/'))
-            else:
+            elif key == 'sort':
+                order.append(getattr(cls, value))
+            elif key:
                 filters.append(getattr(cls, key) == value)
-        resources = session.query(cls).filter(*filters)
+        resources = session.query(cls).filter(*filters).order_by(*order)
     else:
         resources = session.query(cls).all()
     return resources
