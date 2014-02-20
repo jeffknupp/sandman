@@ -69,13 +69,19 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     """Test the basic HTTP verbs (e.g. "PUT", "GET", etc.)"""
     def test_get(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
-        assert len(json.loads(response.data)[u'resources']) == 1
+        response = self.get_response('/artists', 200)
+        assert len(json.loads(response.data)[u'resources']) == 275
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200)
-        assert len(json.loads(response.data)[u'resources']) == 275
+        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
+        assert len(json.loads(response.data)[u'resources']) == 1
+
+    def test_get_with_like_filter(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
+        assert len(json.loads(response.data)[u'resources']) == 1
+
 
     def test_get_attribute(self):
         """Test simple HTTP GET"""

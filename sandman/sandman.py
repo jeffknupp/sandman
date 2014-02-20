@@ -207,9 +207,12 @@ def retrieve_collection(collection, query_arguments=None):
     if query_arguments:
         filters = []
         for key, value in query_arguments.items():
-            if key=='page':
+            if key == 'page':
                 continue
-            filters.append(getattr(cls, key) == value)
+            if value.startswith('%'):
+                filters.append(getattr(cls, key).like(str(value), escape='/'))
+            else:
+                filters.append(getattr(cls, key) == value)
         resources = session.query(cls).filter(*filters)
     else:
         resources = session.query(cls).all()
