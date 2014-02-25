@@ -69,18 +69,35 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     """Test the basic HTTP verbs (e.g. "PUT", "GET", etc.)"""
     def test_get(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
-        assert len(json.loads(response.data)[u'resources']) == 1
+        response = self.get_response('/artists', 200)
+        assert len(json.loads(response.data)[u'resources']) == 275
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200)
-        assert len(json.loads(response.data)[u'resources']) == 275
+        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
+        assert len(json.loads(response.data)[u'resources']) == 1
+
+    def test_get_with_like_filter(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
+        assert len(json.loads(response.data)[u'resources']) == 1
+
+    def test_get_with_sort(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'sort': 'Name'})
+        assert json.loads(response.data)[u'resources'][0]['Name'] == 'A Cor Do Som'
 
     def test_get_attribute(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists/1/Name', 200)
         assert json.loads(response.data)[u'Name'] == 'AC/DC'
+
+    def test_get_object_attribute(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/tracks/347', 200)
+        response = self.get_response('/tracks/347/style', 200)
+        assert json.loads(response.data)[u'Name'] == 'Rock'
+
 
     def test_post(self):
         """Test simple HTTP POST"""
