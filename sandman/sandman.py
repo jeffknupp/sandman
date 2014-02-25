@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from . import app, db
 from .exception import InvalidAPIUsage
 from .model.models import Model
+from .model.utils import _get_session
 
 JSON, HTML = range(2)
 JSON_CONTENT_TYPES = set(['application/json',])
@@ -21,13 +22,6 @@ type [{}].  Acceptable methods: [{}]"""
 UNSUPPORTED_CONTENT_TYPE_MESSAGE = """Content-type [{}] not supported.
 Supported values for 'Content-type': {}""".format(
         str(ACCEPTABLE_CONTENT_TYPES), '{}')
-
-def _get_session():
-    """Return (and memoize) a database session"""
-    session = getattr(g, '_session', None)
-    if session is None:
-        session = g._session = db.session()
-    return session
 
 def _perform_database_action(action, *args):
     """Call session.*action* with the given *args*.

@@ -6,7 +6,7 @@ from decimal import Decimal
 from flask import current_app
 from flask.ext.admin.contrib.sqla import ModelView
 
-from sandman import app
+from sandman import app, db
 
 
 class Model(object):
@@ -62,21 +62,6 @@ class Model(object):
         primary_key_value = getattr(self, self.primary_key(), None)
         return '/{}/{}'.format(self.endpoint(), primary_key_value)
 
-    def links(self):
-        """Return a list of links for endpoints related to the resource."""
-        links = []
-        for foreign_key in self.__table__.foreign_keys:
-            column = foreign_key.column.name
-            column_value = getattr(self, column, None)
-            if column_value:
-                table = foreign_key.column.table.name
-                with app.app_context():
-                    endpoint = current_app.class_references[table]
-                links.append({'rel': endpoint.__name__, 'uri': '/{}/{}'.format(
-                    endpoint.__name__, column_value)})
-        links.append({'rel': 'self', 'uri': self.resource_uri()})
-        return links
-
     @classmethod
     def primary_key(cls):
         """Return the name of the table's primary key
@@ -87,7 +72,7 @@ class Model(object):
 
         return cls.__table__.primary_key.columns.values()[0].name
 
-    def as_dict(self):
+    def as_dict(self, depth=1):
         """Return a dictionary containing only the attributes which map to
         an instance's database columns.
 
@@ -99,7 +84,24 @@ class Model(object):
             result_dict[column] = getattr(self, column, None)
             if isinstance(result_dict[column], Decimal):
                 result_dict[column] = str(result_dict[column])
-        result_dict['links'] = self.links()
+        for foreign_key in self.__table__.foreign_keys:
+            column_name = foreign_key.column.name
+            column_value = getattr(self, column_name, None)
+            if column_value:
+                table = foreign_key.column.table.name
+                with app.app_context():
+                    endpoint = current_app.class_references[table]
+                    session = db.session()
+                    resource = session.query(endpoint).get(column_value)
+                if depth < 2:
+                    result_dict.update({
+                        'rel': endpoint.__name__, 
+                        endpoint.__name__.lower() + ':' : resource.as_dict(depth + 1)
+                        })
+                else:
+                    result_dict[endpoint.__name__.lower() + '_url'] = '/{}/{}'.format(endpoint.__name__, column_value)
+
+        result_dict['self'] = self.resource_uri()
         return result_dict
 
     def from_dict(self, dictionary):
