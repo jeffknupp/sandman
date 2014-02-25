@@ -102,11 +102,11 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     def test_post(self):
         """Test simple HTTP POST"""
         response = self.post_response()
-        assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
-        assert json.loads(response.data)[u'links'] == [
-                {u'rel': u'self', u'uri': u'/artists/276'}
-                ]
-
+        assert json.loads(response.data) == {
+            'ArtistId': 276,
+            'Name': 'Jeff Knupp',
+            'self': '/artists/276'
+            }
     def test_posted_location(self):
         """Make sure 'Location' header returned in response actually points to
         new resource created during POST."""
@@ -119,7 +119,12 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         new resource created during POST."""
         post_response = self.post_response()
         as_json = json.loads(post_response.data)
-        uri = as_json[u'links'][0][u'uri']
+        assert as_json == {
+                'ArtistId': 276,
+                'Name': 'Jeff Knupp',
+                'self': '/artists/276'
+                }
+        uri = as_json['self']
         self.app.get(uri)
         assert as_json[u'Name'] == u'Jeff Knupp'
 
@@ -132,8 +137,7 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert response.status_code == 201
         assert type(response.data) == str
         assert json.loads(response.data)['Name'] == u'Jeff Knupp'
-        assert json.loads(response.data)['links'] == [
-                {u'rel': u'self', u'uri': u'/artists/276'}]
+        assert json.loads(response.data)['self'] == '/artists/276'
 
     def test_patch_existing_resource(self):
         """Send HTTP PATCH for an existing resource (should be updated)."""
