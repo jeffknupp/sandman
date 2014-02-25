@@ -1,7 +1,7 @@
 """Various utility functions for registering and activating models."""
 import webbrowser
 
-from flask import current_app
+from flask import current_app, g
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
 from sqlalchemy.engine import reflection
@@ -11,6 +11,14 @@ from sqlalchemy.schema import Table
 
 from sandman import app, db
 from sandman.model.models import Model, AdminModelViewWithPK
+
+def _get_session():
+    """Return (and memoize) a database session"""
+    session = getattr(g, '_session', None)
+    if session is None:
+        session = g._session = db.session()
+    return session
+
 
 def generate_endpoint_classes(db, generate_pks=False):
     """Return a list of model classes generated for each reflected database
