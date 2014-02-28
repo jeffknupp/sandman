@@ -11,6 +11,12 @@ Homepage
 Visit the home of ``sandman`` on the web:
 `sandman.io <http://www.sandman.io>`__
 
+Discuss
+-------
+
+Looking for a place to ask questions about sandman? Check out the
+sandman-discuss and sandman-users forums!
+
 Documentation
 -------------
 
