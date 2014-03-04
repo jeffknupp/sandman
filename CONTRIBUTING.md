@@ -30,7 +30,7 @@ that might aid you in contributing to `sandman`.
         * This may be an indication that your code should be refactored
     * If you're creating a totaly new feature, create a new class in `test_sandmand.py` that inherits from `TestSandmanBase`
 * Run `python setup.py test` to make sure your tests pass
-* Run `coverage run setup.py test --source=sandman` if you have the `coverage` package installed to generate coverage data
+* Run `coverage run --source=sandman setup.py test` if you have the `coverage` package installed to generate coverage data
 * Check your coverage by running `coverage report`
 
 ## Submitting Changes
