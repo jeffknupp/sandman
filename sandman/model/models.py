@@ -138,3 +138,8 @@ class Model(object):
 class AdminModelViewWithPK(ModelView):
     """Mixin admin view class that displays primary keys on the admin form"""
     column_display_pk = True
+
+class AuthenticatedAdminModelView(ModelView):
+
+    def is_accessible(self):
+        raise NotImplementedError('You must implement the \'is_accessible\' method to use authorization.')
