@@ -6,26 +6,26 @@ The Simplest Application
 ------------------------
 
 Here's what's required to create a RESTful API service from an existing database using
-`sandman`::
+``sandman`` ::
 
     $ sandmanctl sqlite:////tmp/my_database.db
 
-*That's it.* `sandman` will then do the following:
+*That's it.* ``sandman`` will then do the following:
 
 * connect to your database and introspect it's contents
 * create and launch a REST API service
 * create an HTML admin interface
 * *open your browser to the admin interface*
 
-That's right. Given a legacy database, `sandman` not only gives you a REST API,
+That's right. Given a legacy database, ``sandman`` not only gives you a REST API,
 it gives you a beautiful admin page and *opens your browser to the admin page*.
 It truly does everything for you.
 
 Supported Databases
 -------------------
 
-`sandman`, by default, supports connections to the same set of databases as
-[SQLAlchemy](http://www.sqlalchemy.org). As of this writing, that includes:
+``sandman`` , by default, supports connections to the same set of databases as
+SQLAlchemy (http://www.sqlalchemy.org). As of this writing, that includes:
 
 * MySQL (MariaDB)
 * PostgreSQL
@@ -42,9 +42,9 @@ Supported Databases
 Behind the Scenes
 -----------------
 
-`sandmanctl` is really just a simple wrapper around the following::
+``sandmanctl``  is really just a simple wrapper around the following::
 
-    from sandman import app
+    from ``sandman`` import app
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
@@ -54,11 +54,11 @@ Behind the Scenes
 
     app.run()
 
-**You don't even need to tell sandman what tables your database contains.** 
-Just point `sandman` at your database and let it do all the heavy lifting
+**You don't even need to tell ``sandman`` what tables your database contains.**
+Just point ``sandman`` at your database and let it do all the heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets make use
-of `sandman`'s awesome filtering capability by specifying a filter term::
+of ``sandman``'s awesome filtering capability by specifying a filter term::
 
     $ python runserver.py &
     * Running on http://127.0.0.1:5000/
@@ -82,22 +82,46 @@ and we get::
         ]
     }
 
-All of that, including filtering/searching, is automagically available from
-those *five* measly lines of code.
+A Quick Guide to REST APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Before we get into more complicated examples, we should discuss some
+REST API basics. The most important concept is that of a *resource*.
+Resources are sources of information, and the API is an interface to this information.
+That is, resources are the actual "objects" manipulated by the API. In ``sandman``, each
+row in a database table is considered a resource.
 
-We'll be using a subset of the Chinook test database as an example. 
-Create one file with the following contents (which I'll call ``runserver.py``)::
+Creating Models
+---------------
 
-    from sandman import app, db
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/jknupp/code/github_code/sandman/scripts/chinook'
+A ``Model`` represents a table in your database. You control which tables to
+expose in the API through the creation of classes which inherit from
+:class:`sandman.model.models.Model`. The only attribute you must define in your
+class is the ``__tablename__`` attribute. ``sandman`` uses this to map your
+class to the corresponding database table. From there, ``sandman`` is able to divine
+all other properties of your tables. Specifically, ``sandman`` creates the
+following:
 
-    # The SQLALCHEMY_DATABASE_URI must be defined before your models.
-    # Normally, this is done by importing your models, but here 
-    # we show them inline.
+- an ``__endpoint__`` attribute that controls resource URIs for the class
+- a ``__methods__`` attribute that determines the allowed HTTP methods for the class
+- ``as_dict`` and ``from_dict`` methods that only operate on class attributes
+  that correspond to database columns
+- an ``update`` method that updates only the values specified (as opposed to
+  ``from_dict``, which replaces all of the object's values with those passed in
+  the dictionary parameter
+- ``links``, ``primary_key``, and ``resource_uri`` methods that provide access
+  to various attributes of the object derived from the underlying database model
+
+`models.py`
+===========
+
+Creating a `models.py` file allows you to get even *more* out of ``sandman``. In the file,
+create a class that derives from `sandman.models.Model` for each table you want to
+turn into a RESTful resource. Here's a simple example using the Chinook test database
+(widely available online)::
 
     from sandman.model import register, activate, Model
-    
+
     class Artist(Model):
         __tablename__ = 'Artist'
 
@@ -114,56 +138,17 @@ Create one file with the following contents (which I'll call ``runserver.py``)::
     register((Artist, Album, Playlist))
     register(Genre)
     # activate must be called *after* register
-    activate()
+    activate(browser=False)
 
-    app.run()
 
-Then simply run::
+``sandman`` Advanced Usage
+----------------------
 
-    python runserver.py
+Hooking up Models
+~~~~~~~~~~~~~~~~~
 
-and try curling your new REST API service!
-
-Of course, you don't actually need to tell sandman about your tables; it's
-perfectly capable of introspecting all of them. To use introspection to make
-*all* of your database tables available via the admin and REST API, simply
-remove all model code and call `activate()` without ever registering a model.
-To stop a browser window from automatically popping up on sandman
-initialization, call `activate()` with `browser=False`.
-
-A Quick Guide to REST APIs
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Before we discuss the example code above in more detail, we should discuss some
-REST API basics first. The most important concept is that of a *resource*.
-Resources are sources of information, and the API is an interface to this information. 
-That is, resources are the actual "objects" manipulated by the API. In sandman, each 
-row in a database table is considered a resource. 
-Even though the example above is short, let's walk through it step by step.
-
-Creating Models
----------------
-
-A ``Model`` represents a table in your database. You control which tables to
-expose in the API through the creation of classes which inherit from 
-:class:`sandman.model.models.Model`. The only attribute you must define in your 
-class is the ``__tablename__`` attribute. sandman uses this to map your
-class to the corresponding database table. From there, sandman is able to divine
-all other properties of your tables. Specifically, sandman creates the
-following:
-
-- an ``__endpoint__`` attribute that controls resource URIs for the class
-- a ``__methods__`` attribute that determines the allowed HTTP methods for the class
-- ``as_dict`` and ``from_dict`` methods that only operate on class attributes
-  that correspond to database columns
-- an ``update`` method that updates only the values specified (as opposed to
-  ``from_dict``, which replaces all of the object's values with those passed in
-  the dictionary parameter
-- ``links``, ``primary_key``, and ``resource_uri`` methods that provide access
-  to various attributes of the object derived from the underlying database model
-
-Customizing Your Resources
-------------------------------------------
+The `__tablename__` attribute is used to tell ``sandman`` which database table
+this class is modeling. It has *no default* and is *required* for all classes.
 
 Providing a custom endpoint
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -195,7 +180,7 @@ by defining the ``__methods__`` attribute and leaving it out, like so::
         __methods__ = ('GET', 'POST', 'PATCH', 'PUT')
 
 For each call into the API, the HTTP method used is validated against the
-acceptable methods for that resource. 
+acceptable methods for that resource.
 
 Performing custom validation on a resource
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,7 +192,7 @@ static method named ``validate_<METHOD>``, where ``<METHOD>`` is the HTTP method
 the validation function should validate. To validate the ``POST`` method on
 ``Genres``, we would define the method ``validate_POST``, like so::
 
-    
+
     class Genre(Model):
         __tablename__ = 'Genre'
         __endpoint__ = 'styles'
@@ -230,9 +215,49 @@ Note that the ``resource`` parameter can be either a single resource or a
 collection of resources, so it's usually necessary to check which type you're
 dealing with. This will likely change in a future version of sandman.
 
+Configuring a model's behavior in the admin interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``sandman`` uses `Flask-Admin` to construct the admin interface. While the default
+settings for individual models are usually sufficient, you can make changes to the
+admin interface for a model by setting the `__view__` attribute to a class that derives
+from `flask.ext.admin.contrib.sqla.ModelView`. The Flask-Admin's documentation should be
+consulted for the full list of attributes that can be configured.
+
+Below, we create a model and, additionally, tell ``sandman`` that we want the tables
+primary key to be displayed in the admin interface (by default, a table's primary keys
+aren't shown)::
+
+  from flask.ext.admin.contrib.sqla import ModelView
+
+  class ModelViewShowPK(ModelView):
+
+    column_display_pk = True
+
+  class Artist(Model):
+    __tablename__ = 'Artist'
+    __view__ = ModelViewShowPK
+
+**Custom `__view__` classes are a powerful way to customize the admin interface.**
+Properties exist to control which columns are sortable or searchable, as well
+as as what fields are editable in the built-in editing view. If you find your
+admin page isn't working exactly as you'd like, the chances are good you can
+add your desired functionality through a custom `__view__` class.
+
+Automatic Introspection
+=======================
+
+Of course, you don't actually need to tell ``sandman`` about your tables; it's
+perfectly capable of introspecting all of them. To use introspection to make
+*all* of your database tables available via the admin and REST API, simply
+remove all model code and call `activate()` without ever registering a model.
+To stop a browser window from automatically popping up on sandman
+initialization, call `activate()` with `browser=False`.
+
+
 Project Layout
 --------------
 
-In a "real" project, you should divide the code into at least two files: one with the 
-``Model`` definitions (``models.py``) and the other with the configuration 
-and the ``app.run()`` call (``runserver.py``). 
+In a "real" project, you should divide the code into at least two files: one with the
+``Model`` definitions (``models.py``) and the other with the configuration
+and the ``app.run()`` call (``runserver.py``).
