@@ -1,9 +1,7 @@
 sandman
 =======
 
-|Build Status| |Coverage Status| |Stories in Ready|
-
-|Analytics|
+|Build Status| |Coverage Status| |Gitter chat| |Analytics|
 
 Homepage
 --------
@@ -247,8 +245,8 @@ Coming Soon
    :target: https://travis-ci.org/jeffknupp/sandman
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop
    :target: https://coveralls.io/r/jeffknupp/sandman?branch=develop
-.. |Stories in Ready| image:: https://badge.waffle.io/jeffknupp/sandman.png
-   :target: http://waffle.io/jeffknupp/sandman
+.. |Gitter chat| image:: https://badges.gitter.im/jeffknupp/sandman.png
+   :target: https://gitter.im/jeffknupp/sandman
 .. |Analytics| image:: https://ga-beacon.appspot.com/UA-12615441-7/sandman/home
    :target: https://github.com/jeffknupp/sandman
 .. |Bitdeli Badge| image:: https://d2weczhvl823v0.cloudfront.net/jeffknupp/sandman/trend.png
