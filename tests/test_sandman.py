@@ -347,6 +347,17 @@ class TestSandmanContentTypes(TestSandmanBase):
         assert response.status_code == 201
         assert 'Jeff Knupp' in response.data
 
+    def test_post_html_with_charset(self):
+        """Test POSTing a resource with a Content-Type that specifies a
+        character set."""
+        response = self.app.post('/artists',
+                content_type='application/x-www-form-urlencoded',
+                charset='UTF-8;',
+                headers={'Accept': 'text/html'},
+                data={u'Name': u'Jeff Knupp'})
+        assert response.status_code == 201
+        assert 'Jeff Knupp' in response.data
+
     def test_post_no_json_data(self):
         """Test POSTing a resource with no JSON data."""
         response = self.app.post('/artists',

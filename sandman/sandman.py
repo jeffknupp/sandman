@@ -21,7 +21,7 @@ FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource \
 type [{}].  Acceptable methods: [{}]"""
 UNSUPPORTED_CONTENT_TYPE_MESSAGE = """Content-type [{}] not supported.
 Supported values for 'Content-type': {}""".format(
-        str(ACCEPTABLE_CONTENT_TYPES), '{}')
+        '{}', str(ACCEPTABLE_CONTENT_TYPES))
 
 def _perform_database_action(action, *args):
     """Call session.*action* with the given *args*.
@@ -159,10 +159,11 @@ def _validate(cls, method, resource=None):
 
 def get_resource_data(incoming_request):
     """Return the data from the incoming *request* based on the Content-type."""
+    content_type = incoming_request.headers['Content-type'].split(';')[0]
     if ('Content-type' not in incoming_request.headers or
-            incoming_request.headers['Content-type'] in JSON_CONTENT_TYPES):
+            content_type in JSON_CONTENT_TYPES):
         return incoming_request.json
-    elif incoming_request.headers['Content-type'] in HTML_CONTENT_TYPES:
+    elif content_type in HTML_CONTENT_TYPES:
         if not incoming_request.form:
             raise InvalidAPIUsage(400)
         return incoming_request.form
