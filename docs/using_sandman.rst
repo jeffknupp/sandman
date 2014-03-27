@@ -112,8 +112,9 @@ following:
 - ``links``, ``primary_key``, and ``resource_uri`` methods that provide access
   to various attributes of the object derived from the underlying database model
 
+============
 `models.py`
-===========
+============
 
 Creating a `models.py` file allows you to get even *more* out of ``sandman``. In the file,
 create a class that derives from `sandman.models.Model` for each table you want to
@@ -142,7 +143,7 @@ turn into a RESTful resource. Here's a simple example using the Chinook test dat
 
 
 ``sandman`` Advanced Usage
-----------------------
+---------------------------
 
 Hooking up Models
 ~~~~~~~~~~~~~~~~~
