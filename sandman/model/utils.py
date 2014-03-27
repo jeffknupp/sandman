@@ -1,5 +1,6 @@
 """Various utility functions for registering and activating models."""
 import webbrowser
+import collections
 
 from flask import current_app, g
 from flask.ext.admin import Admin
@@ -150,7 +151,7 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False):
     with app.app_context():
         generate_pks = app.config.get('SANDMAN_GENERATE_PKS', None) or False
         if getattr(app, 'class_references', None) is None or reflect_all:
-            app.class_references = {}
+            app.class_references = collections.OrderedDict()
             generate_endpoint_classes(db, generate_pks)
         else:
             Model.prepare(db.engine)
