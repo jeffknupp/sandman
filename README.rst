@@ -1,7 +1,15 @@
 sandman
 =======
 
-|Build Status| |Coverage Status| |Gitter chat| |Analytics|
+|Build Status|
+
+|Coverage Status|
+
+|Gitter chat|
+
+|Analytics|
+
+|PyPI|
 
 Homepage
 --------
@@ -249,5 +257,7 @@ Coming Soon
    :target: https://gitter.im/jeffknupp/sandman
 .. |Analytics| image:: https://ga-beacon.appspot.com/UA-12615441-7/sandman/home
    :target: https://github.com/jeffknupp/sandman
+.. |PyPI| image:: http://img.shields.io/pypi/dm/sandman.svg
+   :target: http://img.shields.io/pypi/dm/sandman.svg
 .. |Bitdeli Badge| image:: https://d2weczhvl823v0.cloudfront.net/jeffknupp/sandman/trend.png
    :target: https://bitdeli.com/free
