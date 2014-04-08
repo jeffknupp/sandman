@@ -95,7 +95,7 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     def test_get_object_attribute(self):
         """Test simple HTTP GET"""
         response = self.get_response('/tracks/347', 200)
-        response = self.get_response('/tracks/347/style', 200)
+        response = self.get_response('/tracks/347/Genre', 200)
         assert json.loads(response.data)[u'Name'] == 'Rock'
 
 

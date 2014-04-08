@@ -67,12 +67,13 @@ def prepare_relationships(db, known_tables):
     for cls in set(known_tables.values()):
         for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
             other = known_tables[foreign_key['referred_table']]
+            constrained_column = foreign_key['constrained_columns']
             if other not in cls.__related_tables__ and cls not in other.__related_tables__ and other != cls:
                 cls.__related_tables__.add(other)
                 # Add a SQLAlchemy relationship as an attribute on the class
-                setattr(cls, other.__name__.lower(), relationship(
-                        other.__name__, backref=cls.__name__.lower()))
-
+                setattr(cls, other.__table__.name, relationship(
+                        other.__name__, backref=db.backref(cls.__name__.lower()),
+                        foreign_keys=str(cls.__name__) + '.' + ''.join(constrained_column)))
 
 def register(cls, use_admin=True):
     """Register with the API a :class:`sandman.model.Model` class and associated
