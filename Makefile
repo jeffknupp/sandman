@@ -9,7 +9,7 @@ build:
 
 test: clean build
 		source sandman_env/bin/activate && \
-		coverage run --source=test setup.py test && \
+		coverage run --source=sandman setup.py test && \
 		coverage html && \
 		coverage report
 
