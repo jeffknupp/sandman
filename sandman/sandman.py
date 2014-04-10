@@ -75,7 +75,7 @@ def _single_attribute_json_response(name, value):
     """
     return jsonify({name: str(value)})
 
-def _single_resource_json_response(resource):
+def _single_resource_json_response(resource, depth=0):
     """Return the JSON representation of *resource*.
 
     :param resource: :class:`sandman.model.Model` to render
@@ -83,7 +83,13 @@ def _single_resource_json_response(resource):
     :rtype: :class:`flask.Response`
 
     """
-    return jsonify(**resource.as_dict())
+    links = resource.links()
+    response = jsonify(**resource.as_dict(depth))
+    response.headers['Link'] = ''
+    for link in links:
+        response.headers['Link'] += '<{}>; rel="{}",'.format(link['uri'], link['rel'])
+    response.headers['Link'] = response.headers['Link'][:-1] 
+    return response
 
 def _single_attribute_html_response(resource, name, value):
     """Return the json representation of a single attribute of a resource.
@@ -111,7 +117,7 @@ def _single_resource_html_response(resource):
     return make_response(render_template('resource.html', resource=resource,
         tablename=tablename))
 
-def _collection_json_response(resources):
+def _collection_json_response(resources, start, stop, depth=0):
     """Return the JSON representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
@@ -120,8 +126,11 @@ def _collection_json_response(resources):
     """
     result_list = []
     for resource in resources:
-        result_list.append(resource.as_dict())
-    return jsonify(resources=result_list)
+        result_list.append(resource.as_dict(depth))
+    if start is not None:
+        return jsonify(resources=result_list[start:stop])
+    else:
+        return jsonify(resources=result_list)
 
 def _collection_html_response(resources, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
@@ -259,12 +268,12 @@ def collection_response(resources, start=None, stop=None):
 
     """
     if _get_acceptable_response_type() == JSON:
-        return _collection_json_response(resources)
+        return _collection_json_response(resources, start, stop)
     else:
         return _collection_html_response(resources, start, stop)
 
 
-def resource_response(resource):
+def resource_response(resource, depth=0):
     """Return a response for the *resource* of the appropriate content type.
 
     :param resource: resource to be returned in request
@@ -273,7 +282,10 @@ def resource_response(resource):
 
     """
     if _get_acceptable_response_type() == JSON:
-        return _single_resource_json_response(resource)
+        depth=0
+        if 'expand' in request.args:
+            depth = 1
+        return _single_resource_json_response(resource, depth)
     else:
         return _single_resource_html_response(resource)
 
@@ -463,10 +475,11 @@ def get_collection(collection):
 
     _validate(cls, request.method, resources)
 
-    start, stop = 1, 20
+    start = stop = None
 
+    print request.args
     if request.args and 'page' in request.args:
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
-        start, stop = page * results_per_page, (page * results_per_page) + 1
+        start, stop = page * results_per_page, (page +1) * results_per_page
     return collection_response(resources, start, stop)

@@ -72,7 +72,22 @@ class Model(object):
 
         return cls.__table__.primary_key.columns.values()[0].name
 
-    def as_dict(self, depth=1):
+    def links(self):
+        """Return a list of links for endpoints related to the resource."""
+        links = []
+        for foreign_key in self.__table__.foreign_keys:
+            column = foreign_key.column.name
+            column_value = getattr(self, column, None)
+            if column_value:
+                table = foreign_key.column.table.name
+                with app.app_context():
+                    endpoint = current_app.class_references[table]
+                links.append({'rel': 'related', 'uri': '/{}/{}'.format(
+                    endpoint.__name__, column_value)})
+        links.append({'rel': 'self', 'uri': self.resource_uri()})
+        return links
+
+    def as_dict(self, depth=0):
         """Return a dictionary containing only the attributes which map to
         an instance's database columns.
 
@@ -84,6 +99,7 @@ class Model(object):
             result_dict[column] = getattr(self, column, None)
             if isinstance(result_dict[column], Decimal):
                 result_dict[column] = str(result_dict[column])
+        result_dict['links'] = self.links()
         for foreign_key in self.__table__.foreign_keys:
             column_name = foreign_key.column.name
             column_value = getattr(self, column_name, None)
@@ -93,10 +109,10 @@ class Model(object):
                     endpoint = current_app.class_references[table]
                     session = db.session()
                     resource = session.query(endpoint).get(column_value)
-                if depth < 2:
+                if depth > 0:
                     result_dict.update({
                         'rel': endpoint.__name__, 
-                        endpoint.__name__.lower() + ':' : resource.as_dict(depth + 1)
+                        endpoint.__name__.lower() : resource.as_dict(depth - 1)
                         })
                 else:
                     result_dict[endpoint.__name__.lower() + '_url'] = '/{}/{}'.format(endpoint.__name__, column_value)

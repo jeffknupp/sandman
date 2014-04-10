@@ -223,3 +223,27 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 * Authentication
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jeffknupp/sandman/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+# Changelog
+
+## Version 0.8.1
+
+### New Feature
+
+* `Link` header now set to a resource's links
+    * Links to related objects now user a proper `rel` value: `related`
+    * The link to the current resource still uses the `self` `rel` value
+    * Links are specified both in the header (as per RFC5988) and in the
+      resource itself
+* Pagination added for JSON (and number of results per page being returned is fixed)
+* Nested JSON models no longer the default; hitting a URL with the argument "expand"
+  will show one level of nested resources
+    * This conforms more closely to REST principles while not sacrificing the
+      functionality. 
+
+
+## Version 0.7.8
+
+### Bug Fixes
+
+* Fix multiple references to same table error (fixes #59)

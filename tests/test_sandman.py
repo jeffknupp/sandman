@@ -98,6 +98,17 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         response = self.get_response('/tracks/347/Genre', 200)
         assert json.loads(response.data)[u'Name'] == 'Rock'
 
+    def test_get_link_header_for_resource(self):
+        """Does GETing a resource return the 'Link' header field?"""
+        response = self.get_response('/tracks/1', 200)
+        assert 'Link' in response.headers
+        assert '</MediaType/1>; rel="related"' in response.headers['Link'] 
+        assert self.get_response('/Album/1', 200).data is not None
+
+    def test_get_expanded_resource(self):
+        """Does GETing a resource return the 'Link' header field?"""
+        response = self.get_response('/tracks/1', 200, params={'expand': 1})
+        assert 'album' in json.loads(response.data)
 
     def test_post(self):
         """Test simple HTTP POST"""
@@ -105,8 +116,9 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert json.loads(response.data) == {
             'ArtistId': 276,
             'Name': 'Jeff Knupp',
-            'self': '/artists/276'
-            }
+            'self': '/artists/276',
+            'links': [{'rel': 'self', 'uri': '/artists/276'}]}
+
     def test_posted_location(self):
         """Make sure 'Location' header returned in response actually points to
         new resource created during POST."""
@@ -122,7 +134,8 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert as_json == {
                 'ArtistId': 276,
                 'Name': 'Jeff Knupp',
-                'self': '/artists/276'
+                'self': '/artists/276',
+                'links': [{'rel': 'self', 'uri': '/artists/276'}]
                 }
         uri = as_json['self']
         self.app.get(uri)
@@ -271,6 +284,11 @@ class TestSandmanValidation(TestSandmanBase):
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 403
+
+    def test_pagination(self):
+        """Can we get paginated results?"""
+        response = self.get_response('/artists', 200, params={'page': 2})
+        assert len(json.loads(response.data)['resources']) == 20
 
 class TestSandmanContentTypes(TestSandmanBase):
     """Sandman tests related to content types"""

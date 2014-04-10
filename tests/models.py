@@ -1,10 +1,15 @@
 """Models for unit testing sandman"""
 
+from flask.ext.admin.contrib.sqla import ModelView
 from sandman.model import register, Model, activate
+
+class ArtistAdminView(ModelView):
+    pass
 
 class Artist(Model):
     """Model mapped to the "Artist" table"""
     __tablename__ = 'Artist'
+    __view__ = ArtistAdminView
 
 class MediaType(Model):
     """Model mapped to the "MediaType" table"""
