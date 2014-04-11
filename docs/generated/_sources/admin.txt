@@ -5,10 +5,11 @@ The sandman Admin Interface
 Activating the sandman Admin Interface
 --------------------------------------
 
-sandman supports an admin interface, much like the default Django admin 
-interface. sandman currently uses [Flask-Admin](https://flask-admin.readthedocs.org/en/latest/)
+sandman supports an admin interface, much like the Django admin 
+interface. ``sandman`` currently uses [Flask-Admin](https://flask-admin.readthedocs.org/en/latest/)
 and some SQLAlchemy, erm, alchemy to allow your resources to be 
-administered via the admin interface.
+administered via the admin interface. Note, though, that the admin 
+interface may drastically change in the future.
 
 Here's a look at the interface generated for the ``chinook`` database's
 ``Track`` table, listing the information about various music tracks:
@@ -16,17 +17,19 @@ Here's a look at the interface generated for the ``chinook`` database's
 .. image:: images/admin_tracks.jpg
 
 Pretty nice! From here you can directly create, edit, and delete resources. In
-the creation and editing forms, objects related via foreign key (e.g. a
+the "create" and "edit" forms, objects related via foreign key (e.g. a
 ``Track``'s associated ``Album``) are auto-populated in a dropdown based on
 available values. This ensures that all database constraints are honored when
 making changes via the admin.
 
 The admin interface (which adds an ``/admin`` endpoint to your
 service, accessible via a browser), is enabled by default. To disable it, pass
-`admin=False` as an argument in your call to `activate`.
+``admin=False`` as an argument in your call to ``activate``.
 By default, calling this function will make _all_ Models accessible in the admin. 
 If you'd like to prevent this, simply call ``register()`` with ``use_admin=False`` 
-for whichever Model/Models you don't want to appear.
+for whichever Model/Models you don't want to appear. Alternatively, you can
+control if a model is viewable, editable, creatable, etc in the admin by
+setting your class's ``__view__`` attribute to your own ``Admin`` class.
 
 Getting Richer Information for Related Objects
 ----------------------------------------------
@@ -78,7 +81,7 @@ more useful information. After making the changes below::
 
     register((Artist, Album, Playlist, Genre, Track, MediaType))
 
-Now, we get much more useful information in the columns mentioned, as you can
+we get much more useful information in the columns mentioned, as you can
 see here:
 
 .. image:: images/admin_tracks_improved.jpg

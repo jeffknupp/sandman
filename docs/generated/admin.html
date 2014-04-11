@@ -56,24 +56,27 @@
 <h1>The sandman Admin Interface<a class="headerlink" href="#the-sandman-admin-interface" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="activating-the-sandman-admin-interface">
 <h2>Activating the sandman Admin Interface<a class="headerlink" href="#activating-the-sandman-admin-interface" title="Permalink to this headline">¶</a></h2>
-<p>sandman supports an admin interface, much like the default Django admin
-interface. sandman currently uses [Flask-Admin](<a class="reference external" href="https://flask-admin.readthedocs.org/en/latest/">https://flask-admin.readthedocs.org/en/latest/</a>)
+<p>sandman supports an admin interface, much like the Django admin
+interface. <tt class="docutils literal"><span class="pre">sandman</span></tt> currently uses [Flask-Admin](<a class="reference external" href="https://flask-admin.readthedocs.org/en/latest/">https://flask-admin.readthedocs.org/en/latest/</a>)
 and some SQLAlchemy, erm, alchemy to allow your resources to be
-administered via the admin interface.</p>
+administered via the admin interface. Note, though, that the admin
+interface may drastically change in the future.</p>
 <p>Here&#8217;s a look at the interface generated for the <tt class="docutils literal"><span class="pre">chinook</span></tt> database&#8217;s
 <tt class="docutils literal"><span class="pre">Track</span></tt> table, listing the information about various music tracks:</p>
 <img alt="_images/admin_tracks.jpg" src="_images/admin_tracks.jpg" />
 <p>Pretty nice! From here you can directly create, edit, and delete resources. In
-the creation and editing forms, objects related via foreign key (e.g. a
+the &#8220;create&#8221; and &#8220;edit&#8221; forms, objects related via foreign key (e.g. a
 <tt class="docutils literal"><span class="pre">Track</span></tt>&#8216;s associated <tt class="docutils literal"><span class="pre">Album</span></tt>) are auto-populated in a dropdown based on
 available values. This ensures that all database constraints are honored when
 making changes via the admin.</p>
 <p>The admin interface (which adds an <tt class="docutils literal"><span class="pre">/admin</span></tt> endpoint to your
 service, accessible via a browser), is enabled by default. To disable it, pass
-<cite>admin=False</cite> as an argument in your call to <cite>activate</cite>.
+<tt class="docutils literal"><span class="pre">admin=False</span></tt> as an argument in your call to <tt class="docutils literal"><span class="pre">activate</span></tt>.
 By default, calling this function will make _all_ Models accessible in the admin.
 If you&#8217;d like to prevent this, simply call <tt class="docutils literal"><span class="pre">register()</span></tt> with <tt class="docutils literal"><span class="pre">use_admin=False</span></tt>
-for whichever Model/Models you don&#8217;t want to appear.</p>
+for whichever Model/Models you don&#8217;t want to appear. Alternatively, you can
+control if a model is viewable, editable, creatable, etc in the admin by
+setting your class&#8217;s <tt class="docutils literal"><span class="pre">__view__</span></tt> attribute to your own <tt class="docutils literal"><span class="pre">Admin</span></tt> class.</p>
 </div>
 <div class="section" id="getting-richer-information-for-related-objects">
 <h2>Getting Richer Information for Related Objects<a class="headerlink" href="#getting-richer-information-for-related-objects" title="Permalink to this headline">¶</a></h2>
@@ -124,7 +127,7 @@ more useful information. After making the changes below:</p>
 <span class="n">register</span><span class="p">((</span><span class="n">Artist</span><span class="p">,</span> <span class="n">Album</span><span class="p">,</span> <span class="n">Playlist</span><span class="p">,</span> <span class="n">Genre</span><span class="p">,</span> <span class="n">Track</span><span class="p">,</span> <span class="n">MediaType</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Now, we get much more useful information in the columns mentioned, as you can
+<p>we get much more useful information in the columns mentioned, as you can
 see here:</p>
 <img alt="_images/admin_tracks_improved.jpg" src="_images/admin_tracks_improved.jpg" />
 </div>
