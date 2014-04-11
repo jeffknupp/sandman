@@ -3,6 +3,7 @@ sed -i -e "s/__version__ = '.*'/__version__ = '$1'/g" sandman/__init__.py
 rm -rf docs/generated
 python setup.py develop
 make docs
+cd docs && make html && cd ..
 git commit docs sandman/__init__.py -m "Update to version v$1"
 git flow release finish v$1
 python setup.py sdist upload -r pypi

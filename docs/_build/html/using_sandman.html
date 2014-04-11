@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Sandman &mdash; sandman 0.8.1 documentation</title>
+    <title>Using Sandman &mdash; sandman 0.8.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.8.1',
+        VERSION:     '0.8.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.8.1 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.8.1.2 documentation" href="index.html" />
     <link rel="next" title="The sandman Admin Interface" href="admin.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.8.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.8.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -62,10 +62,10 @@
 </div>
 <p><em>That&#8217;s it.</em> <tt class="docutils literal"><span class="pre">sandman</span></tt> will then do the following:</p>
 <ul class="simple">
-<li>connect to your database and introspect it&#8217;s contents</li>
-<li>create and launch a REST API service</li>
-<li>create an HTML admin interface</li>
-<li><em>open your browser to the admin interface</em></li>
+<li>Connect to your database and introspect it&#8217;s contents</li>
+<li>Create and launch a RESTful API service</li>
+<li>Create an HTML admin interface</li>
+<li><em>Open your browser to the admin interface</em></li>
 </ul>
 <p>That&#8217;s right. Given a legacy database, <tt class="docutils literal"><span class="pre">sandman</span></tt> not only gives you a REST API,
 it gives you a beautiful admin page and <em>opens your browser to the admin page</em>.
@@ -89,8 +89,8 @@ SQLAlchemy (<a class="reference external" href="http://www.sqlalchemy.org">http:
 <li>MonetDB</li>
 </ul>
 </div>
-<div class="section" id="behind-the-scenes">
-<h2>Behind the Scenes<a class="headerlink" href="#behind-the-scenes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="beyond-sandmanctl">
+<h2>Beyond <cite>sandmanctl</cite><a class="headerlink" href="#beyond-sandmanctl" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">sandmanctl</span></tt>  is really just a simple wrapper around the following:</p>
 <div class="highlight-python"><pre>from ``sandman`` import app
 
@@ -98,20 +98,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
 
 from sandman.model import activate
 
-activate()
+activate(browser=True)
 
 app.run()</pre>
 </div>
-<p><strong>You don&#8217;t even need to tell ``sandman`` what tables your database contains.</strong>
-Just point <tt class="docutils literal"><span class="pre">sandman</span></tt> at your database and let it do all the heavy lifting</p>
-<p>Let&#8217;s start our new service and make a request. While we&#8217;re at it, lets make use
+<p><strong>Notice you don&#8217;t even need to tell ``sandman`` what tables your database contains.</strong>
+Just point <tt class="docutils literal"><span class="pre">sandman</span></tt> at your database and let it do all the heavy lifting.</p>
+<p>If you put the code above into a file named <tt class="docutils literal"><span class="pre">runserver.py</span></tt>, You can start this new
+service and make a request. While we&#8217;re at it, lets make use
 of <tt class="docutils literal"><span class="pre">sandman</span></tt>&#8216;s awesome filtering capability by specifying a filter term:</p>
 <div class="highlight-python"><pre>$ python runserver.py &amp;
 * Running on http://127.0.0.1:5000/
 
 &gt; curl GET "http://localhost:5000/artists?Name=AC/DC"</pre>
 </div>
-<p>and we get:</p>
+<p>you should see the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
@@ -128,6 +129,10 @@ of <tt class="docutils literal"><span class="pre">sandman</span></tt>&#8216;s aw
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>If you were to leave off the filtering term, you would get <strong>all</strong> results from
+the <tt class="docutils literal"><span class="pre">Artist</span></tt> table. You can also <em>paginate</em> these results by specifying <tt class="docutils literal"><span class="pre">?page=2</span></tt>
+or something similar. The number of results returned per page is controlled by
+the config value <tt class="docutils literal"><span class="pre">RESULTS_PER_PAGE</span></tt>, which defualts to 20.</p>
 <div class="section" id="a-quick-guide-to-rest-apis">
 <h3>A Quick Guide to REST APIs<a class="headerlink" href="#a-quick-guide-to-rest-apis" title="Permalink to this headline">¶</a></h3>
 <p>Before we get into more complicated examples, we should discuss some
@@ -135,14 +140,24 @@ REST API basics. The most important concept is that of a <em>resource</em>.
 Resources are sources of information, and the API is an interface to this information.
 That is, resources are the actual &#8220;objects&#8221; manipulated by the API. In <tt class="docutils literal"><span class="pre">sandman</span></tt>, each
 row in a database table is considered a resource.</p>
+<p>Groups of resources are called <em>collections</em>. In <tt class="docutils literal"><span class="pre">sandman</span></tt>, each table in your
+database is a collection. Collections can be queried and added to using the
+appropriate <em>HTTP method</em>. <tt class="docutils literal"><span class="pre">sandman</span></tt> supports the following HTTP methods:</p>
+<div class="highlight-python"><pre>* GET
+* POST
+* PUT
+* DELETE
+* PATCH</pre>
+</div>
+<p>Support for the <tt class="docutils literal"><span class="pre">HEAD</span></tt> and <tt class="docutils literal"><span class="pre">OPTIONS</span></tt> methods is underway.</p>
 </div>
 </div>
 <div class="section" id="creating-models">
 <h2>Creating Models<a class="headerlink" href="#creating-models" title="Permalink to this headline">¶</a></h2>
 <p>A <tt class="docutils literal"><span class="pre">Model</span></tt> represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
-<a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a>. The only attribute you must define in your
-class is the <tt class="docutils literal"><span class="pre">__tablename__</span></tt> attribute. <tt class="docutils literal"><span class="pre">sandman</span></tt> uses this to map your
+<a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a>. If you create a <tt class="docutils literal"><span class="pre">Model</span></tt>, the only attribute you
+must define in your class is the <tt class="docutils literal"><span class="pre">__tablename__</span></tt> attribute. <tt class="docutils literal"><span class="pre">sandman</span></tt> uses this to map your
 class to the corresponding database table. From there, <tt class="docutils literal"><span class="pre">sandman</span></tt> is able to divine
 all other properties of your tables. Specifically, <tt class="docutils literal"><span class="pre">sandman</span></tt> creates the
 following:</p>
@@ -161,7 +176,7 @@ to various attributes of the object derived from the underlying database model</
 </div>
 <div class="section" id="models-py">
 <h1><cite>models.py</cite><a class="headerlink" href="#models-py" title="Permalink to this headline">¶</a></h1>
-<p>Creating a <cite>models.py</cite> file allows you to get even <em>more</em> out of <tt class="docutils literal"><span class="pre">sandman</span></tt>. In the file,
+<p>Creating a <cite>models.py</cite> file allows you to get <em>even more</em> out of <tt class="docutils literal"><span class="pre">sandman</span></tt>. In the file,
 create a class that derives from <cite>sandman.models.Model</cite> for each table you want to
 turn into a RESTful resource. Here&#8217;s a simple example using the Chinook test database
 (widely available online):</p>
@@ -195,10 +210,10 @@ this class is modeling. It has <em>no default</em> and is <em>required</em> for 
 </div>
 <div class="section" id="providing-a-custom-endpoint">
 <h3>Providing a custom endpoint<a class="headerlink" href="#providing-a-custom-endpoint" title="Permalink to this headline">¶</a></h3>
-<p>In the code above, we created 4 <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a> classes that
-correspond to tables in our database. If we wanted to change the endpoint for a
-class (the default endpoint is simply the class&#8217;s name pluralized), we would do
-so by setting the <tt class="docutils literal"><span class="pre">__endpoint__</span></tt> attribute in the definition of the class:</p>
+<p>In the code above, we created four <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a> classes that
+correspond to tables in our database. If we wanted to change the HTTP endpoint for
+one of the models (the default endpoint is simply the class&#8217;s name pluralized in lowercase),
+we would do so by setting the <tt class="docutils literal"><span class="pre">__endpoint__</span></tt> attribute in the definition of the class:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Genre</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;Genre&#39;</span>
     <span class="n">__endpoint__</span> <span class="o">=</span> <span class="s">&#39;styles&#39;</span>
@@ -212,7 +227,8 @@ retrieve the resources in the <tt class="docutils literal"><span class="pre">Gen
 <p>Many times, we&#8217;d like to specify that certain actions can only be carried out
 against certain types of resources. If we wanted to prevent API users from
 deleting any <tt class="docutils literal"><span class="pre">Genre</span></tt> resources, for example, we could specify this implicitly
-by defining the <tt class="docutils literal"><span class="pre">__methods__</span></tt> attribute and leaving it out, like so:</p>
+by defining the <tt class="docutils literal"><span class="pre">__methods__</span></tt> attribute and leaving out the <tt class="docutils literal"><span class="pre">DELETE</span></tt> method,
+like so:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Genre</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;Genre&#39;</span>
     <span class="n">__endpoint__</span> <span class="o">=</span> <span class="s">&#39;styles&#39;</span>
@@ -226,7 +242,7 @@ acceptable methods for that resource.</p>
 <h3>Performing custom validation on a resource<a class="headerlink" href="#performing-custom-validation-on-a-resource" title="Permalink to this headline">¶</a></h3>
 <p>Specifying which HTTP methods are acceptable gives rather coarse control over
 how a user of the API can interact with our resources. For more granular
-control, custom validation functions can be specified. To do so, simply define a
+control, custom a validation function can be specified. To do so, simply define a
 static method named <tt class="docutils literal"><span class="pre">validate_&lt;METHOD&gt;</span></tt>, where <tt class="docutils literal"><span class="pre">&lt;METHOD&gt;</span></tt> is the HTTP method
 the validation function should validate. To validate the <tt class="docutils literal"><span class="pre">POST</span></tt> method on
 <tt class="docutils literal"><span class="pre">Genres</span></tt>, we would define the method <tt class="docutils literal"><span class="pre">validate_POST</span></tt>, like so:</p>
@@ -259,7 +275,7 @@ settings for individual models are usually sufficient, you can make changes to t
 admin interface for a model by setting the <cite>__view__</cite> attribute to a class that derives
 from <cite>flask.ext.admin.contrib.sqla.ModelView</cite>. The Flask-Admin&#8217;s documentation should be
 consulted for the full list of attributes that can be configured.</p>
-<p>Below, we create a model and, additionally, tell <tt class="docutils literal"><span class="pre">sandman</span></tt> that we want the tables
+<p>Below, we create a model and, additionally, tell <tt class="docutils literal"><span class="pre">sandman</span></tt> that we want the table&#8217;s
 primary key to be displayed in the admin interface (by default, a table&#8217;s primary keys
 aren&#8217;t shown):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">flask.ext.admin.contrib.sqla</span> <span class="kn">import</span> <span class="n">ModelView</span>
@@ -293,7 +309,7 @@ initialization, call <cite>activate()</cite> with <cite>browser=False</cite>.</p
 <h2>Project Layout<a class="headerlink" href="#project-layout" title="Permalink to this headline">¶</a></h2>
 <p>In a &#8220;real&#8221; project, you should divide the code into at least two files: one with the
 <tt class="docutils literal"><span class="pre">Model</span></tt> definitions (<tt class="docutils literal"><span class="pre">models.py</span></tt>) and the other with the configuration
-and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> call (<tt class="docutils literal"><span class="pre">runserver.py</span></tt>).</p>
+and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> which I call (<tt class="docutils literal"><span class="pre">runserver.py</span></tt>).</p>
 </div>
 </div>
 
@@ -308,7 +324,7 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
 <li><a class="reference internal" href="#">Using Sandman</a><ul>
 <li><a class="reference internal" href="#the-simplest-application">The Simplest Application</a></li>
 <li><a class="reference internal" href="#supported-databases">Supported Databases</a></li>
-<li><a class="reference internal" href="#behind-the-scenes">Behind the Scenes</a><ul>
+<li><a class="reference internal" href="#beyond-sandmanctl">Beyond <cite>sandmanctl</cite></a><ul>
 <li><a class="reference internal" href="#a-quick-guide-to-rest-apis">A Quick Guide to REST APIs</a></li>
 </ul>
 </li>
@@ -375,7 +391,7 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> cal
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.8.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.8.1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

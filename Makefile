@@ -14,7 +14,7 @@ test: clean build
 		coverage report
 
 docs:
-	sphinx-build -aE docs docs/generated > /dev/null
+	sphinx-build -aE docs build/docs > /dev/null
 
 release: test docs
 	open docs/generated/index.html
