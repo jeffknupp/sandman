@@ -12,10 +12,10 @@ Here's what's required to create a RESTful API service from an existing database
 
 *That's it.* ``sandman`` will then do the following:
 
-* connect to your database and introspect it's contents
-* create and launch a REST API service
-* create an HTML admin interface
-* *open your browser to the admin interface*
+* Connect to your database and introspect it's contents
+* Create and launch a RESTful API service
+* Create an HTML admin interface
+* *Open your browser to the admin interface*
 
 That's right. Given a legacy database, ``sandman`` not only gives you a REST API,
 it gives you a beautiful admin page and *opens your browser to the admin page*.
@@ -39,8 +39,8 @@ SQLAlchemy (http://www.sqlalchemy.org). As of this writing, that includes:
 * SAP Sybase SQL Anywhere
 * MonetDB
 
-Behind the Scenes
------------------
+Beyond `sandmanctl`
+-------------------
 
 ``sandmanctl``  is really just a simple wrapper around the following::
 
@@ -50,14 +50,15 @@ Behind the Scenes
 
     from sandman.model import activate
 
-    activate()
+    activate(browser=True)
 
     app.run()
 
-**You don't even need to tell ``sandman`` what tables your database contains.**
-Just point ``sandman`` at your database and let it do all the heavy lifting
+**Notice you don't even need to tell ``sandman`` what tables your database contains.**
+Just point ``sandman`` at your database and let it do all the heavy lifting.
 
-Let's start our new service and make a request. While we're at it, lets make use
+If you put the code above into a file named ``runserver.py``, You can start this new 
+service and make a request. While we're at it, lets make use
 of ``sandman``'s awesome filtering capability by specifying a filter term::
 
     $ python runserver.py &
@@ -65,7 +66,7 @@ of ``sandman``'s awesome filtering capability by specifying a filter term::
 
     > curl GET "http://localhost:5000/artists?Name=AC/DC"
 
-and we get::
+you should see the following::
 
     {
         "resources": [
@@ -82,6 +83,11 @@ and we get::
         ]
     }
 
+If you were to leave off the filtering term, you would get **all** results from
+the ``Artist`` table. You can also *paginate* these results by specifying ``?page=2``
+or something similar. The number of results returned per page is controlled by
+the config value ``RESULTS_PER_PAGE``, which defualts to 20. 
+
 A Quick Guide to REST APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -91,13 +97,25 @@ Resources are sources of information, and the API is an interface to this inform
 That is, resources are the actual "objects" manipulated by the API. In ``sandman``, each
 row in a database table is considered a resource.
 
+Groups of resources are called *collections*. In ``sandman``, each table in your
+database is a collection. Collections can be queried and added to using the
+appropriate *HTTP method*. ``sandman`` supports the following HTTP methods::
+
+* GET
+* POST
+* PUT
+* DELETE
+* PATCH
+
+Support for the ``HEAD`` and ``OPTIONS`` methods is underway.
+
 Creating Models
 ---------------
 
 A ``Model`` represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
-:class:`sandman.model.models.Model`. The only attribute you must define in your
-class is the ``__tablename__`` attribute. ``sandman`` uses this to map your
+:class:`sandman.model.models.Model`. If you create a ``Model``, the only attribute you 
+must define in your class is the ``__tablename__`` attribute. ``sandman`` uses this to map your
 class to the corresponding database table. From there, ``sandman`` is able to divine
 all other properties of your tables. Specifically, ``sandman`` creates the
 following:
@@ -116,7 +134,7 @@ following:
 `models.py`
 ============
 
-Creating a `models.py` file allows you to get even *more* out of ``sandman``. In the file,
+Creating a `models.py` file allows you to get *even more* out of ``sandman``. In the file,
 create a class that derives from `sandman.models.Model` for each table you want to
 turn into a RESTful resource. Here's a simple example using the Chinook test database
 (widely available online)::
@@ -143,7 +161,7 @@ turn into a RESTful resource. Here's a simple example using the Chinook test dat
 
 
 ``sandman`` Advanced Usage
----------------------------
+--------------------------
 
 Hooking up Models
 ~~~~~~~~~~~~~~~~~
@@ -154,10 +172,10 @@ this class is modeling. It has *no default* and is *required* for all classes.
 Providing a custom endpoint
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the code above, we created 4 :class:`sandman.model.models.Model` classes that
-correspond to tables in our database. If we wanted to change the endpoint for a
-class (the default endpoint is simply the class's name pluralized), we would do
-so by setting the ``__endpoint__`` attribute in the definition of the class::
+In the code above, we created four :class:`sandman.model.models.Model` classes that
+correspond to tables in our database. If we wanted to change the HTTP endpoint for
+one of the models (the default endpoint is simply the class's name pluralized in lowercase),
+we would do so by setting the ``__endpoint__`` attribute in the definition of the class::
 
     class Genre(Model):
         __tablename__ = 'Genre'
@@ -172,8 +190,8 @@ Restricting allowable methods on a resource
 Many times, we'd like to specify that certain actions can only be carried out
 against certain types of resources. If we wanted to prevent API users from
 deleting any ``Genre`` resources, for example, we could specify this implicitly
-by defining the ``__methods__`` attribute and leaving it out, like so::
-
+by defining the ``__methods__`` attribute and leaving out the ``DELETE`` method,
+like so::
 
     class Genre(Model):
         __tablename__ = 'Genre'
@@ -188,7 +206,7 @@ Performing custom validation on a resource
 
 Specifying which HTTP methods are acceptable gives rather coarse control over
 how a user of the API can interact with our resources. For more granular
-control, custom validation functions can be specified. To do so, simply define a
+control, custom a validation function can be specified. To do so, simply define a
 static method named ``validate_<METHOD>``, where ``<METHOD>`` is the HTTP method
 the validation function should validate. To validate the ``POST`` method on
 ``Genres``, we would define the method ``validate_POST``, like so::
@@ -225,7 +243,7 @@ admin interface for a model by setting the `__view__` attribute to a class that 
 from `flask.ext.admin.contrib.sqla.ModelView`. The Flask-Admin's documentation should be
 consulted for the full list of attributes that can be configured.
 
-Below, we create a model and, additionally, tell ``sandman`` that we want the tables
+Below, we create a model and, additionally, tell ``sandman`` that we want the table's
 primary key to be displayed in the admin interface (by default, a table's primary keys
 aren't shown)::
 
@@ -261,4 +279,4 @@ Project Layout
 
 In a "real" project, you should divide the code into at least two files: one with the
 ``Model`` definitions (``models.py``) and the other with the configuration
-and the ``app.run()`` call (``runserver.py``).
+and the ``app.run()`` which I call (``runserver.py``).
