@@ -33,12 +33,12 @@ class TestSandmanForeignKeysBase(object):
     def test_get(self):
         """Test simple HTTP GET, enough to cover all cases for now."""
         response = self.app.get('/job_schedules')
-        assert len(json.loads(response.data)[u'resources']) == 1
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
 
     def test_date_time(self):
         """Test serializing a datetime object works properly."""
         response = self.app.get('/date_times')
-        assert len(json.loads(response.data)[u'resources']) == 1
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
         
     def teardown_method(self, _):
         """Remove the database file copied during setup."""

@@ -19,9 +19,8 @@ ACCEPTABLE_CONTENT_TYPES = (JSON_CONTENT_TYPES | HTML_CONTENT_TYPES
 FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
 FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource \
 type [{}].  Acceptable methods: [{}]"""
-UNSUPPORTED_CONTENT_TYPE_MESSAGE = """Content-type [{}] not supported.
-Supported values for 'Content-type': {}""".format(
-        '{}', str(ACCEPTABLE_CONTENT_TYPES))
+UNSUPPORTED_CONTENT_TYPE_MESSAGE = 'Content-type [{types}] not supported.'
+#UNSUPPORTED_CONTENT_TYPE_MESSAGE += """\nSupported values for 'Content-type': {}""".format(ACCEPTABLE_CONTENT_TYPES)
 
 def _perform_database_action(action, *args):
     """Call session.*action* with the given *args*.
@@ -179,7 +178,7 @@ def get_resource_data(incoming_request):
     else:
         # HTTP 415: Unsupported Media Type
         raise InvalidAPIUsage(415,
-                UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(
+                UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(types=
                     incoming_request.headers['Content-type']))
 
 def endpoint_class(collection):
@@ -382,7 +381,7 @@ def put_resource(collection, key):
         _perform_database_action('add', resource)
     except IntegrityError as exception:
         raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(
-            exception.message))
+            exception))
     return no_content_response()
 
 @app.route('/<collection>', methods=['POST'])
@@ -423,7 +422,7 @@ def delete_resource(collection, key):
         _perform_database_action('delete', resource)
     except IntegrityError as exception:
         raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(
-            exception.message))
+            exception))
     return no_content_response()
 
 @app.route('/<collection>/<key>', methods=['GET'])
@@ -477,7 +476,6 @@ def get_collection(collection):
 
     start = stop = None
 
-    print request.args
     if request.args and 'page' in request.args:
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
