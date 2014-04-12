@@ -125,7 +125,8 @@ a browser window popped up. Now's the time to go check that out. You'll find
 it's that Django-style admin interface you've been bugging me about, looking
 something like this:
 
-![admin interface awesomesauce screenshot](/docs/images/admin_tracks_improved.jpg)
+![admin interface awesomesauce screenshot](http://sandman.io/static/img/admin_small.jpg)
+
 
 (If you want to disable the browser from opening automatically each time `sandman`
 starts, call `activate` with `browser=False`)

@@ -97,7 +97,7 @@ Let's start our new service and make a request. While we're at it, lets
 make use of ``sandman``'s awesome filtering capability by specifying a
 filter term:
 
-.. code:: bash
+.. code:: zsh
 
     > python runserver.py &
     * Running on http://127.0.0.1:5000/
@@ -131,12 +131,12 @@ built automatically? Fine. You may have noticed that when you ran
 check that out. You'll find it's that Django-style admin interface
 you've been bugging me about, looking something like this:
 
-.. figure:: /docs/images/admin_tracks_improved.jpg
+.. figure:: http://sandman.io/static/img/admin_small.jpg
    :alt: admin interface awesomesauce screenshot
 
    admin interface awesomesauce screenshot
-
-(If you want to disable the browser from opening automatically each time ``sandman`` starts, call ``activate`` with ``browser=False``)
+(If you want to disable the browser from opening automatically each time
+``sandman`` starts, call ``activate`` with ``browser=False``)
 
 If you wanted to specify specific tables that ``sandman`` should make
 available, how do you do that? With this little ditty:
@@ -248,6 +248,40 @@ Coming Soon
 -  Authentication
 
 |Bitdeli Badge|
+
+Changelog
+=========
+
+Version 0.8.1
+-------------
+
+New Feature
+~~~~~~~~~~~
+
+-  ``Link`` header now set to a resource's links
+
+   -  Links to related objects now user a proper ``rel`` value:
+      ``related``
+   -  The link to the current resource still uses the ``self`` ``rel``
+      value
+   -  Links are specified both in the header (as per RFC5988) and in the
+      resource itself
+
+-  Pagination added for JSON (and number of results per page being
+   returned is fixed)
+-  Nested JSON models no longer the default; hitting a URL with the
+   argument "expand" will show one level of nested resources
+
+   -  This conforms more closely to REST principles while not
+      sacrificing the functionality.
+
+Version 0.7.8
+-------------
+
+Bug Fixes
+~~~~~~~~~
+
+-  Fix multiple references to same table error (fixes #59)
 
 .. |Build Status| image:: https://travis-ci.org/jeffknupp/sandman.png?branch=develop
    :target: https://travis-ci.org/jeffknupp/sandman
