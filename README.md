@@ -227,6 +227,11 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 
 # Changelog
 
+## Version 0.9.1
+
+* Python 3 support!
+    * `sandman` tests now pass for both 2.7 and 3.4! Python 3.4 is officially supported.
+
 ## Version 0.8.1
 
 ### New Feature
