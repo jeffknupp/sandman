@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Sandman &mdash; sandman 0.8.1.2 documentation</title>
+    <title>Using Sandman &mdash; sandman 0.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.8.1.2',
+        VERSION:     '0.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.8.1.2 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.0.0 documentation" href="index.html" />
     <link rel="next" title="The sandman Admin Interface" href="admin.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.8.1.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,7 +58,8 @@
 <h2>The Simplest Application<a class="headerlink" href="#the-simplest-application" title="Permalink to this headline">¶</a></h2>
 <p>Here&#8217;s what&#8217;s required to create a RESTful API service from an existing database using
 <tt class="docutils literal"><span class="pre">sandman</span></tt></p>
-<div class="highlight-python"><pre>$ sandmanctl sqlite:////tmp/my_database.db</pre>
+<div class="highlight-python"><div class="highlight"><pre>$ sandmanctl sqlite:////tmp/my_database.db
+</pre></div>
 </div>
 <p><em>That&#8217;s it.</em> <tt class="docutils literal"><span class="pre">sandman</span></tt> will then do the following:</p>
 <ul class="simple">
@@ -92,25 +93,27 @@ SQLAlchemy (<a class="reference external" href="http://www.sqlalchemy.org">http:
 <div class="section" id="beyond-sandmanctl">
 <h2>Beyond <cite>sandmanctl</cite><a class="headerlink" href="#beyond-sandmanctl" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">sandmanctl</span></tt>  is really just a simple wrapper around the following:</p>
-<div class="highlight-python"><pre>from ``sandman`` import app
+<div class="highlight-python"><div class="highlight"><pre>from ``sandman`` import app
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chinook'
+app.config[&#39;SQLALCHEMY_DATABASE_URI&#39;] = &#39;sqlite:///chinook&#39;
 
 from sandman.model import activate
 
 activate(browser=True)
 
-app.run()</pre>
+app.run()
+</pre></div>
 </div>
 <p><strong>Notice you don&#8217;t even need to tell ``sandman`` what tables your database contains.</strong>
 Just point <tt class="docutils literal"><span class="pre">sandman</span></tt> at your database and let it do all the heavy lifting.</p>
 <p>If you put the code above into a file named <tt class="docutils literal"><span class="pre">runserver.py</span></tt>, You can start this new
 service and make a request. While we&#8217;re at it, lets make use
 of <tt class="docutils literal"><span class="pre">sandman</span></tt>&#8216;s awesome filtering capability by specifying a filter term:</p>
-<div class="highlight-python"><pre>$ python runserver.py &amp;
+<div class="highlight-python"><div class="highlight"><pre>$ python runserver.py &amp;
 * Running on http://127.0.0.1:5000/
 
-&gt; curl GET "http://localhost:5000/artists?Name=AC/DC"</pre>
+&gt; curl GET &quot;http://localhost:5000/artists?Name=AC/DC&quot;
+</pre></div>
 </div>
 <p>you should see the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
@@ -143,11 +146,12 @@ row in a database table is considered a resource.</p>
 <p>Groups of resources are called <em>collections</em>. In <tt class="docutils literal"><span class="pre">sandman</span></tt>, each table in your
 database is a collection. Collections can be queried and added to using the
 appropriate <em>HTTP method</em>. <tt class="docutils literal"><span class="pre">sandman</span></tt> supports the following HTTP methods:</p>
-<div class="highlight-python"><pre>* GET
+<div class="highlight-python"><div class="highlight"><pre>* GET
 * POST
 * PUT
 * DELETE
-* PATCH</pre>
+* PATCH
+</pre></div>
 </div>
 <p>Support for the <tt class="docutils literal"><span class="pre">HEAD</span></tt> and <tt class="docutils literal"><span class="pre">OPTIONS</span></tt> methods is underway.</p>
 </div>
@@ -391,12 +395,12 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> whi
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.8.1.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jeff Knupp.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

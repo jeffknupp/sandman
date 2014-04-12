@@ -11,4 +11,4 @@ app.secret_key = '42'
 db = SQLAlchemy(app)
 from . import sandman
 
-__version__ = '0.8.1.2'
+__version__ = ''
