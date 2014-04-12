@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.sandman &mdash; sandman 0.8.1.2 documentation</title>
+    <title>sandman.sandman &mdash; sandman 0.9.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.8.1.2',
+        VERSION:     '0.9.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.8.1.2 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.9.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.8.1.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.9.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -68,9 +68,8 @@
 <span class="n">FORWARDED_EXCEPTION_MESSAGE</span> <span class="o">=</span> <span class="s">&#39;Request could not be completed. Exception: [{}]&#39;</span>
 <span class="n">FORBIDDEN_EXCEPTION_MESSAGE</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;Method [{}] not acceptable for resource </span><span class="se">\</span>
 <span class="s">type [{}].  Acceptable methods: [{}]&quot;&quot;&quot;</span>
-<span class="n">UNSUPPORTED_CONTENT_TYPE_MESSAGE</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;Content-type [{}] not supported.</span>
-<span class="s">Supported values for &#39;Content-type&#39;: {}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="s">&#39;{}&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ACCEPTABLE_CONTENT_TYPES</span><span class="p">))</span>
+<span class="n">UNSUPPORTED_CONTENT_TYPE_MESSAGE</span> <span class="o">=</span> <span class="s">&#39;Content-type [{types}] not supported.&#39;</span>
+<span class="c">#UNSUPPORTED_CONTENT_TYPE_MESSAGE += &quot;&quot;&quot;\nSupported values for &#39;Content-type&#39;: {}&quot;&quot;&quot;.format(ACCEPTABLE_CONTENT_TYPES)</span>
 
 <span class="k">def</span> <span class="nf">_perform_database_action</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Call session.*action* with the given *args*.</span>
@@ -228,7 +227,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c"># HTTP 415: Unsupported Media Type</span>
         <span class="k">raise</span> <span class="n">InvalidAPIUsage</span><span class="p">(</span><span class="mi">415</span><span class="p">,</span>
-                <span class="n">UNSUPPORTED_CONTENT_TYPE_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">UNSUPPORTED_CONTENT_TYPE_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">types</span><span class="o">=</span>
                     <span class="n">incoming_request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-type&#39;</span><span class="p">]))</span>
 </div>
 <div class="viewcode-block" id="endpoint_class"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.endpoint_class">[docs]</a><span class="k">def</span> <span class="nf">endpoint_class</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
@@ -431,7 +430,7 @@
         <span class="n">_perform_database_action</span><span class="p">(</span><span class="s">&#39;add&#39;</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">InvalidAPIUsage</span><span class="p">(</span><span class="mi">422</span><span class="p">,</span> <span class="n">FORWARDED_EXCEPTION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
+            <span class="n">exception</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;POST&#39;</span><span class="p">])</span>
@@ -472,7 +471,7 @@
         <span class="n">_perform_database_action</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">IntegrityError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">InvalidAPIUsage</span><span class="p">(</span><span class="mi">422</span><span class="p">,</span> <span class="n">FORWARDED_EXCEPTION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
+            <span class="n">exception</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
@@ -526,7 +525,6 @@
 
     <span class="n">start</span> <span class="o">=</span> <span class="n">stop</span> <span class="o">=</span> <span class="bp">None</span>
 
-    <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span> <span class="ow">and</span> <span class="s">&#39;page&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
         <span class="n">page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;page&#39;</span><span class="p">])</span>
         <span class="n">results_per_page</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;RESULTS_PER_PAGE&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
@@ -565,13 +563,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.8.1.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.9.1 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jeff Knupp.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
