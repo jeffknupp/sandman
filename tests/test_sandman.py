@@ -63,7 +63,7 @@ class TestSandmanBase(object):
     def is_html_response(response):
         """Return True if *response* is an HTML response"""
         assert 'text/html' in str(response.headers['Content-type'])
-        return '<!DOCTYPE html>' in str(response.get_data(as_text=True))
+        return '<!DOCTYPE html>' in response.get_data(as_text=True)
 
 class TestSandmanBasicVerbs(TestSandmanBase):
     """Test the basic HTTP verbs (e.g. "PUT", "GET", etc.)"""
@@ -148,7 +148,6 @@ class TestSandmanBasicVerbs(TestSandmanBase):
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
-        assert type(response.get_data(as_text=True)) == str
         assert json.loads(response.get_data(as_text=True))['Name'] == u'Jeff Knupp'
         assert json.loads(response.get_data(as_text=True))['self'] == '/artists/276'
 
