@@ -6,34 +6,35 @@ from flask import (jsonify, request, g,
 from sqlalchemy.exc import IntegrityError
 from . import app, db
 from .exception import InvalidAPIUsage
+from .model.models import Model
+from .model.utils import _get_session
 
 JSON, HTML = range(2)
 JSON_CONTENT_TYPES = set(['application/json',])
 HTML_CONTENT_TYPES = set(['text/html', 'application/x-www-form-urlencoded'])
 ALL_CONTENT_TYPES = set(['*/*'])
-ACCEPTABLE_CONTENT_TYPES = JSON_CONTENT_TYPES | HTML_CONTENT_TYPES | ALL_CONTENT_TYPES
+ACCEPTABLE_CONTENT_TYPES = (JSON_CONTENT_TYPES | HTML_CONTENT_TYPES
+        | ALL_CONTENT_TYPES)
 
 FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
-FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource type [{}].
-Acceptable methods: [{}]"""
-UNSUPPORTED_CONTENT_TYPE_MESSAGE = """Content-type [{}] not supported.
-Supported values for 'Content-type': {}""".format(str(ACCEPTABLE_CONTENT_TYPES), '{}')
-
-def _get_session():
-    """Return (and memoize) a database session"""
-    session = getattr(g, '_session', None)
-    if session is None:
-        session = g._session = db.session()
-    return session
+FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource \
+type [{}].  Acceptable methods: [{}]"""
+UNSUPPORTED_CONTENT_TYPE_MESSAGE = 'Content-type [{types}] not supported.'
+#UNSUPPORTED_CONTENT_TYPE_MESSAGE += """\nSupported values for 'Content-type': {}""".format(ACCEPTABLE_CONTENT_TYPES)
 
 def _perform_database_action(action, *args):
+    """Call session.*action* with the given *args*.
+
+    Will later be used to abstract away database backend.
+    """
     session = _get_session()
     getattr(session, action)(*args)
     session.commit()
 
 def _get_acceptable_response_type():
     """Return the mimetype for this request."""
-    if 'Accept' not in request.headers or request.headers['Accept'] in ALL_CONTENT_TYPES:
+    if ('Accept' not in request.headers or request.headers['Accept'] in
+            ALL_CONTENT_TYPES):
         return JSON
     acceptable_content_types = set(request.headers['ACCEPT'].strip().split(','))
     if acceptable_content_types & HTML_CONTENT_TYPES:
@@ -55,16 +56,25 @@ def handle_exception(error):
             return response
         else:
             return error.abort()
-    except InvalidAPIUsage as e:
+    except InvalidAPIUsage as _:
         # In addition to the original exception, we don't support the content
         # type in the request's 'Accept' header, which is a more important
         # error, so return that instead of what was originally raised.
         response = jsonify(error.to_dict())
-        print request.headers, e, error
         response.status_code = 415
         return response
 
-def _single_resource_json_response(resource):
+def _single_attribute_json_response(name, value):
+    """Return the json representation of a single attribute of a resource.
+
+    :param string name:  name of the attribute
+    :param string value: string value of the attribute
+    :rtype: :class:`flask.Response`
+
+    """
+    return jsonify({name: str(value)})
+
+def _single_resource_json_response(resource, depth=0):
     """Return the JSON representation of *resource*.
 
     :param resource: :class:`sandman.model.Model` to render
@@ -72,7 +82,25 @@ def _single_resource_json_response(resource):
     :rtype: :class:`flask.Response`
 
     """
-    return jsonify(**resource.as_dict())
+    links = resource.links()
+    response = jsonify(**resource.as_dict(depth))
+    response.headers['Link'] = ''
+    for link in links:
+        response.headers['Link'] += '<{}>; rel="{}",'.format(link['uri'], link['rel'])
+    response.headers['Link'] = response.headers['Link'][:-1] 
+    return response
+
+def _single_attribute_html_response(resource, name, value):
+    """Return the json representation of a single attribute of a resource.
+
+    :param :class:`sandman.model.Model` resource: resource to get attribute from
+    :param string name:  name of the attribute
+    :param string value: string value of the attribute
+    :rtype: :class:`flask.Response`
+
+    """
+    return make_response(render_template('attribute.html', resource=resource,
+        name=name, value=value))
 
 def _single_resource_html_response(resource):
     """Return the HTML representation of *resource*.
@@ -88,7 +116,7 @@ def _single_resource_html_response(resource):
     return make_response(render_template('resource.html', resource=resource,
         tablename=tablename))
 
-def _collection_json_response(resources):
+def _collection_json_response(resources, start, stop, depth=0):
     """Return the JSON representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
@@ -97,10 +125,13 @@ def _collection_json_response(resources):
     """
     result_list = []
     for resource in resources:
-        result_list.append(resource.as_dict())
-    return jsonify(resources=result_list)
+        result_list.append(resource.as_dict(depth))
+    if start is not None:
+        return jsonify(resources=result_list[start:stop])
+    else:
+        return jsonify(resources=result_list)
 
-def _collection_html_response(resources):
+def _collection_html_response(resources, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
@@ -108,7 +139,7 @@ def _collection_html_response(resources):
 
     """
     return make_response(render_template('collection.html',
-        resources=resources))
+        resources=resources[start:stop]))
 
 def _validate(cls, method, resource=None):
     """Return ``True`` if the the given *cls* supports the HTTP *method* found
@@ -118,7 +149,8 @@ def _validate(cls, method, resource=None):
     :type cls: :class:`sandman.model.Model` instance
     :param string method: HTTP method of incoming request
     :param resource: *cls* instance associated with the request
-    :type resource: :class:`sandman.model.Model` or list of :class:`sandman.model.Model` or None
+    :type resource: :class:`sandman.model.Model` or list of
+                    :class:`sandman.model.Model` or None
     :rtype: bool
 
     """
@@ -133,19 +165,21 @@ def _validate(cls, method, resource=None):
         if not class_validator(resource):
             raise InvalidAPIUsage(403)
 
-def get_resource_data(request):
-    if 'Content-type' not in request.headers or request.headers['Content-type'] in JSON_CONTENT_TYPES:
-        return request.json
-    elif request.headers['Content-type'] in HTML_CONTENT_TYPES:
-        if not request.form:
+def get_resource_data(incoming_request):
+    """Return the data from the incoming *request* based on the Content-type."""
+    content_type = incoming_request.headers['Content-type'].split(';')[0]
+    if ('Content-type' not in incoming_request.headers or
+            content_type in JSON_CONTENT_TYPES):
+        return incoming_request.json
+    elif content_type in HTML_CONTENT_TYPES:
+        if not incoming_request.form:
             raise InvalidAPIUsage(400)
-        return request.form
+        return incoming_request.form
     else:
-        # HTTP 415: Unsupported Media Type 
-        print request.headers
+        # HTTP 415: Unsupported Media Type
         raise InvalidAPIUsage(415,
-                UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(
-                    request.headers['Content-type']))
+                UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(types=
+                    incoming_request.headers['Content-type']))
 
 def endpoint_class(collection):
     """Return the :class:`sandman.model.Model` associated with the endpoint
@@ -157,7 +191,7 @@ def endpoint_class(collection):
     """
     with app.app_context():
         try:
-            cls = current_app.endpoint_classes[collection]
+            cls = current_app.class_references[collection]
         except KeyError:
             raise InvalidAPIUsage(404)
         return cls
@@ -175,9 +209,17 @@ def retrieve_collection(collection, query_arguments=None):
     cls = endpoint_class(collection)
     if query_arguments:
         filters = []
+        order = []
         for key, value in query_arguments.items():
-            filters.append(getattr(cls, key)==value)
-        resources = session.query(cls).filter(*filters)
+            if key == 'page':
+                continue
+            if value.startswith('%'):
+                filters.append(getattr(cls, key).like(str(value), escape='/'))
+            elif key == 'sort':
+                order.append(getattr(cls, value))
+            elif key:
+                filters.append(getattr(cls, key) == value)
+        resources = session.query(cls).filter(*filters).order_by(*order)
     else:
         resources = session.query(cls).all()
     return resources
@@ -212,11 +254,11 @@ def resource_created_response(resource):
     else:
         response = _single_resource_html_response(resource)
     response.status_code = 201
-    response.headers['Location']  = 'http://localhost:5000/{}'.format(
+    response.headers['Location'] = 'http://localhost:5000/{}'.format(
             resource.resource_uri())
     return response
 
-def collection_response(resources):
+def collection_response(resources, start=None, stop=None):
     """Return a response for the *resources* of the appropriate content type.
 
     :param resources: resources to be returned in request
@@ -225,12 +267,12 @@ def collection_response(resources):
 
     """
     if _get_acceptable_response_type() == JSON:
-        return _collection_json_response(resources)
+        return _collection_json_response(resources, start, stop)
     else:
-        return _collection_html_response(resources)
+        return _collection_html_response(resources, start, stop)
 
 
-def resource_response(resource):
+def resource_response(resource, depth=0):
     """Return a response for the *resource* of the appropriate content type.
 
     :param resource: resource to be returned in request
@@ -239,9 +281,26 @@ def resource_response(resource):
 
     """
     if _get_acceptable_response_type() == JSON:
-        return _single_resource_json_response(resource)
+        depth=0
+        if 'expand' in request.args:
+            depth = 1
+        return _single_resource_json_response(resource, depth)
     else:
         return _single_resource_html_response(resource)
+
+def attribute_response(resource, name, value):
+    """Return a response for the *resource* of the appropriate content type.
+
+    :param resource: resource to be returned in request
+    :type resource: :class:`sandman.model.Model`
+    :rtype: :class:`flask.Response`
+
+    """
+    if _get_acceptable_response_type() == JSON:
+        return _single_attribute_json_response(name, value)
+    else:
+        return _single_attribute_html_response(resource, name, value)
+
 
 def no_content_response():
     """Return the appropriate *Response* with status code *204*, signaling a
@@ -254,7 +313,7 @@ def no_content_response():
     response.status_code = 204
     return response
 
-def update_resource(resource, request):
+def update_resource(resource, incoming_request):
     """Replace the contents of a resource with *data* and return an appropriate
     *Response*.
 
@@ -262,7 +321,7 @@ def update_resource(resource, request):
     :param data: New values for the fields in *resource*
 
     """
-    resource.from_dict(get_resource_data(request))
+    resource.from_dict(get_resource_data(incoming_request))
     _perform_database_action('merge', resource)
     return no_content_response()
 
@@ -321,7 +380,8 @@ def put_resource(collection, key):
     try:
         _perform_database_action('add', resource)
     except IntegrityError as exception:
-        raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(exception.message))
+        raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(
+            exception))
     return no_content_response()
 
 @app.route('/<collection>', methods=['POST'])
@@ -361,12 +421,13 @@ def delete_resource(collection, key):
     try:
         _perform_database_action('delete', resource)
     except IntegrityError as exception:
-        raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(exception.message))
+        raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(
+            exception))
     return no_content_response()
 
 @app.route('/<collection>/<key>', methods=['GET'])
 def get_resource(collection, key):
-    """Return the appropriate *Response* for retrieving a single resource
+    """Return the appropriate *Response* for retrieving a single resource.
 
     :param string collection: a :class:`sandman.model.Model` endpoint
     :param string key: the primary key for the :class:`sandman.model.Model`
@@ -377,6 +438,25 @@ def get_resource(collection, key):
     _validate(endpoint_class(collection), request.method, resource)
 
     return resource_response(resource)
+
+@app.route('/<collection>/<key>/<attribute>', methods=['GET'])
+def get_resource_attribute(collection, key, attribute):
+    """Return the appropriate *Response* for retrieving an attribute of
+    a single resource.
+
+    :param string collection: a :class:`sandman.model.Model` endpoint
+    :param string key: the primary key for the :class:`sandman.model.Model`
+    :rtype: :class:`flask.Response`
+
+    """
+    resource = retrieve_resource(collection, key)
+    _validate(endpoint_class(collection), request.method, resource)
+    value = getattr(resource, attribute)
+    if isinstance(value, Model):
+        return resource_response(value)
+    else:
+        return attribute_response(resource, attribute, value)
+
 
 @app.route('/<collection>', methods=['GET'])
 def get_collection(collection):
@@ -394,4 +474,10 @@ def get_collection(collection):
 
     _validate(cls, request.method, resources)
 
-    return collection_response(resources)
+    start = stop = None
+
+    if request.args and 'page' in request.args:
+        page = int(request.args['page'])
+        results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
+        start, stop = page * results_per_page, (page +1) * results_per_page
+    return collection_response(resources, start, stop)

@@ -1,10 +1,10 @@
-.PHONY: docs release clean
+.PHONY: docs release clean build
 
 clean:
 	rm -rf sandman_env htmlcov
 
 build:
-	virtualenv sandman_env && source sandman_env/bin/activate && \
+	virtualenv -p /usr/local/bin/python3 sandman_env && source sandman_env/bin/activate && \
 		pip install -r requirements.txt
 
 test: clean build
@@ -14,7 +14,7 @@ test: clean build
 		coverage report
 
 docs:
-	sphinx-build -aE docs docs/generated > /dev/null
+	sphinx-build -aE docs build/docs > /dev/null
 
 release: test docs
 	open docs/generated/index.html

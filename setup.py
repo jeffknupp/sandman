@@ -25,7 +25,7 @@ long_description = read('README.rst')
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--strict', '--verbose', '--tb=long', 'sandman/test']
+        self.test_args = ['--strict', '--verbose', '--tb=long', 'tests']
         self.test_suite = True
 
     def run_tests(self):
@@ -44,16 +44,23 @@ setup(
                       'Flask-SQLAlchemy>=1.0',
                       'SQLAlchemy>=0.8.2',
                       'Flask-Admin>=1.0.6',
+                      'docopt>=0.6.1',
                       ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
     description='Automated REST APIs for existing database-driven systems',
     long_description=long_description,
-    scripts=['scripts/sandmanctl'],
+    entry_points={
+        'console_scripts': [
+            'sandmanctl = sandman.sandmanctl:main',
+            ],
+        },
     packages=['sandman', 'sandman.model'],
     include_package_data=True,
     platforms='any',
     test_suite='sandman.test.test_sandman',
+    zip_safe=False,
+    package_data={'sandman': ['templates/**', 'static/*/*']},
     classifiers = [
         'Programming Language :: Python',
         'Development Status :: 4 - Beta',

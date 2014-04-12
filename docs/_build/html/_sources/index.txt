@@ -1,5 +1,5 @@
 .. sandman documentation master file, created by
-   sphinx-quickstart on Sun Aug 11 14:41:23 2013.
+   sphinx-quickstart on Tue Jul 23 16:14:54 2013.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -9,8 +9,11 @@ Welcome to sandman's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
+   installation
+   using_sandman
+   admin
    sandman
 
 

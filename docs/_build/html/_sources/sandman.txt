@@ -1,13 +1,5 @@
-sandman Package
+sandman API
 ===============
-
-:mod:`sandman` Package
-----------------------
-
-.. automodule:: sandman.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 :mod:`exception` Module
 -----------------------
@@ -21,7 +13,12 @@ sandman Package
 -------------------
 
 .. automodule:: sandman.model
+    :members: register, activate
+
+.. automodule:: sandman.model.models
     :members:
+    :private-members:
+    :special-members: __endpoint__, __methods__, __table__, __tablename__
     :undoc-members:
     :show-inheritance:
 
@@ -32,11 +29,3 @@ sandman Package
     :members:
     :undoc-members:
     :show-inheritance:
-
-Subpackages
------------
-
-.. toctree::
-
-    sandman.test
-

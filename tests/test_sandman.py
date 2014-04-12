@@ -1,14 +1,16 @@
 """Main test class for sandman"""
 
-from sandman import app
 import os
 import shutil
 import json
+import datetime
+
+from sandman import app
 
 class TestSandmanBase(object):
     """Base class for all sandman test classes."""
 
-    DB_LOCATION = os.path.join(os.getcwd(), 'sandman', 'test', 'chinook')
+    DB_LOCATION = os.path.join(os.getcwd(), 'tests', 'chinook.sqlite3')
 
     def setup_method(self, _):
         """Grab the database file from the *data* directory and configure the
@@ -16,22 +18,27 @@ class TestSandmanBase(object):
         shutil.copy(
                 os.path.join(
                     os.getcwd(),
-                    'sandman',
-                    'test',
+                    'tests',
                     'data',
-                    'chinook'),
+                    'chinook.sqlite3'),
                 self.DB_LOCATION)
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + self.DB_LOCATION
+        app.config['SANDMAN_SHOW_PKS'] = False
+        app.config['SANDMAN_GENERATE_PKS'] = False
         app.config['TESTING'] = True
         self.app = app.test_client()
+        #pylint: disable=unused-variable
         from . import models
-
+ 
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
+        #pylint: disable=attribute-defined-outside-init
         self.app = None
 
-    def get_response(self, uri, status_code, params=None, has_data=True, headers=None):
+    #pylint: disable=too-many-arguments
+    def get_response(self, uri, status_code, params=None, has_data=True,
+            headers=None):
         """Return the response generated from a generic GET request. Do basic
         validation on the response."""
         if headers is None:
@@ -39,7 +46,7 @@ class TestSandmanBase(object):
         response = self.app.get(uri, query_string=params, headers=headers)
         assert response.status_code == status_code
         if has_data:
-            assert response.data
+            assert response.get_data(as_text=True)
         return response
 
     def post_response(self):
@@ -49,33 +56,68 @@ class TestSandmanBase(object):
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
-        assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
+        assert json.loads(response.get_data(as_text=True))[u'Name'] == u'Jeff Knupp'
         return response
 
     @staticmethod
     def is_html_response(response):
         """Return True if *response* is an HTML response"""
-        assert 'text/html' in response.headers['Content-type']
-        return '<!DOCTYPE html>' in response.data
+        assert 'text/html' in str(response.headers['Content-type'])
+        return '<!DOCTYPE html>' in response.get_data(as_text=True)
 
 class TestSandmanBasicVerbs(TestSandmanBase):
+    """Test the basic HTTP verbs (e.g. "PUT", "GET", etc.)"""
     def test_get(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
-        assert len(json.loads(response.data)[u'resources']) == 1
+        response = self.get_response('/artists', 200)
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200)
-        assert len(json.loads(response.data)[u'resources']) == 275
+        response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
+
+    def test_get_with_like_filter(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
+
+    def test_get_with_sort(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'sort': 'Name'})
+        assert json.loads(response.get_data(as_text=True))[u'resources'][0]['Name'] == 'A Cor Do Som'
+
+    def test_get_attribute(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists/1/Name', 200)
+        assert json.loads(response.get_data(as_text=True))[u'Name'] == 'AC/DC'
+
+    def test_get_object_attribute(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/tracks/347', 200)
+        response = self.get_response('/tracks/347/Genre', 200)
+        assert json.loads(response.get_data(as_text=True))[u'Name'] == 'Rock'
+
+    def test_get_link_header_for_resource(self):
+        """Does GETing a resource return the 'Link' header field?"""
+        response = self.get_response('/tracks/1', 200)
+        assert 'Link' in response.headers
+        assert '</MediaType/1>; rel="related"' in response.headers['Link'] 
+        assert self.get_response('/Album/1', 200).data is not None
+
+    def test_get_expanded_resource(self):
+        """Does GETing a resource return the 'Link' header field?"""
+        response = self.get_response('/tracks/1', 200, params={'expand': 1})
+        assert 'album' in json.loads(response.get_data(as_text=True))
 
     def test_post(self):
         """Test simple HTTP POST"""
         response = self.post_response()
-        assert json.loads(response.data)[u'Name'] == u'Jeff Knupp'
-        assert json.loads(response.data)[u'links'] == [
-                {u'rel': u'self', u'uri': u'/artists/276'}
-                ]
+        assert json.loads(response.get_data(as_text=True)) == {
+            'ArtistId': 276,
+            'Name': 'Jeff Knupp',
+            'self': '/artists/276',
+            'links': [{'rel': 'self', 'uri': '/artists/276'}]}
 
     def test_posted_location(self):
         """Make sure 'Location' header returned in response actually points to
@@ -88,8 +130,14 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         """Make sure 'uri' in the links returned in response actually points to
         new resource created during POST."""
         post_response = self.post_response()
-        as_json = json.loads(post_response.data)
-        uri = as_json[u'links'][0][u'uri']
+        as_json = json.loads(post_response.get_data(as_text=True))
+        assert as_json == {
+                'ArtistId': 276,
+                'Name': 'Jeff Knupp',
+                'self': '/artists/276',
+                'links': [{'rel': 'self', 'uri': '/artists/276'}]
+                }
+        uri = as_json['self']
         self.app.get(uri)
         assert as_json[u'Name'] == u'Jeff Knupp'
 
@@ -100,10 +148,8 @@ class TestSandmanBasicVerbs(TestSandmanBase):
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 201
-        assert type(response.data) == str
-        assert json.loads(response.data)['Name'] == u'Jeff Knupp'
-        assert json.loads(response.data)['links'] == [
-                {u'rel': u'self', u'uri': u'/artists/276'}]
+        assert json.loads(response.get_data(as_text=True))['Name'] == u'Jeff Knupp'
+        assert json.loads(response.get_data(as_text=True))['self'] == '/artists/276'
 
     def test_patch_existing_resource(self):
         """Send HTTP PATCH for an existing resource (should be updated)."""
@@ -113,9 +159,9 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert response.status_code == 204
         response = self.get_response('/artists/275', 200)
         assert json.loads(
-                response.data.decode('utf-8'))[u'Name'] == u'Jeff Knupp'
+                response.get_data(as_text=True))[u'Name'] == u'Jeff Knupp'
         assert json.loads(
-                response.data.decode('utf-8'))[u'ArtistId'] == 275
+                response.get_data(as_text=True))[u'ArtistId'] == 275
 
     def test_delete_resource(self):
         """Test DELETEing a resource."""
@@ -150,9 +196,9 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert response.status_code == 204
         response = self.get_response('/tracks/1', 200)
         assert json.loads(
-                response.data.decode('utf-8'))[u'Name'] == u'Some New Album'
+                response.get_data(as_text=True))[u'Name'] == u'Some New Album'
         assert json.loads(
-                response.data.decode('utf-8'))[u'Composer'] is None
+                response.get_data(as_text=True))[u'Composer'] is None
 
     def test_put_unknown_resource(self):
         """Test HTTP PUTing a resource that doesn't exist. Should give 404."""
@@ -186,7 +232,7 @@ class TestSandmanUserDefinitions(TestSandmanBase):
     def test_user_defined_endpoint(self):
         """Make sure user-defined endpoint exists."""
         response = self.get_response('/styles', 200)
-        assert len(json.loads(response.data)[u'resources']) == 25
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 25
 
     def test_user_validation_reject(self):
         """Test user-defined validation which on request which should be
@@ -238,12 +284,24 @@ class TestSandmanValidation(TestSandmanBase):
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
         assert response.status_code == 403
 
+    def test_pagination(self):
+        """Can we get paginated results?"""
+        response = self.get_response('/artists', 200, params={'page': 2})
+        assert len(json.loads(response.get_data(as_text=True))['resources']) == 20
+
 class TestSandmanContentTypes(TestSandmanBase):
     """Sandman tests related to content types"""
 
     def test_get_html(self):
         """Test getting HTML version of a resource rather than JSON."""
         response = self.get_response('/artists/1',
+                200,
+                headers={'Accept': 'text/html'})
+        assert self.is_html_response(response)
+
+    def test_get_html_attribute(self):
+        """Test getting HTML version of a resource rather than JSON."""
+        response = self.get_response('/artists/1/Name',
                 200,
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)
@@ -258,18 +316,18 @@ class TestSandmanContentTypes(TestSandmanBase):
 
     def test_get_html_collection(self):
         """Test getting HTML version of a collection rather than JSON."""
-        response = self.app.get('/artists',
+        response = self.get_response('/artists',
                 200,
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)
-        assert 'Aerosmith' in response.data
+        assert 'Aerosmith' in response.get_data(as_text=True)
 
     def test_get_json(self):
         """Test explicitly getting the JSON version of a resource."""
         response = self.get_response('/artists',
                 200,
                 headers={'Accept': 'application/json'})
-        assert len(json.loads(response.data)[u'resources']) == 275
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
 
     def test_get_unknown_url(self):
         """Test sending a GET request to a URL that would match the
@@ -298,13 +356,24 @@ class TestSandmanContentTypes(TestSandmanBase):
         assert self.is_html_response(response)
 
     def test_post_html_response(self):
-        """Test POSTing a resource via form parameters and requesting the 
+        """Test POSTing a resource via form parameters and requesting the
         response be HTML formatted."""
         response = self.app.post('/artists',
                 headers={'Accept': 'text/html'},
                 data={u'Name': u'Jeff Knupp'})
         assert response.status_code == 201
-        assert 'Jeff Knupp' in response.data
+        assert 'Jeff Knupp' in str(response.get_data(as_text=True))
+
+    def test_post_html_with_charset(self):
+        """Test POSTing a resource with a Content-Type that specifies a
+        character set."""
+        response = self.app.post('/artists',
+                content_type='application/x-www-form-urlencoded',
+                charset='UTF-8;',
+                headers={'Accept': 'text/html'},
+                data={u'Name': u'Jeff Knupp'})
+        assert response.status_code == 201
+        assert 'Jeff Knupp' in str(response.get_data(as_text=True))
 
     def test_post_no_json_data(self):
         """Test POSTing a resource with no JSON data."""
@@ -362,7 +431,7 @@ class TestSandmanAdmin(TestSandmanBase):
         # If related tables are being loaded correctly, Tracks will have a
         # Mediatype column, at least one of which has the value 'MPEG audio
         # file'.
-        assert 'MPEG audio file' in response.data
+        assert 'MPEG audio file' in str(response.get_data(as_text=True))
 
     def test_admin_default_str_repr(self):
         """Ensure default ``__str__`` implementations works in the admin."""
@@ -371,13 +440,13 @@ class TestSandmanAdmin(TestSandmanBase):
         # If related tables are being loaded correctly, Tracks will have a
         # Genre column, but should display the GenreId and not the name ('Jazz'
         # is the genre for many results on the third page
-        assert 'Jazz' not in response.data
+        assert 'Jazz' not in str(response.get_data(as_text=True))
 
+    #pylint: disable=invalid-name
     def test_admin_default_str_repr_different_table_class_name(self):
         """Ensure default ``__str__`` representation for classes where the
         classname differs from the table name show up with the classname (not the
         table name)."""
 
         response = self.get_response('/admin/styleview/', 200)
-        assert 'Genre' not in response.data
-
+        assert 'Genre' not in str(response.get_data(as_text=True))

@@ -1,5 +1,5 @@
 *.py[cod]
-
+*.py-e
 *.swp
 chinook
 runserver.py
@@ -8,6 +8,7 @@ output.html
 test_run
 # C extensions
 *.so
+sandman_env
 
 # Packages
 *.egg

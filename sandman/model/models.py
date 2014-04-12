@@ -2,8 +2,12 @@
 a table in the database that should be modeled as a resource."""
 
 from decimal import Decimal
-from sandman import app
+
 from flask import current_app
+from flask.ext.admin.contrib.sqla import ModelView
+
+from sandman import app, db
+
 
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
@@ -35,10 +39,6 @@ class Model(object):
     __table__ = None
     """Will be populated by SQLAlchemy with the table's meta-information."""
 
-    __related_tables__ = set()
-    """List of Models for which this model has a foreign key relationship
-    with.""" 
-
     @classmethod
     def endpoint(cls):
         """Return the :class:`sandman.model.Model`'s endpoint.
@@ -48,7 +48,10 @@ class Model(object):
         """
         if cls.__endpoint__ is not None:
             return cls.__endpoint__
-        return cls.__tablename__.lower() + 's'
+        value = cls.__tablename__.lower()
+        if not value.endswith('s'):
+            value += 's'
+        return value
 
     def resource_uri(self):
         """Return the URI at which the resource can be found.
@@ -58,20 +61,6 @@ class Model(object):
         """
         primary_key_value = getattr(self, self.primary_key(), None)
         return '/{}/{}'.format(self.endpoint(), primary_key_value)
-
-    def links(self):
-        """Return a list of links for endpoints related to the resource."""
-        links = []
-        for foreign_key in self.__table__.foreign_keys:
-            column = foreign_key.column.name
-            column_value = getattr(self, column, None)
-            if column_value:
-                table = foreign_key.column.table.name
-                with app.app_context():
-                    endpoint = current_app.table_to_endpoint[table]
-                links.append({'rel': endpoint, 'uri': '/{}/{}'.format(endpoint, column_value)})
-        links.append({'rel': 'self', 'uri': self.resource_uri()})
-        return links
 
     @classmethod
     def primary_key(cls):
@@ -83,7 +72,22 @@ class Model(object):
 
         return cls.__table__.primary_key.columns.values()[0].name
 
-    def as_dict(self):
+    def links(self):
+        """Return a list of links for endpoints related to the resource."""
+        links = []
+        for foreign_key in self.__table__.foreign_keys:
+            column = foreign_key.column.name
+            column_value = getattr(self, column, None)
+            if column_value:
+                table = foreign_key.column.table.name
+                with app.app_context():
+                    endpoint = current_app.class_references[table]
+                links.append({'rel': 'related', 'uri': '/{}/{}'.format(
+                    endpoint.__name__, column_value)})
+        links.append({'rel': 'self', 'uri': self.resource_uri()})
+        return links
+
+    def as_dict(self, depth=0):
         """Return a dictionary containing only the attributes which map to
         an instance's database columns.
 
@@ -96,14 +100,32 @@ class Model(object):
             if isinstance(result_dict[column], Decimal):
                 result_dict[column] = str(result_dict[column])
         result_dict['links'] = self.links()
+        for foreign_key in self.__table__.foreign_keys:
+            column_name = foreign_key.column.name
+            column_value = getattr(self, column_name, None)
+            if column_value:
+                table = foreign_key.column.table.name
+                with app.app_context():
+                    endpoint = current_app.class_references[table]
+                    session = db.session()
+                    resource = session.query(endpoint).get(column_value)
+                if depth > 0:
+                    result_dict.update({
+                        'rel': endpoint.__name__, 
+                        endpoint.__name__.lower() : resource.as_dict(depth - 1)
+                        })
+                else:
+                    result_dict[endpoint.__name__.lower() + '_url'] = '/{}/{}'.format(endpoint.__name__, column_value)
+
+        result_dict['self'] = self.resource_uri()
         return result_dict
 
     def from_dict(self, dictionary):
         """Set a set of attributes which correspond to the
         :class:`sandman.model.Model`'s columns.
 
-        :param dict dictionary: A dictionary of attributes to set on the instance
-            whose keys are the column names of
+        :param dict dictionary: A dictionary of attributes to set on the
+            instance whose keys are the column names of
             the :class:`sandman.model.Model`'s underlying database table.
 
         """
@@ -128,3 +150,12 @@ class Model(object):
 
     def __str__(self):
         return str(getattr(self, self.primary_key()))
+
+class AdminModelViewWithPK(ModelView):
+    """Mixin admin view class that displays primary keys on the admin form"""
+    column_display_pk = True
+
+class AuthenticatedAdminModelView(ModelView):
+
+    def is_accessible(self):
+        raise NotImplementedError('You must implement the \'is_accessible\' method to use authorization.')

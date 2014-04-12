@@ -1,0 +1,2872 @@
+-- MySQL dump 10.14  Distrib 5.5.34-MariaDB, for Linux (x86_64)
+--
+-- Host: localhost    Database: nova
+-- ------------------------------------------------------
+-- Server version	5.5.34-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `agent_builds`
+--
+
+DROP TABLE IF EXISTS `agent_builds`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `agent_builds` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hypervisor` varchar(255) DEFAULT NULL,
+  `os` varchar(255) DEFAULT NULL,
+  `architecture` varchar(255) DEFAULT NULL,
+  `version` varchar(255) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `md5hash` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_agent_builds0hypervisor0os0architecture0deleted` (`hypervisor`,`os`,`architecture`,`deleted`),
+  KEY `agent_builds_hypervisor_os_arch_idx` (`hypervisor`,`os`,`architecture`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aggregate_hosts`
+--
+
+DROP TABLE IF EXISTS `aggregate_hosts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aggregate_hosts` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `host` varchar(255) DEFAULT NULL,
+  `aggregate_id` int(11) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_aggregate_hosts0host0aggregate_id0deleted` (`host`,`aggregate_id`,`deleted`),
+  KEY `aggregate_id` (`aggregate_id`),
+  CONSTRAINT `aggregate_hosts_ibfk_1` FOREIGN KEY (`aggregate_id`) REFERENCES `aggregates` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aggregate_metadata`
+--
+
+DROP TABLE IF EXISTS `aggregate_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aggregate_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aggregate_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_aggregate_metadata0aggregate_id0key0deleted` (`aggregate_id`,`key`,`deleted`),
+  KEY `aggregate_metadata_key_idx` (`key`),
+  CONSTRAINT `aggregate_metadata_ibfk_1` FOREIGN KEY (`aggregate_id`) REFERENCES `aggregates` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aggregates`
+--
+
+DROP TABLE IF EXISTS `aggregates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aggregates` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `block_device_mapping`
+--
+
+DROP TABLE IF EXISTS `block_device_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `block_device_mapping` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_name` varchar(255) DEFAULT NULL,
+  `delete_on_termination` tinyint(1) DEFAULT NULL,
+  `snapshot_id` varchar(36) DEFAULT NULL,
+  `volume_id` varchar(36) DEFAULT NULL,
+  `volume_size` int(11) DEFAULT NULL,
+  `no_device` tinyint(1) DEFAULT NULL,
+  `connection_info` mediumtext,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `source_type` varchar(255) DEFAULT NULL,
+  `destination_type` varchar(255) DEFAULT NULL,
+  `guest_format` varchar(255) DEFAULT NULL,
+  `device_type` varchar(255) DEFAULT NULL,
+  `disk_bus` varchar(255) DEFAULT NULL,
+  `boot_index` int(11) DEFAULT NULL,
+  `image_id` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `snapshot_id` (`snapshot_id`),
+  KEY `volume_id` (`volume_id`),
+  KEY `block_device_mapping_instance_uuid_idx` (`instance_uuid`),
+  KEY `block_device_mapping_instance_uuid_device_name_idx` (`instance_uuid`,`device_name`),
+  KEY `block_device_mapping_instance_uuid_virtual_name_device_name_idx` (`instance_uuid`,`device_name`),
+  KEY `block_device_mapping_instance_uuid_volume_id_idx` (`instance_uuid`,`volume_id`),
+  CONSTRAINT `block_device_mapping_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `bw_usage_cache`
+--
+
+DROP TABLE IF EXISTS `bw_usage_cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bw_usage_cache` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `start_period` datetime NOT NULL,
+  `last_refreshed` datetime DEFAULT NULL,
+  `bw_in` bigint(20) DEFAULT NULL,
+  `bw_out` bigint(20) DEFAULT NULL,
+  `mac` varchar(255) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `last_ctr_in` bigint(20) DEFAULT NULL,
+  `last_ctr_out` bigint(20) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bw_usage_cache_uuid_start_period_idx` (`uuid`,`start_period`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cells`
+--
+
+DROP TABLE IF EXISTS `cells`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cells` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `api_url` varchar(255) DEFAULT NULL,
+  `weight_offset` float DEFAULT NULL,
+  `weight_scale` float DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `is_parent` tinyint(1) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `transport_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_cells0name0deleted` (`name`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `certificates`
+--
+
+DROP TABLE IF EXISTS `certificates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `certificates` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `certificates_project_id_deleted_idx` (`project_id`,`deleted`),
+  KEY `certificates_user_id_deleted_idx` (`user_id`,`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `compute_node_stats`
+--
+
+DROP TABLE IF EXISTS `compute_node_stats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `compute_node_stats` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `compute_node_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_compute_node_stats_compute_node_id` (`compute_node_id`),
+  KEY `compute_node_stats_node_id_and_deleted_idx` (`compute_node_id`,`deleted`),
+  CONSTRAINT `fk_compute_node_stats_compute_node_id` FOREIGN KEY (`compute_node_id`) REFERENCES `compute_nodes` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1588 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `compute_nodes`
+--
+
+DROP TABLE IF EXISTS `compute_nodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `compute_nodes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` int(11) NOT NULL,
+  `vcpus` int(11) NOT NULL,
+  `memory_mb` int(11) NOT NULL,
+  `local_gb` int(11) NOT NULL,
+  `vcpus_used` int(11) NOT NULL,
+  `memory_mb_used` int(11) NOT NULL,
+  `local_gb_used` int(11) NOT NULL,
+  `hypervisor_type` mediumtext NOT NULL,
+  `hypervisor_version` int(11) NOT NULL,
+  `cpu_info` mediumtext NOT NULL,
+  `disk_available_least` int(11) DEFAULT NULL,
+  `free_ram_mb` int(11) DEFAULT NULL,
+  `free_disk_gb` int(11) DEFAULT NULL,
+  `current_workload` int(11) DEFAULT NULL,
+  `running_vms` int(11) DEFAULT NULL,
+  `hypervisor_hostname` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `host_ip` varchar(39) DEFAULT NULL,
+  `supported_instances` text,
+  `pci_stats` text,
+  PRIMARY KEY (`id`),
+  KEY `fk_compute_nodes_service_id` (`service_id`),
+  CONSTRAINT `fk_compute_nodes_service_id` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `console_pools`
+--
+
+DROP TABLE IF EXISTS `console_pools`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `console_pools` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(39) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `console_type` varchar(255) DEFAULT NULL,
+  `public_hostname` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `compute_host` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_console_pools0host0console_type0compute_host0deleted` (`host`,`console_type`,`compute_host`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `consoles`
+--
+
+DROP TABLE IF EXISTS `consoles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `consoles` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_name` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `port` int(11) DEFAULT NULL,
+  `pool_id` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `pool_id` (`pool_id`),
+  KEY `consoles_instance_uuid_idx` (`instance_uuid`),
+  CONSTRAINT `consoles_ibfk_1` FOREIGN KEY (`pool_id`) REFERENCES `console_pools` (`id`),
+  CONSTRAINT `consoles_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dns_domains`
+--
+
+DROP TABLE IF EXISTS `dns_domains`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dns_domains` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `domain` varchar(255) NOT NULL,
+  `scope` varchar(255) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`domain`),
+  KEY `project_id` (`project_id`),
+  KEY `dns_domains_domain_deleted_idx` (`domain`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dump_compute_node_stats`
+--
+
+DROP TABLE IF EXISTS `dump_compute_node_stats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dump_compute_node_stats` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `compute_node_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dump_compute_nodes`
+--
+
+DROP TABLE IF EXISTS `dump_compute_nodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dump_compute_nodes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` int(11) NOT NULL,
+  `vcpus` int(11) NOT NULL,
+  `memory_mb` int(11) NOT NULL,
+  `local_gb` int(11) NOT NULL,
+  `vcpus_used` int(11) NOT NULL,
+  `memory_mb_used` int(11) NOT NULL,
+  `local_gb_used` int(11) NOT NULL,
+  `hypervisor_type` mediumtext NOT NULL,
+  `hypervisor_version` int(11) NOT NULL,
+  `cpu_info` mediumtext NOT NULL,
+  `disk_available_least` int(11) DEFAULT NULL,
+  `free_ram_mb` int(11) DEFAULT NULL,
+  `free_disk_gb` int(11) DEFAULT NULL,
+  `current_workload` int(11) DEFAULT NULL,
+  `running_vms` int(11) DEFAULT NULL,
+  `hypervisor_hostname` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `host_ip` varchar(39) DEFAULT NULL,
+  `supported_instances` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dump_instance_actions`
+--
+
+DROP TABLE IF EXISTS `dump_instance_actions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dump_instance_actions` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `action` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `request_id` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dump_instance_faults`
+--
+
+DROP TABLE IF EXISTS `dump_instance_faults`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dump_instance_faults` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `code` int(11) NOT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `details` mediumtext,
+  `host` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `dump_migrations`
+--
+
+DROP TABLE IF EXISTS `dump_migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dump_migrations` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `source_compute` varchar(255) DEFAULT NULL,
+  `dest_compute` varchar(255) DEFAULT NULL,
+  `dest_host` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `old_instance_type_id` int(11) DEFAULT NULL,
+  `new_instance_type_id` int(11) DEFAULT NULL,
+  `source_node` varchar(255) DEFAULT NULL,
+  `dest_node` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `fixed_ips`
+--
+
+DROP TABLE IF EXISTS `fixed_ips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fixed_ips` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(39) DEFAULT NULL,
+  `network_id` int(11) DEFAULT NULL,
+  `allocated` tinyint(1) DEFAULT NULL,
+  `leased` tinyint(1) DEFAULT NULL,
+  `reserved` tinyint(1) DEFAULT NULL,
+  `virtual_interface_id` int(11) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_fixed_ips0address0deleted` (`address`,`deleted`),
+  KEY `network_id` (`network_id`),
+  KEY `fixed_ips_virtual_interface_id_fkey` (`virtual_interface_id`),
+  KEY `address` (`address`),
+  KEY `fixed_ips_instance_uuid_fkey` (`instance_uuid`),
+  KEY `fixed_ips_host_idx` (`host`),
+  KEY `fixed_ips_network_id_host_deleted_idx` (`network_id`,`host`,`deleted`),
+  KEY `fixed_ips_address_reserved_network_id_deleted_idx` (`address`,`reserved`,`network_id`,`deleted`),
+  KEY `fixed_ips_deleted_allocated_idx` (`address`,`deleted`,`allocated`),
+  CONSTRAINT `fixed_ips_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `floating_ips`
+--
+
+DROP TABLE IF EXISTS `floating_ips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `floating_ips` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(39) DEFAULT NULL,
+  `fixed_ip_id` int(11) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `auto_assigned` tinyint(1) DEFAULT NULL,
+  `pool` varchar(255) DEFAULT NULL,
+  `interface` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_floating_ips0address0deleted` (`address`,`deleted`),
+  KEY `fixed_ip_id` (`fixed_ip_id`),
+  KEY `floating_ips_host_idx` (`host`),
+  KEY `floating_ips_project_id_idx` (`project_id`),
+  KEY `floating_ips_pool_deleted_fixed_ip_id_project_id_idx` (`pool`,`deleted`,`fixed_ip_id`,`project_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_actions`
+--
+
+DROP TABLE IF EXISTS `instance_actions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_actions` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `action` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `request_id` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `instance_uuid_idx` (`instance_uuid`),
+  KEY `request_id_idx` (`request_id`),
+  CONSTRAINT `fk_instance_actions_instance_uuid` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=565 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_actions_events`
+--
+
+DROP TABLE IF EXISTS `instance_actions_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_actions_events` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event` varchar(255) DEFAULT NULL,
+  `action_id` int(11) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `result` varchar(255) DEFAULT NULL,
+  `traceback` text,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `action_id` (`action_id`),
+  CONSTRAINT `instance_actions_events_ibfk_1` FOREIGN KEY (`action_id`) REFERENCES `instance_actions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=827 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_faults`
+--
+
+DROP TABLE IF EXISTS `instance_faults`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_faults` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `code` int(11) NOT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `details` mediumtext,
+  `host` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `instance_faults_host_idx` (`host`),
+  KEY `instance_faults_instance_uuid_deleted_created_at_idx` (`instance_uuid`,`deleted`,`created_at`),
+  CONSTRAINT `fk_instance_faults_instance_uuid` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_group_member`
+--
+
+DROP TABLE IF EXISTS `instance_group_member`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_group_member` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_id` varchar(255) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `group_id` (`group_id`),
+  KEY `instance_group_member_instance_idx` (`instance_id`),
+  CONSTRAINT `instance_group_member_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `instance_groups` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_group_metadata`
+--
+
+DROP TABLE IF EXISTS `instance_group_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_group_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `group_id` (`group_id`),
+  KEY `instance_group_metadata_key_idx` (`key`),
+  CONSTRAINT `instance_group_metadata_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `instance_groups` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_group_policy`
+--
+
+DROP TABLE IF EXISTS `instance_group_policy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_group_policy` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `policy` varchar(255) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `group_id` (`group_id`),
+  KEY `instance_group_policy_policy_idx` (`policy`),
+  CONSTRAINT `instance_group_policy_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `instance_groups` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_groups`
+--
+
+DROP TABLE IF EXISTS `instance_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_groups` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_instance_groups0uuid0deleted` (`uuid`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_id_mappings`
+--
+
+DROP TABLE IF EXISTS `instance_id_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_id_mappings` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_instance_id_mappings_uuid` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_info_caches`
+--
+
+DROP TABLE IF EXISTS `instance_info_caches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_info_caches` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `network_info` mediumtext,
+  `instance_uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_instance_info_caches0instance_uuid` (`instance_uuid`),
+  CONSTRAINT `instance_info_caches_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_metadata`
+--
+
+DROP TABLE IF EXISTS `instance_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `instance_metadata_instance_uuid_idx` (`instance_uuid`),
+  CONSTRAINT `instance_metadata_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_system_metadata`
+--
+
+DROP TABLE IF EXISTS `instance_system_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_system_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_uuid` varchar(36) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `instance_uuid` (`instance_uuid`),
+  CONSTRAINT `instance_system_metadata_ibfk_1` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=4222 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_type_extra_specs`
+--
+
+DROP TABLE IF EXISTS `instance_type_extra_specs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_type_extra_specs` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_type_id` int(11) NOT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_instance_type_extra_specs0instance_type_id0key0deleted` (`instance_type_id`,`key`,`deleted`),
+  KEY `instance_type_extra_specs_instance_type_id_key_idx` (`instance_type_id`,`key`),
+  CONSTRAINT `instance_type_extra_specs_ibfk_1` FOREIGN KEY (`instance_type_id`) REFERENCES `instance_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_type_projects`
+--
+
+DROP TABLE IF EXISTS `instance_type_projects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_type_projects` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_type_id` int(11) NOT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_instance_type_projects0instance_type_id0project_id0deleted` (`instance_type_id`,`project_id`,`deleted`),
+  KEY `instance_type_id` (`instance_type_id`),
+  CONSTRAINT `instance_type_projects_ibfk_1` FOREIGN KEY (`instance_type_id`) REFERENCES `instance_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instance_types`
+--
+
+DROP TABLE IF EXISTS `instance_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instance_types` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `memory_mb` int(11) NOT NULL,
+  `vcpus` int(11) NOT NULL,
+  `swap` int(11) NOT NULL,
+  `vcpu_weight` int(11) DEFAULT NULL,
+  `flavorid` varchar(255) DEFAULT NULL,
+  `rxtx_factor` float DEFAULT NULL,
+  `root_gb` int(11) DEFAULT NULL,
+  `ephemeral_gb` int(11) DEFAULT NULL,
+  `disabled` tinyint(1) DEFAULT NULL,
+  `is_public` tinyint(1) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_instance_types0name0deleted` (`name`,`deleted`),
+  UNIQUE KEY `uniq_instance_types0flavorid0deleted` (`flavorid`,`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `instances`
+--
+
+DROP TABLE IF EXISTS `instances`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `instances` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `internal_id` int(11) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `image_ref` varchar(255) DEFAULT NULL,
+  `kernel_id` varchar(255) DEFAULT NULL,
+  `ramdisk_id` varchar(255) DEFAULT NULL,
+  `launch_index` int(11) DEFAULT NULL,
+  `key_name` varchar(255) DEFAULT NULL,
+  `key_data` mediumtext,
+  `power_state` int(11) DEFAULT NULL,
+  `vm_state` varchar(255) DEFAULT NULL,
+  `memory_mb` int(11) DEFAULT NULL,
+  `vcpus` int(11) DEFAULT NULL,
+  `hostname` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `user_data` mediumtext,
+  `reservation_id` varchar(255) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `launched_at` datetime DEFAULT NULL,
+  `terminated_at` datetime DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `display_description` varchar(255) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  `locked` tinyint(1) DEFAULT NULL,
+  `os_type` varchar(255) DEFAULT NULL,
+  `launched_on` mediumtext,
+  `instance_type_id` int(11) DEFAULT NULL,
+  `vm_mode` varchar(255) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `architecture` varchar(255) DEFAULT NULL,
+  `root_device_name` varchar(255) DEFAULT NULL,
+  `access_ip_v4` varchar(39) DEFAULT NULL,
+  `access_ip_v6` varchar(39) DEFAULT NULL,
+  `config_drive` varchar(255) DEFAULT NULL,
+  `task_state` varchar(255) DEFAULT NULL,
+  `default_ephemeral_device` varchar(255) DEFAULT NULL,
+  `default_swap_device` varchar(255) DEFAULT NULL,
+  `progress` int(11) DEFAULT NULL,
+  `auto_disk_config` tinyint(1) DEFAULT NULL,
+  `shutdown_terminate` tinyint(1) DEFAULT NULL,
+  `disable_terminate` tinyint(1) DEFAULT NULL,
+  `root_gb` int(11) DEFAULT NULL,
+  `ephemeral_gb` int(11) DEFAULT NULL,
+  `cell_name` varchar(255) DEFAULT NULL,
+  `node` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `locked_by` enum('owner','admin') DEFAULT NULL,
+  `cleaned` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uuid` (`uuid`),
+  KEY `project_id` (`project_id`),
+  KEY `instances_reservation_id_idx` (`reservation_id`),
+  KEY `instances_terminated_at_launched_at_idx` (`terminated_at`,`launched_at`),
+  KEY `instances_task_state_updated_at_idx` (`task_state`,`updated_at`),
+  KEY `instances_host_deleted_idx` (`host`,`deleted`),
+  KEY `instances_uuid_deleted_idx` (`uuid`,`deleted`),
+  KEY `instances_host_node_deleted_idx` (`host`,`node`,`deleted`),
+  KEY `instances_host_deleted_cleaned_idx` (`host`,`deleted`,`cleaned`)
+) ENGINE=InnoDB AUTO_INCREMENT=263 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `iscsi_targets`
+--
+
+DROP TABLE IF EXISTS `iscsi_targets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `iscsi_targets` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_num` int(11) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `volume_id` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `iscsi_targets_volume_id_fkey` (`volume_id`),
+  KEY `iscsi_targets_host_idx` (`host`),
+  KEY `iscsi_targets_host_volume_id_deleted_idx` (`host`,`volume_id`,`deleted`),
+  CONSTRAINT `iscsi_targets_volume_id_fkey` FOREIGN KEY (`volume_id`) REFERENCES `volumes` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `key_pairs`
+--
+
+DROP TABLE IF EXISTS `key_pairs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `key_pairs` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `fingerprint` varchar(255) DEFAULT NULL,
+  `public_key` mediumtext,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_key_pairs0user_id0name0deleted` (`user_id`,`name`,`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `migrate_version`
+--
+
+DROP TABLE IF EXISTS `migrate_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `migrate_version` (
+  `repository_id` varchar(250) NOT NULL,
+  `repository_path` mediumtext,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`repository_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `migrations` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `source_compute` varchar(255) DEFAULT NULL,
+  `dest_compute` varchar(255) DEFAULT NULL,
+  `dest_host` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `old_instance_type_id` int(11) DEFAULT NULL,
+  `new_instance_type_id` int(11) DEFAULT NULL,
+  `source_node` varchar(255) DEFAULT NULL,
+  `dest_node` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `migrations_by_host_nodes_and_status_idx` (`deleted`,`source_compute`(100),`dest_compute`(100),`source_node`(100),`dest_node`(100),`status`),
+  KEY `migrations_instance_uuid_and_status_idx` (`deleted`,`instance_uuid`,`status`),
+  KEY `fk_migrations_instance_uuid` (`instance_uuid`),
+  CONSTRAINT `fk_migrations_instance_uuid` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `networks`
+--
+
+DROP TABLE IF EXISTS `networks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `networks` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `injected` tinyint(1) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  `netmask` varchar(39) DEFAULT NULL,
+  `bridge` varchar(255) DEFAULT NULL,
+  `gateway` varchar(39) DEFAULT NULL,
+  `broadcast` varchar(39) DEFAULT NULL,
+  `dns1` varchar(39) DEFAULT NULL,
+  `vlan` int(11) DEFAULT NULL,
+  `vpn_public_address` varchar(39) DEFAULT NULL,
+  `vpn_public_port` int(11) DEFAULT NULL,
+  `vpn_private_address` varchar(39) DEFAULT NULL,
+  `dhcp_start` varchar(39) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `cidr_v6` varchar(43) DEFAULT NULL,
+  `gateway_v6` varchar(39) DEFAULT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `netmask_v6` varchar(39) DEFAULT NULL,
+  `bridge_interface` varchar(255) DEFAULT NULL,
+  `multi_host` tinyint(1) DEFAULT NULL,
+  `dns2` varchar(39) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `priority` int(11) DEFAULT NULL,
+  `rxtx_base` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_networks0vlan0deleted` (`vlan`,`deleted`),
+  KEY `networks_host_idx` (`host`),
+  KEY `networks_cidr_v6_idx` (`cidr_v6`),
+  KEY `networks_bridge_deleted_idx` (`bridge`,`deleted`),
+  KEY `networks_project_id_deleted_idx` (`project_id`,`deleted`),
+  KEY `networks_uuid_project_id_deleted_idx` (`uuid`,`project_id`,`deleted`),
+  KEY `networks_vlan_deleted_idx` (`vlan`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `pci_devices`
+--
+
+DROP TABLE IF EXISTS `pci_devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pci_devices` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `compute_node_id` int(11) NOT NULL,
+  `address` varchar(12) NOT NULL,
+  `product_id` varchar(4) DEFAULT NULL,
+  `vendor_id` varchar(4) DEFAULT NULL,
+  `dev_type` varchar(8) DEFAULT NULL,
+  `dev_id` varchar(255) DEFAULT NULL,
+  `label` varchar(255) NOT NULL,
+  `status` varchar(36) NOT NULL,
+  `extra_info` text,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_pci_devices0compute_node_id0address0deleted` (`compute_node_id`,`address`,`deleted`),
+  KEY `ix_pci_devices_instance_uuid_deleted` (`instance_uuid`,`deleted`),
+  KEY `ix_pci_devices_compute_node_id_deleted` (`compute_node_id`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `project_user_quotas`
+--
+
+DROP TABLE IF EXISTS `project_user_quotas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `project_user_quotas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `user_id` varchar(255) NOT NULL,
+  `project_id` varchar(255) NOT NULL,
+  `resource` varchar(25) NOT NULL,
+  `hard_limit` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_project_user_quotas0user_id0project_id0resource0deleted` (`user_id`,`project_id`,`resource`,`deleted`),
+  KEY `project_user_quotas_project_id_deleted_idx` (`project_id`,`deleted`),
+  KEY `project_user_quotas_user_id_deleted_idx` (`user_id`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `provider_fw_rules`
+--
+
+DROP TABLE IF EXISTS `provider_fw_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `provider_fw_rules` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `protocol` varchar(5) DEFAULT NULL,
+  `from_port` int(11) DEFAULT NULL,
+  `to_port` int(11) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `quota_classes`
+--
+
+DROP TABLE IF EXISTS `quota_classes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quota_classes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `class_name` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) DEFAULT NULL,
+  `hard_limit` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_quota_classes_class_name` (`class_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `quota_usages`
+--
+
+DROP TABLE IF EXISTS `quota_usages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quota_usages` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) DEFAULT NULL,
+  `in_use` int(11) NOT NULL,
+  `reserved` int(11) NOT NULL,
+  `until_refresh` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_quota_usages_project_id` (`project_id`),
+  KEY `ix_quota_usages_user_id_deleted` (`user_id`,`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `quotas`
+--
+
+DROP TABLE IF EXISTS `quotas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quotas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) NOT NULL,
+  `hard_limit` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_quotas0project_id0resource0deleted` (`project_id`,`resource`,`deleted`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reservations`
+--
+
+DROP TABLE IF EXISTS `reservations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `reservations` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `usage_id` int(11) NOT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) DEFAULT NULL,
+  `delta` int(11) NOT NULL,
+  `expire` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `usage_id` (`usage_id`),
+  KEY `ix_reservations_project_id` (`project_id`),
+  KEY `ix_reservations_user_id_deleted` (`user_id`,`deleted`),
+  KEY `reservations_uuid_idx` (`uuid`),
+  CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`usage_id`) REFERENCES `quota_usages` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1582 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `s3_images`
+--
+
+DROP TABLE IF EXISTS `s3_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `s3_images` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `security_group_default_rules`
+--
+
+DROP TABLE IF EXISTS `security_group_default_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `security_group_default_rules` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `protocol` varchar(5) DEFAULT NULL,
+  `from_port` int(11) DEFAULT NULL,
+  `to_port` int(11) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `security_group_instance_association`
+--
+
+DROP TABLE IF EXISTS `security_group_instance_association`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `security_group_instance_association` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `security_group_id` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `security_group_id` (`security_group_id`),
+  KEY `security_group_instance_association_instance_uuid_idx` (`instance_uuid`),
+  CONSTRAINT `security_group_instance_association_ibfk_1` FOREIGN KEY (`security_group_id`) REFERENCES `security_groups` (`id`),
+  CONSTRAINT `security_group_instance_association_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `security_group_rules`
+--
+
+DROP TABLE IF EXISTS `security_group_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `security_group_rules` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent_group_id` int(11) DEFAULT NULL,
+  `protocol` varchar(255) DEFAULT NULL,
+  `from_port` int(11) DEFAULT NULL,
+  `to_port` int(11) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `parent_group_id` (`parent_group_id`),
+  KEY `group_id` (`group_id`),
+  CONSTRAINT `security_group_rules_ibfk_1` FOREIGN KEY (`parent_group_id`) REFERENCES `security_groups` (`id`),
+  CONSTRAINT `security_group_rules_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `security_groups` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `security_groups`
+--
+
+DROP TABLE IF EXISTS `security_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `security_groups` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_security_groups0project_id0name0deleted` (`project_id`,`name`,`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `services`
+--
+
+DROP TABLE IF EXISTS `services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `services` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `host` varchar(255) DEFAULT NULL,
+  `binary` varchar(255) DEFAULT NULL,
+  `topic` varchar(255) DEFAULT NULL,
+  `report_count` int(11) NOT NULL,
+  `disabled` tinyint(1) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `disabled_reason` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_services0host0topic0deleted` (`host`,`topic`,`deleted`),
+  UNIQUE KEY `uniq_services0host0binary0deleted` (`host`,`binary`,`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_agent_builds`
+--
+
+DROP TABLE IF EXISTS `shadow_agent_builds`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_agent_builds` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hypervisor` varchar(255) DEFAULT NULL,
+  `os` varchar(255) DEFAULT NULL,
+  `architecture` varchar(255) DEFAULT NULL,
+  `version` varchar(255) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `md5hash` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_aggregate_hosts`
+--
+
+DROP TABLE IF EXISTS `shadow_aggregate_hosts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_aggregate_hosts` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `host` varchar(255) DEFAULT NULL,
+  `aggregate_id` int(11) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_aggregate_metadata`
+--
+
+DROP TABLE IF EXISTS `shadow_aggregate_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_aggregate_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aggregate_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_aggregates`
+--
+
+DROP TABLE IF EXISTS `shadow_aggregates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_aggregates` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_block_device_mapping`
+--
+
+DROP TABLE IF EXISTS `shadow_block_device_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_block_device_mapping` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_name` varchar(255) DEFAULT NULL,
+  `delete_on_termination` tinyint(1) DEFAULT NULL,
+  `snapshot_id` varchar(36) DEFAULT NULL,
+  `volume_id` varchar(36) DEFAULT NULL,
+  `volume_size` int(11) DEFAULT NULL,
+  `no_device` tinyint(1) DEFAULT NULL,
+  `connection_info` mediumtext,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `source_type` varchar(255) DEFAULT NULL,
+  `destination_type` varchar(255) DEFAULT NULL,
+  `guest_format` varchar(255) DEFAULT NULL,
+  `device_type` varchar(255) DEFAULT NULL,
+  `disk_bus` varchar(255) DEFAULT NULL,
+  `boot_index` int(11) DEFAULT NULL,
+  `image_id` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_bw_usage_cache`
+--
+
+DROP TABLE IF EXISTS `shadow_bw_usage_cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_bw_usage_cache` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `start_period` datetime NOT NULL,
+  `last_refreshed` datetime DEFAULT NULL,
+  `bw_in` bigint(20) DEFAULT NULL,
+  `bw_out` bigint(20) DEFAULT NULL,
+  `mac` varchar(255) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `last_ctr_in` bigint(20) DEFAULT NULL,
+  `last_ctr_out` bigint(20) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_cells`
+--
+
+DROP TABLE IF EXISTS `shadow_cells`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_cells` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `api_url` varchar(255) DEFAULT NULL,
+  `weight_offset` float DEFAULT NULL,
+  `weight_scale` float DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `is_parent` tinyint(1) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `transport_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_certificates`
+--
+
+DROP TABLE IF EXISTS `shadow_certificates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_certificates` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_compute_node_stats`
+--
+
+DROP TABLE IF EXISTS `shadow_compute_node_stats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_compute_node_stats` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `compute_node_id` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_compute_nodes`
+--
+
+DROP TABLE IF EXISTS `shadow_compute_nodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_compute_nodes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` int(11) NOT NULL,
+  `vcpus` int(11) NOT NULL,
+  `memory_mb` int(11) NOT NULL,
+  `local_gb` int(11) NOT NULL,
+  `vcpus_used` int(11) NOT NULL,
+  `memory_mb_used` int(11) NOT NULL,
+  `local_gb_used` int(11) NOT NULL,
+  `hypervisor_type` mediumtext NOT NULL,
+  `hypervisor_version` int(11) NOT NULL,
+  `cpu_info` mediumtext NOT NULL,
+  `disk_available_least` int(11) DEFAULT NULL,
+  `free_ram_mb` int(11) DEFAULT NULL,
+  `free_disk_gb` int(11) DEFAULT NULL,
+  `current_workload` int(11) DEFAULT NULL,
+  `running_vms` int(11) DEFAULT NULL,
+  `hypervisor_hostname` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `host_ip` varchar(39) DEFAULT NULL,
+  `supported_instances` text,
+  `pci_stats` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_console_pools`
+--
+
+DROP TABLE IF EXISTS `shadow_console_pools`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_console_pools` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(39) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `console_type` varchar(255) DEFAULT NULL,
+  `public_hostname` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `compute_host` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_consoles`
+--
+
+DROP TABLE IF EXISTS `shadow_consoles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_consoles` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_name` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `port` int(11) DEFAULT NULL,
+  `pool_id` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_dns_domains`
+--
+
+DROP TABLE IF EXISTS `shadow_dns_domains`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_dns_domains` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `domain` varchar(255) NOT NULL,
+  `scope` varchar(255) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`domain`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_fixed_ips`
+--
+
+DROP TABLE IF EXISTS `shadow_fixed_ips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_fixed_ips` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(39) DEFAULT NULL,
+  `network_id` int(11) DEFAULT NULL,
+  `allocated` tinyint(1) DEFAULT NULL,
+  `leased` tinyint(1) DEFAULT NULL,
+  `reserved` tinyint(1) DEFAULT NULL,
+  `virtual_interface_id` int(11) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_floating_ips`
+--
+
+DROP TABLE IF EXISTS `shadow_floating_ips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_floating_ips` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(39) DEFAULT NULL,
+  `fixed_ip_id` int(11) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `auto_assigned` tinyint(1) DEFAULT NULL,
+  `pool` varchar(255) DEFAULT NULL,
+  `interface` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_actions`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_actions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_actions` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `action` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `request_id` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_actions_events`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_actions_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_actions_events` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event` varchar(255) DEFAULT NULL,
+  `action_id` int(11) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `finish_time` datetime DEFAULT NULL,
+  `result` varchar(255) DEFAULT NULL,
+  `traceback` text,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_faults`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_faults`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_faults` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `code` int(11) NOT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `details` mediumtext,
+  `host` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_group_member`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_group_member`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_group_member` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_id` varchar(255) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_group_metadata`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_group_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_group_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_group_policy`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_group_policy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_group_policy` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `policy` varchar(255) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_groups`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_groups` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_id_mappings`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_id_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_id_mappings` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_info_caches`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_info_caches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_info_caches` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `network_info` mediumtext,
+  `instance_uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_metadata`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_system_metadata`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_system_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_system_metadata` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_uuid` varchar(36) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_type_extra_specs`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_type_extra_specs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_type_extra_specs` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_type_id` int(11) NOT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_type_projects`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_type_projects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_type_projects` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_type_id` int(11) NOT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instance_types`
+--
+
+DROP TABLE IF EXISTS `shadow_instance_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instance_types` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `memory_mb` int(11) NOT NULL,
+  `vcpus` int(11) NOT NULL,
+  `swap` int(11) NOT NULL,
+  `vcpu_weight` int(11) DEFAULT NULL,
+  `flavorid` varchar(255) DEFAULT NULL,
+  `rxtx_factor` float DEFAULT NULL,
+  `root_gb` int(11) DEFAULT NULL,
+  `ephemeral_gb` int(11) DEFAULT NULL,
+  `disabled` tinyint(1) DEFAULT NULL,
+  `is_public` tinyint(1) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_instances`
+--
+
+DROP TABLE IF EXISTS `shadow_instances`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_instances` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `internal_id` int(11) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `image_ref` varchar(255) DEFAULT NULL,
+  `kernel_id` varchar(255) DEFAULT NULL,
+  `ramdisk_id` varchar(255) DEFAULT NULL,
+  `launch_index` int(11) DEFAULT NULL,
+  `key_name` varchar(255) DEFAULT NULL,
+  `key_data` mediumtext,
+  `power_state` int(11) DEFAULT NULL,
+  `vm_state` varchar(255) DEFAULT NULL,
+  `memory_mb` int(11) DEFAULT NULL,
+  `vcpus` int(11) DEFAULT NULL,
+  `hostname` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `user_data` mediumtext,
+  `reservation_id` varchar(255) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `launched_at` datetime DEFAULT NULL,
+  `terminated_at` datetime DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `display_description` varchar(255) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  `locked` tinyint(1) DEFAULT NULL,
+  `os_type` varchar(255) DEFAULT NULL,
+  `launched_on` mediumtext,
+  `instance_type_id` int(11) DEFAULT NULL,
+  `vm_mode` varchar(255) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `architecture` varchar(255) DEFAULT NULL,
+  `root_device_name` varchar(255) DEFAULT NULL,
+  `access_ip_v4` varchar(39) DEFAULT NULL,
+  `access_ip_v6` varchar(39) DEFAULT NULL,
+  `config_drive` varchar(255) DEFAULT NULL,
+  `task_state` varchar(255) DEFAULT NULL,
+  `default_ephemeral_device` varchar(255) DEFAULT NULL,
+  `default_swap_device` varchar(255) DEFAULT NULL,
+  `progress` int(11) DEFAULT NULL,
+  `auto_disk_config` tinyint(1) DEFAULT NULL,
+  `shutdown_terminate` tinyint(1) DEFAULT NULL,
+  `disable_terminate` tinyint(1) DEFAULT NULL,
+  `root_gb` int(11) DEFAULT NULL,
+  `ephemeral_gb` int(11) DEFAULT NULL,
+  `cell_name` varchar(255) DEFAULT NULL,
+  `node` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `locked_by` enum('owner','admin') DEFAULT NULL,
+  `cleaned` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_iscsi_targets`
+--
+
+DROP TABLE IF EXISTS `shadow_iscsi_targets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_iscsi_targets` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_num` int(11) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `volume_id` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_key_pairs`
+--
+
+DROP TABLE IF EXISTS `shadow_key_pairs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_key_pairs` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `fingerprint` varchar(255) DEFAULT NULL,
+  `public_key` mediumtext,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_migrate_version`
+--
+
+DROP TABLE IF EXISTS `shadow_migrate_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_migrate_version` (
+  `repository_id` varchar(250) NOT NULL,
+  `repository_path` mediumtext,
+  `version` int(11) DEFAULT NULL,
+  PRIMARY KEY (`repository_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_migrations`
+--
+
+DROP TABLE IF EXISTS `shadow_migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_migrations` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `source_compute` varchar(255) DEFAULT NULL,
+  `dest_compute` varchar(255) DEFAULT NULL,
+  `dest_host` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `old_instance_type_id` int(11) DEFAULT NULL,
+  `new_instance_type_id` int(11) DEFAULT NULL,
+  `source_node` varchar(255) DEFAULT NULL,
+  `dest_node` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_networks`
+--
+
+DROP TABLE IF EXISTS `shadow_networks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_networks` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `injected` tinyint(1) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  `netmask` varchar(39) DEFAULT NULL,
+  `bridge` varchar(255) DEFAULT NULL,
+  `gateway` varchar(39) DEFAULT NULL,
+  `broadcast` varchar(39) DEFAULT NULL,
+  `dns1` varchar(39) DEFAULT NULL,
+  `vlan` int(11) DEFAULT NULL,
+  `vpn_public_address` varchar(39) DEFAULT NULL,
+  `vpn_public_port` int(11) DEFAULT NULL,
+  `vpn_private_address` varchar(39) DEFAULT NULL,
+  `dhcp_start` varchar(39) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `cidr_v6` varchar(43) DEFAULT NULL,
+  `gateway_v6` varchar(39) DEFAULT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `netmask_v6` varchar(39) DEFAULT NULL,
+  `bridge_interface` varchar(255) DEFAULT NULL,
+  `multi_host` tinyint(1) DEFAULT NULL,
+  `dns2` varchar(39) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `priority` int(11) DEFAULT NULL,
+  `rxtx_base` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_pci_devices`
+--
+
+DROP TABLE IF EXISTS `shadow_pci_devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_pci_devices` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `compute_node_id` int(11) NOT NULL,
+  `address` varchar(12) NOT NULL,
+  `product_id` varchar(4) DEFAULT NULL,
+  `vendor_id` varchar(4) DEFAULT NULL,
+  `dev_type` varchar(8) DEFAULT NULL,
+  `dev_id` varchar(255) DEFAULT NULL,
+  `label` varchar(255) NOT NULL,
+  `status` varchar(36) NOT NULL,
+  `extra_info` text,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_project_user_quotas`
+--
+
+DROP TABLE IF EXISTS `shadow_project_user_quotas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_project_user_quotas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `user_id` varchar(255) NOT NULL,
+  `project_id` varchar(255) NOT NULL,
+  `resource` varchar(25) NOT NULL,
+  `hard_limit` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_provider_fw_rules`
+--
+
+DROP TABLE IF EXISTS `shadow_provider_fw_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_provider_fw_rules` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `protocol` varchar(5) DEFAULT NULL,
+  `from_port` int(11) DEFAULT NULL,
+  `to_port` int(11) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_quota_classes`
+--
+
+DROP TABLE IF EXISTS `shadow_quota_classes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_quota_classes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `class_name` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) DEFAULT NULL,
+  `hard_limit` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_quota_usages`
+--
+
+DROP TABLE IF EXISTS `shadow_quota_usages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_quota_usages` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) DEFAULT NULL,
+  `in_use` int(11) NOT NULL,
+  `reserved` int(11) NOT NULL,
+  `until_refresh` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_quotas`
+--
+
+DROP TABLE IF EXISTS `shadow_quotas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_quotas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) NOT NULL,
+  `hard_limit` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_reservations`
+--
+
+DROP TABLE IF EXISTS `shadow_reservations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_reservations` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `usage_id` int(11) NOT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `resource` varchar(255) DEFAULT NULL,
+  `delta` int(11) NOT NULL,
+  `expire` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_s3_images`
+--
+
+DROP TABLE IF EXISTS `shadow_s3_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_s3_images` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_security_group_default_rules`
+--
+
+DROP TABLE IF EXISTS `shadow_security_group_default_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_security_group_default_rules` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `protocol` varchar(5) DEFAULT NULL,
+  `from_port` int(11) DEFAULT NULL,
+  `to_port` int(11) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_security_group_instance_association`
+--
+
+DROP TABLE IF EXISTS `shadow_security_group_instance_association`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_security_group_instance_association` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `security_group_id` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_security_group_rules`
+--
+
+DROP TABLE IF EXISTS `shadow_security_group_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_security_group_rules` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent_group_id` int(11) DEFAULT NULL,
+  `protocol` varchar(255) DEFAULT NULL,
+  `from_port` int(11) DEFAULT NULL,
+  `to_port` int(11) DEFAULT NULL,
+  `cidr` varchar(43) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_security_groups`
+--
+
+DROP TABLE IF EXISTS `shadow_security_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_security_groups` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_services`
+--
+
+DROP TABLE IF EXISTS `shadow_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_services` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `host` varchar(255) DEFAULT NULL,
+  `binary` varchar(255) DEFAULT NULL,
+  `topic` varchar(255) DEFAULT NULL,
+  `report_count` int(11) NOT NULL,
+  `disabled` tinyint(1) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `disabled_reason` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_snapshot_id_mappings`
+--
+
+DROP TABLE IF EXISTS `shadow_snapshot_id_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_snapshot_id_mappings` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_snapshots`
+--
+
+DROP TABLE IF EXISTS `shadow_snapshots`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_snapshots` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` varchar(36) NOT NULL,
+  `volume_id` varchar(36) NOT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `progress` varchar(255) DEFAULT NULL,
+  `volume_size` int(11) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `display_description` varchar(255) DEFAULT NULL,
+  `deleted` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_task_log`
+--
+
+DROP TABLE IF EXISTS `shadow_task_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_task_log` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_name` varchar(255) NOT NULL,
+  `state` varchar(255) NOT NULL,
+  `host` varchar(255) NOT NULL,
+  `period_beginning` datetime NOT NULL,
+  `period_ending` datetime NOT NULL,
+  `message` varchar(255) NOT NULL,
+  `task_items` int(11) DEFAULT NULL,
+  `errors` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_virtual_interfaces`
+--
+
+DROP TABLE IF EXISTS `shadow_virtual_interfaces`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_virtual_interfaces` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(255) DEFAULT NULL,
+  `network_id` int(11) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_volume_id_mappings`
+--
+
+DROP TABLE IF EXISTS `shadow_volume_id_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_volume_id_mappings` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_volume_usage_cache`
+--
+
+DROP TABLE IF EXISTS `shadow_volume_usage_cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_volume_usage_cache` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `volume_id` varchar(36) NOT NULL,
+  `tot_last_refreshed` datetime DEFAULT NULL,
+  `tot_reads` bigint(20) DEFAULT NULL,
+  `tot_read_bytes` bigint(20) DEFAULT NULL,
+  `tot_writes` bigint(20) DEFAULT NULL,
+  `tot_write_bytes` bigint(20) DEFAULT NULL,
+  `curr_last_refreshed` datetime DEFAULT NULL,
+  `curr_reads` bigint(20) DEFAULT NULL,
+  `curr_read_bytes` bigint(20) DEFAULT NULL,
+  `curr_writes` bigint(20) DEFAULT NULL,
+  `curr_write_bytes` bigint(20) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `project_id` varchar(36) DEFAULT NULL,
+  `user_id` varchar(36) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `shadow_volumes`
+--
+
+DROP TABLE IF EXISTS `shadow_volumes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `shadow_volumes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` varchar(36) NOT NULL,
+  `ec2_id` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `size` int(11) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  `mountpoint` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `attach_status` varchar(255) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `launched_at` datetime DEFAULT NULL,
+  `terminated_at` datetime DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `display_description` varchar(255) DEFAULT NULL,
+  `provider_location` varchar(256) DEFAULT NULL,
+  `provider_auth` varchar(256) DEFAULT NULL,
+  `snapshot_id` varchar(36) DEFAULT NULL,
+  `volume_type_id` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `attach_time` datetime DEFAULT NULL,
+  `deleted` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `snapshot_id_mappings`
+--
+
+DROP TABLE IF EXISTS `snapshot_id_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `snapshot_id_mappings` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `snapshots`
+--
+
+DROP TABLE IF EXISTS `snapshots`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `snapshots` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` varchar(36) NOT NULL,
+  `volume_id` varchar(36) NOT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `progress` varchar(255) DEFAULT NULL,
+  `volume_size` int(11) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `display_description` varchar(255) DEFAULT NULL,
+  `deleted` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `task_log`
+--
+
+DROP TABLE IF EXISTS `task_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `task_log` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_name` varchar(255) NOT NULL,
+  `state` varchar(255) NOT NULL,
+  `host` varchar(255) NOT NULL,
+  `period_beginning` datetime NOT NULL,
+  `period_ending` datetime NOT NULL,
+  `message` varchar(255) NOT NULL,
+  `task_items` int(11) DEFAULT NULL,
+  `errors` int(11) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_task_log0task_name0host0period_beginning0period_ending` (`task_name`,`host`,`period_beginning`,`period_ending`),
+  KEY `ix_task_log_period_beginning` (`period_beginning`),
+  KEY `ix_task_log_host` (`host`),
+  KEY `ix_task_log_period_ending` (`period_ending`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `virtual_interfaces`
+--
+
+DROP TABLE IF EXISTS `virtual_interfaces`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `virtual_interfaces` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(255) DEFAULT NULL,
+  `network_id` int(11) DEFAULT NULL,
+  `uuid` varchar(36) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_virtual_interfaces0address0deleted` (`address`,`deleted`),
+  KEY `network_id` (`network_id`),
+  KEY `virtual_interfaces_instance_uuid_fkey` (`instance_uuid`),
+  CONSTRAINT `virtual_interfaces_instance_uuid_fkey` FOREIGN KEY (`instance_uuid`) REFERENCES `instances` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `volume_id_mappings`
+--
+
+DROP TABLE IF EXISTS `volume_id_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `volume_id_mappings` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(36) NOT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `volume_usage_cache`
+--
+
+DROP TABLE IF EXISTS `volume_usage_cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `volume_usage_cache` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `volume_id` varchar(36) NOT NULL,
+  `tot_last_refreshed` datetime DEFAULT NULL,
+  `tot_reads` bigint(20) DEFAULT NULL,
+  `tot_read_bytes` bigint(20) DEFAULT NULL,
+  `tot_writes` bigint(20) DEFAULT NULL,
+  `tot_write_bytes` bigint(20) DEFAULT NULL,
+  `curr_last_refreshed` datetime DEFAULT NULL,
+  `curr_reads` bigint(20) DEFAULT NULL,
+  `curr_read_bytes` bigint(20) DEFAULT NULL,
+  `curr_writes` bigint(20) DEFAULT NULL,
+  `curr_write_bytes` bigint(20) DEFAULT NULL,
+  `deleted` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `project_id` varchar(36) DEFAULT NULL,
+  `user_id` varchar(36) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `volumes`
+--
+
+DROP TABLE IF EXISTS `volumes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `volumes` (
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `id` varchar(36) NOT NULL,
+  `ec2_id` varchar(255) DEFAULT NULL,
+  `user_id` varchar(255) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `size` int(11) DEFAULT NULL,
+  `availability_zone` varchar(255) DEFAULT NULL,
+  `mountpoint` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `attach_status` varchar(255) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `launched_at` datetime DEFAULT NULL,
+  `terminated_at` datetime DEFAULT NULL,
+  `display_name` varchar(255) DEFAULT NULL,
+  `display_description` varchar(255) DEFAULT NULL,
+  `provider_location` varchar(256) DEFAULT NULL,
+  `provider_auth` varchar(256) DEFAULT NULL,
+  `snapshot_id` varchar(36) DEFAULT NULL,
+  `volume_type_id` int(11) DEFAULT NULL,
+  `instance_uuid` varchar(36) DEFAULT NULL,
+  `attach_time` datetime DEFAULT NULL,
+  `deleted` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `volumes_instance_uuid_idx` (`instance_uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2014-02-08 11:22:40

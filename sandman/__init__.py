@@ -7,7 +7,8 @@ a completely new system based on your existing data, using HATEOAS."""
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 app = Flask(__name__)
+app.secret_key = '42'
 db = SQLAlchemy(app)
 from . import sandman
 
-__version__ = '0.6.2'
+__version__ = '0.8.1.2'
