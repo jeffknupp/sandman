@@ -135,8 +135,8 @@ you've been bugging me about, looking something like this:
    :alt: admin interface awesomesauce screenshot
 
    admin interface awesomesauce screenshot
-(If you want to disable the browser from opening automatically each time
-``sandman`` starts, call ``activate`` with ``browser=False``)
+
+(If you want to disable the browser from opening automatically each time ``sandman`` starts, call ``activate`` with ``browser=False``)
 
 If you wanted to specify specific tables that ``sandman`` should make
 available, how do you do that? With this little ditty:
