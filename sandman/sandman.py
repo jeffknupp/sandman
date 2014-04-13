@@ -481,3 +481,24 @@ def get_collection(collection):
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
         start, stop = page * results_per_page, (page +1) * results_per_page
     return collection_response(resources, start, stop)
+
+@app.route('/', methods=['GET'])
+def index():
+    """Return information about each type of resource and how it can be
+    accessed."""
+    classes = []
+    with app.app_context():
+        classes = current_app.class_references.values()
+    if _get_acceptable_response_type() == JSON:
+        meta_data = {}
+        for cls in classes:
+            meta_data[cls.endpoint()] = {'link': '/' + cls.endpoint()}
+        return jsonify(meta_data)
+    else:
+        return render_template('index.html', classes=classes)
+
+@app.route('/<collection>/meta', methods=['GET'])
+def get_meta(collection):
+    cls = endpoint_class(collection)
+    description = cls.meta()
+    return jsonify(description)

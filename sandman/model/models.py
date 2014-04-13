@@ -148,6 +148,14 @@ class Model(object):
             setattr(self, column, None)
         self.from_dict(dictionary)
 
+    @classmethod
+    def meta(cls):
+        attribute_info = {}
+        for name, value in cls.__table__.columns.items():
+            attribute_info[name] = str(value.type)
+
+        return {cls.__name__: attribute_info}
+
     def __str__(self):
         return str(getattr(self, self.primary_key()))
 
