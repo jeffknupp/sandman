@@ -228,6 +228,17 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 
 # Changelog
 
+## Version 0.9.2
+
+* The `meta` endpoint
+    * All resources now have a `/<resource>/meta` endpoint that describes the
+      types of each of their fields (both in HTML and JSON) 
+* The root endpoint
+    * A "root" endpoint (`/`) has been created. It lists all resources
+      registered in the application and includes URLs to their various
+      endpoints. This allows a "dumb" client to navigate the API without knowing
+      URLs beforehand.
+
 ## Version 0.9.1
 
 * Python 3 support!
