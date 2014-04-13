@@ -86,7 +86,7 @@ you should see the following::
 If you were to leave off the filtering term, you would get **all** results from
 the ``Artist`` table. You can also *paginate* these results by specifying ``?page=2``
 or something similar. The number of results returned per page is controlled by
-the config value ``RESULTS_PER_PAGE``, which defualts to 20. 
+the config value ``RESULTS_PER_PAGE``, which defaults to 20. 
 
 A Quick Guide to REST APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,10 +107,11 @@ appropriate *HTTP method*. ``sandman`` supports the following HTTP methods::
 * DELETE
 * PATCH
 
-Support for the ``HEAD`` and ``OPTIONS`` methods is underway.
+(Support for the ``HEAD`` and ``OPTIONS`` methods is underway.)
 
+===============
 Creating Models
----------------
+===============
 
 A ``Model`` represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
@@ -129,10 +130,6 @@ following:
   the dictionary parameter
 - ``links``, ``primary_key``, and ``resource_uri`` methods that provide access
   to various attributes of the object derived from the underlying database model
-
-============
-`models.py`
-============
 
 Creating a `models.py` file allows you to get *even more* out of ``sandman``. In the file,
 create a class that derives from `sandman.models.Model` for each table you want to
@@ -160,17 +157,14 @@ turn into a RESTful resource. Here's a simple example using the Chinook test dat
     activate(browser=False)
 
 
-``sandman`` Advanced Usage
---------------------------
-
 Hooking up Models
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The `__tablename__` attribute is used to tell ``sandman`` which database table
 this class is modeling. It has *no default* and is *required* for all classes.
 
 Providing a custom endpoint
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 In the code above, we created four :class:`sandman.model.models.Model` classes that
 correspond to tables in our database. If we wanted to change the HTTP endpoint for
@@ -185,7 +179,7 @@ Now we would point our browser (or ``curl``) to ``localhost:5000/styles`` to
 retrieve the resources in the ``Genre`` table.
 
 Restricting allowable methods on a resource
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 Many times, we'd like to specify that certain actions can only be carried out
 against certain types of resources. If we wanted to prevent API users from
@@ -202,7 +196,7 @@ For each call into the API, the HTTP method used is validated against the
 acceptable methods for that resource.
 
 Performing custom validation on a resource
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Specifying which HTTP methods are acceptable gives rather coarse control over
 how a user of the API can interact with our resources. For more granular
@@ -235,7 +229,7 @@ collection of resources, so it's usually necessary to check which type you're
 dealing with. This will likely change in a future version of sandman.
 
 Configuring a model's behavior in the admin interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 ``sandman`` uses `Flask-Admin` to construct the admin interface. While the default
 settings for individual models are usually sufficient, you can make changes to the
@@ -263,6 +257,46 @@ as as what fields are editable in the built-in editing view. If you find your
 admin page isn't working exactly as you'd like, the chances are good you can
 add your desired functionality through a custom `__view__` class.
 
+
+===============
+Model Endpoints
+===============
+
+If you were to create a ``Model`` class named ``Resource``, the following endpoints would be created:
+
+* ``resources/``
+    * ``GET``: retrieve all resources (i.e. the *collection*)
+    * ``POST``: create a new resource
+* ``resources/<id>``
+    * ``GET``: retrieve a specific resource
+    * ``PATCH``: update an existing resource
+    * ``PUT``: create or update a resource with the given ID
+    * ``DELETE``: delete a specific resource
+* ``resources/meta``
+    * ``GET``: retrieve a description of a resource's structure
+
+The root endpoint
+-----------------
+
+For each project, a "root" endpoint (``/``) is created that gives clients
+the information required to interact with your API. The endpoint for each
+resource is listed, along with the ``/meta`` endpoint describing a resource's
+structure.
+
+The root endpoint is available as both JSON and HTML. The same information is
+returned by each version.
+
+The ``/meta`` endpoint
+----------------------
+
+A ``/meta`` endpoint, which lists the models attributes (i.e. the database
+columns) and their type. This can be used to create client code that is 
+decoupled from the structure of your database. 
+
+A ``/meta`` endpoint is automatically generated for every ``Model`` you register.
+This is available both as JSON and HTML.
+
+=======================
 Automatic Introspection
 =======================
 
@@ -272,11 +306,3 @@ perfectly capable of introspecting all of them. To use introspection to make
 remove all model code and call `activate()` without ever registering a model.
 To stop a browser window from automatically popping up on sandman
 initialization, call `activate()` with `browser=False`.
-
-
-Project Layout
---------------
-
-In a "real" project, you should divide the code into at least two files: one with the
-``Model`` definitions (``models.py``) and the other with the configuration
-and the ``app.run()`` which I call (``runserver.py``).
