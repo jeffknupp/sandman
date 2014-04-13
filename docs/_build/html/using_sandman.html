@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Sandman &mdash; sandman 0.0.0 documentation</title>
+    <title>Using Sandman &mdash; sandman 0.9.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.0',
+        VERSION:     '0.9.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.0.0 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.9.2 documentation" href="index.html" />
     <link rel="next" title="The sandman Admin Interface" href="admin.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -135,7 +135,7 @@ of <tt class="docutils literal"><span class="pre">sandman</span></tt>&#8216;s aw
 <p>If you were to leave off the filtering term, you would get <strong>all</strong> results from
 the <tt class="docutils literal"><span class="pre">Artist</span></tt> table. You can also <em>paginate</em> these results by specifying <tt class="docutils literal"><span class="pre">?page=2</span></tt>
 or something similar. The number of results returned per page is controlled by
-the config value <tt class="docutils literal"><span class="pre">RESULTS_PER_PAGE</span></tt>, which defualts to 20.</p>
+the config value <tt class="docutils literal"><span class="pre">RESULTS_PER_PAGE</span></tt>, which defaults to 20.</p>
 <div class="section" id="a-quick-guide-to-rest-apis">
 <h3>A Quick Guide to REST APIs<a class="headerlink" href="#a-quick-guide-to-rest-apis" title="Permalink to this headline">¶</a></h3>
 <p>Before we get into more complicated examples, we should discuss some
@@ -153,11 +153,12 @@ appropriate <em>HTTP method</em>. <tt class="docutils literal"><span class="pre"
 * PATCH
 </pre></div>
 </div>
-<p>Support for the <tt class="docutils literal"><span class="pre">HEAD</span></tt> and <tt class="docutils literal"><span class="pre">OPTIONS</span></tt> methods is underway.</p>
+<p>(Support for the <tt class="docutils literal"><span class="pre">HEAD</span></tt> and <tt class="docutils literal"><span class="pre">OPTIONS</span></tt> methods is underway.)</p>
+</div>
 </div>
 </div>
 <div class="section" id="creating-models">
-<h2>Creating Models<a class="headerlink" href="#creating-models" title="Permalink to this headline">¶</a></h2>
+<h1>Creating Models<a class="headerlink" href="#creating-models" title="Permalink to this headline">¶</a></h1>
 <p>A <tt class="docutils literal"><span class="pre">Model</span></tt> represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
 <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a>. If you create a <tt class="docutils literal"><span class="pre">Model</span></tt>, the only attribute you
@@ -176,10 +177,6 @@ the dictionary parameter</li>
 <li><tt class="docutils literal"><span class="pre">links</span></tt>, <tt class="docutils literal"><span class="pre">primary_key</span></tt>, and <tt class="docutils literal"><span class="pre">resource_uri</span></tt> methods that provide access
 to various attributes of the object derived from the underlying database model</li>
 </ul>
-</div>
-</div>
-<div class="section" id="models-py">
-<h1><cite>models.py</cite><a class="headerlink" href="#models-py" title="Permalink to this headline">¶</a></h1>
 <p>Creating a <cite>models.py</cite> file allows you to get <em>even more</em> out of <tt class="docutils literal"><span class="pre">sandman</span></tt>. In the file,
 create a class that derives from <cite>sandman.models.Model</cite> for each table you want to
 turn into a RESTful resource. Here&#8217;s a simple example using the Chinook test database
@@ -205,15 +202,13 @@ turn into a RESTful resource. Here&#8217;s a simple example using the Chinook te
 <span class="n">activate</span><span class="p">(</span><span class="n">browser</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="sandman-advanced-usage">
-<h2><tt class="docutils literal"><span class="pre">sandman</span></tt> Advanced Usage<a class="headerlink" href="#sandman-advanced-usage" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="hooking-up-models">
-<h3>Hooking up Models<a class="headerlink" href="#hooking-up-models" title="Permalink to this headline">¶</a></h3>
+<h2>Hooking up Models<a class="headerlink" href="#hooking-up-models" title="Permalink to this headline">¶</a></h2>
 <p>The <cite>__tablename__</cite> attribute is used to tell <tt class="docutils literal"><span class="pre">sandman</span></tt> which database table
 this class is modeling. It has <em>no default</em> and is <em>required</em> for all classes.</p>
 </div>
 <div class="section" id="providing-a-custom-endpoint">
-<h3>Providing a custom endpoint<a class="headerlink" href="#providing-a-custom-endpoint" title="Permalink to this headline">¶</a></h3>
+<h2>Providing a custom endpoint<a class="headerlink" href="#providing-a-custom-endpoint" title="Permalink to this headline">¶</a></h2>
 <p>In the code above, we created four <a class="reference internal" href="sandman.html#sandman.model.models.Model" title="sandman.model.models.Model"><tt class="xref py py-class docutils literal"><span class="pre">sandman.model.models.Model</span></tt></a> classes that
 correspond to tables in our database. If we wanted to change the HTTP endpoint for
 one of the models (the default endpoint is simply the class&#8217;s name pluralized in lowercase),
@@ -227,7 +222,7 @@ we would do so by setting the <tt class="docutils literal"><span class="pre">__e
 retrieve the resources in the <tt class="docutils literal"><span class="pre">Genre</span></tt> table.</p>
 </div>
 <div class="section" id="restricting-allowable-methods-on-a-resource">
-<h3>Restricting allowable methods on a resource<a class="headerlink" href="#restricting-allowable-methods-on-a-resource" title="Permalink to this headline">¶</a></h3>
+<h2>Restricting allowable methods on a resource<a class="headerlink" href="#restricting-allowable-methods-on-a-resource" title="Permalink to this headline">¶</a></h2>
 <p>Many times, we&#8217;d like to specify that certain actions can only be carried out
 against certain types of resources. If we wanted to prevent API users from
 deleting any <tt class="docutils literal"><span class="pre">Genre</span></tt> resources, for example, we could specify this implicitly
@@ -243,7 +238,7 @@ like so:</p>
 acceptable methods for that resource.</p>
 </div>
 <div class="section" id="performing-custom-validation-on-a-resource">
-<h3>Performing custom validation on a resource<a class="headerlink" href="#performing-custom-validation-on-a-resource" title="Permalink to this headline">¶</a></h3>
+<h2>Performing custom validation on a resource<a class="headerlink" href="#performing-custom-validation-on-a-resource" title="Permalink to this headline">¶</a></h2>
 <p>Specifying which HTTP methods are acceptable gives rather coarse control over
 how a user of the API can interact with our resources. For more granular
 control, custom a validation function can be specified. To do so, simply define a
@@ -273,7 +268,7 @@ collection of resources, so it&#8217;s usually necessary to check which type you
 dealing with. This will likely change in a future version of sandman.</p>
 </div>
 <div class="section" id="configuring-a-model-s-behavior-in-the-admin-interface">
-<h3>Configuring a model&#8217;s behavior in the admin interface<a class="headerlink" href="#configuring-a-model-s-behavior-in-the-admin-interface" title="Permalink to this headline">¶</a></h3>
+<h2>Configuring a model&#8217;s behavior in the admin interface<a class="headerlink" href="#configuring-a-model-s-behavior-in-the-admin-interface" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">sandman</span></tt> uses <cite>Flask-Admin</cite> to construct the admin interface. While the default
 settings for individual models are usually sufficient, you can make changes to the
 admin interface for a model by setting the <cite>__view__</cite> attribute to a class that derives
@@ -298,23 +293,67 @@ Properties exist to control which columns are sortable or searchable, as well
 as as what fields are editable in the built-in editing view. If you find your
 admin page isn&#8217;t working exactly as you&#8217;d like, the chances are good you can
 add your desired functionality through a custom <cite>__view__</cite> class.</p>
+</div>
+</div>
+<div class="section" id="model-endpoints">
+<h1>Model Endpoints<a class="headerlink" href="#model-endpoints" title="Permalink to this headline">¶</a></h1>
+<p>If you were to create a <tt class="docutils literal"><span class="pre">Model</span></tt> class named <tt class="docutils literal"><span class="pre">Resource</span></tt>, the following endpoints would be created:</p>
+<ul>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">resources/</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">GET</span></tt>: retrieve all resources (i.e. the <em>collection</em>)</li>
+<li><tt class="docutils literal"><span class="pre">POST</span></tt>: create a new resource</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">resources/&lt;id&gt;</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">GET</span></tt>: retrieve a specific resource</li>
+<li><tt class="docutils literal"><span class="pre">PATCH</span></tt>: update an existing resource</li>
+<li><tt class="docutils literal"><span class="pre">PUT</span></tt>: create or update a resource with the given ID</li>
+<li><tt class="docutils literal"><span class="pre">DELETE</span></tt>: delete a specific resource</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">resources/meta</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">GET</span></tt>: retrieve a description of a resource&#8217;s structure</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="section" id="the-root-endpoint">
+<h2>The root endpoint<a class="headerlink" href="#the-root-endpoint" title="Permalink to this headline">¶</a></h2>
+<p>For each project, a &#8220;root&#8221; endpoint (<tt class="docutils literal"><span class="pre">/</span></tt>) is created that gives clients
+the information required to interact with your API. The endpoint for each
+resource is listed, along with the <tt class="docutils literal"><span class="pre">/meta</span></tt> endpoint describing a resource&#8217;s
+structure.</p>
+<p>The root endpoint is available as both JSON and HTML. The same information is
+returned by each version.</p>
+</div>
+<div class="section" id="the-meta-endpoint">
+<h2>The <tt class="docutils literal"><span class="pre">/meta</span></tt> endpoint<a class="headerlink" href="#the-meta-endpoint" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="docutils literal"><span class="pre">/meta</span></tt> endpoint, which lists the models attributes (i.e. the database
+columns) and their type. This can be used to create client code that is
+decoupled from the structure of your database.</p>
+<p>A <tt class="docutils literal"><span class="pre">/meta</span></tt> endpoint is automatically generated for every <tt class="docutils literal"><span class="pre">Model</span></tt> you register.
+This is available both as JSON and HTML.</p>
+</div>
+</div>
 <div class="section" id="automatic-introspection">
-<h4>Automatic Introspection<a class="headerlink" href="#automatic-introspection" title="Permalink to this headline">¶</a></h4>
+<h1>Automatic Introspection<a class="headerlink" href="#automatic-introspection" title="Permalink to this headline">¶</a></h1>
 <p>Of course, you don&#8217;t actually need to tell <tt class="docutils literal"><span class="pre">sandman</span></tt> about your tables; it&#8217;s
 perfectly capable of introspecting all of them. To use introspection to make
 <em>all</em> of your database tables available via the admin and REST API, simply
 remove all model code and call <cite>activate()</cite> without ever registering a model.
 To stop a browser window from automatically popping up on sandman
 initialization, call <cite>activate()</cite> with <cite>browser=False</cite>.</p>
-</div>
-</div>
-</div>
-<div class="section" id="project-layout">
-<h2>Project Layout<a class="headerlink" href="#project-layout" title="Permalink to this headline">¶</a></h2>
-<p>In a &#8220;real&#8221; project, you should divide the code into at least two files: one with the
-<tt class="docutils literal"><span class="pre">Model</span></tt> definitions (<tt class="docutils literal"><span class="pre">models.py</span></tt>) and the other with the configuration
-and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> which I call (<tt class="docutils literal"><span class="pre">runserver.py</span></tt>).</p>
-</div>
 </div>
 
 
@@ -332,24 +371,22 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> whi
 <li><a class="reference internal" href="#a-quick-guide-to-rest-apis">A Quick Guide to REST APIs</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#creating-models">Creating Models</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#models-py"><cite>models.py</cite></a><ul>
-<li><a class="reference internal" href="#sandman-advanced-usage"><tt class="docutils literal"><span class="pre">sandman</span></tt> Advanced Usage</a><ul>
+<li><a class="reference internal" href="#creating-models">Creating Models</a><ul>
 <li><a class="reference internal" href="#hooking-up-models">Hooking up Models</a></li>
 <li><a class="reference internal" href="#providing-a-custom-endpoint">Providing a custom endpoint</a></li>
 <li><a class="reference internal" href="#restricting-allowable-methods-on-a-resource">Restricting allowable methods on a resource</a></li>
 <li><a class="reference internal" href="#performing-custom-validation-on-a-resource">Performing custom validation on a resource</a></li>
-<li><a class="reference internal" href="#configuring-a-model-s-behavior-in-the-admin-interface">Configuring a model&#8217;s behavior in the admin interface</a><ul>
+<li><a class="reference internal" href="#configuring-a-model-s-behavior-in-the-admin-interface">Configuring a model&#8217;s behavior in the admin interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-endpoints">Model Endpoints</a><ul>
+<li><a class="reference internal" href="#the-root-endpoint">The root endpoint</a></li>
+<li><a class="reference internal" href="#the-meta-endpoint">The <tt class="docutils literal"><span class="pre">/meta</span></tt> endpoint</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#automatic-introspection">Automatic Introspection</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#project-layout">Project Layout</a></li>
-</ul>
-</li>
 </ul>
 
   <h4>Previous topic</h4>
@@ -395,7 +432,7 @@ and the <tt class="docutils literal"><span class="pre">app.run()</span></tt> whi
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
