@@ -152,7 +152,7 @@ class Model(object):
     def meta(cls):
         attribute_info = {}
         for name, value in cls.__table__.columns.items():
-            attribute_info[name] = str(value.type)
+            attribute_info[name] = str(value.type).lower()
 
         return {cls.__name__: attribute_info}
 

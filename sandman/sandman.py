@@ -492,7 +492,10 @@ def index():
     if _get_acceptable_response_type() == JSON:
         meta_data = {}
         for cls in classes:
-            meta_data[cls.endpoint()] = {'link': '/' + cls.endpoint()}
+            meta_data[cls.endpoint()] = {
+                    'link': '/' + cls.endpoint(),
+                    'meta': '/' + cls.endpoint() + '/meta'
+                    }
         return jsonify(meta_data)
     else:
         return render_template('index.html', classes=classes)
