@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman API &mdash; sandman 0.0.0 documentation</title>
+    <title>sandman API &mdash; sandman 0.9.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.0',
+        VERSION:     '0.9.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.0.0 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.9.2 documentation" href="index.html" />
     <link rel="prev" title="The sandman Admin Interface" href="admin.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -321,6 +321,11 @@ the <tt class="xref py py-class docutils literal"><span class="pre">sandman.mode
 </dd></dl>
 
 <dl class="classmethod">
+<dt id="sandman.model.models.Model.meta">
+<em class="property">classmethod </em><tt class="descname">meta</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
 <dt id="sandman.model.models.Model.primary_key">
 <em class="property">classmethod </em><tt class="descname">primary_key</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/model/models.html#Model.primary_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.model.models.Model.primary_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the name of the table&#8217;s primary key</p>
@@ -466,6 +471,11 @@ resources.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="sandman.sandman.get_meta">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_meta</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="sandman.sandman.get_resource">
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the appropriate <em>Response</em> for retrieving a single resource.</p>
@@ -519,6 +529,13 @@ a single resource.</p>
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">handle_exception</tt><big>(</big><em>error</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#handle_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.handle_exception" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a response with the appropriate status code, message, and content
 type when an <tt class="docutils literal"><span class="pre">InvalidAPIUsage</span></tt> exception is raised.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sandman.sandman.index">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">index</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return information about each type of resource and how it can be
+accessed.</p>
 </dd></dl>
 
 <dl class="function">
@@ -749,7 +766,7 @@ values to use in a &#8216;where&#8217; clause search.</p>
         <li class="right" >
           <a href="admin.html" title="The sandman Admin Interface"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.0.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
