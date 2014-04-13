@@ -127,6 +127,7 @@ something like this:
 
 ![admin interface awesomesauce screenshot](http://sandman.io/static/img/admin_small.jpg)
 
+----
 
 (If you want to disable the browser from opening automatically each time `sandman`
 starts, call `activate` with `browser=False`)
