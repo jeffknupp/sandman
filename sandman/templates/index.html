@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Available Endpoints</h1>
+    <ul class="list-unstyled">
+        {% for class in classes %}
+            <li>
+                <p>
+                    {{ class.__name__ }}:<br/>
+                    link: <a href="{{ class.endpoint() }}">/{{ class.endpoint()|lower }}</a><br/>
+                    meta: <a href="{{ class.endpoint() }}/meta">/{{ class.endpoint()|lower }}/meta</a>
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
