@@ -488,7 +488,7 @@ def index():
     accessed."""
     classes = []
     with app.app_context():
-        classes = current_app.class_references.values()
+        classes = set(current_app.class_references.values())
     if _get_acceptable_response_type() == JSON:
         meta_data = {}
         for cls in classes:
