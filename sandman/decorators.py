@@ -1,8 +1,6 @@
 import functools
 import hashlib
 from flask import jsonify, request, url_for, current_app, make_response, g
-from .rate_limit import RateLimit
-from .errors import too_many_requests, precondition_failed, not_modified
 
 
 def json(f):
@@ -24,30 +22,6 @@ def json(f):
             rv.headers.extend(headers)
         return rv
     return wrapped
-
-
-def rate_limit(limit, per, scope_func=lambda: request.remote_addr):
-    def decorator(f):
-        @functools.wraps(f)
-        def wrapped(*args, **kwargs):
-            if current_app.config['USE_RATE_LIMITS']:
-                key = 'rate-limit/%s/%s/' % (f.__name__, scope_func())
-                limiter = RateLimit(key, limit, per)
-                if not limiter.over_limit:
-                    rv = f(*args, **kwargs)
-                else:
-                    rv = too_many_requests('You have exceeded your request rate')
-                #rv = make_response(rv)
-                g.headers = {
-                    'X-RateLimit-Remaining': str(limiter.remaining),
-                    'X-RateLimit-Limit': str(limiter.limit),
-                    'X-RateLimit-Reset': str(limiter.reset)
-                }
-                return rv
-            else:
-                return f(*args, **kwargs)
-        return wrapped
-    return decorator
 
 
 def paginate(max_per_page=10):
