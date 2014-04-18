@@ -72,6 +72,12 @@ writing, that includes:
 -  SAP Sybase SQL Anywhere
 -  MonetDB
 
+Authentication
+--------------
+
+As of version 0.9.3, ``sandman`` fully supports HTTP Basic
+Authentication! See the documentation for more details.
+
 Behind the Scenes
 -----------------
 
@@ -245,15 +251,18 @@ Contact Me
 Questions or comments about ``sandman``? Hit me up at
 jeff@jeffknupp.com.
 
-Coming Soon
-~~~~~~~~~~~
-
--  Authentication
-
 |Bitdeli Badge|
 
 Changelog
 =========
+
+Version 0.9.3
+-------------
+
+-  Authentication supported!
+
+   -  Entire API and admin can be protected by HTTP Basic Auth. See the
+      docs for more details.
 
 Version 0.9.2
 -------------

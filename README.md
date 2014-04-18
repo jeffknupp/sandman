@@ -68,6 +68,12 @@ Supported Databases
 * SAP Sybase SQL Anywhere
 * MonetDB
 
+Authentication
+--------------
+
+As of version 0.9.3, `sandman` fully supports HTTP Basic Authentication! See the
+documentation for more details.
+
 Behind the Scenes
 -----------------
 
@@ -220,13 +226,15 @@ use of the [Chinook](http://chinookdatabase.codeplex.com) sample SQL database.
 
 Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:jeff@jeffknupp.com).
 
-### Coming Soon
-
-* Authentication
-
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jeffknupp/sandman/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 # Changelog
+
+## Version 0.9.3
+
+* Authentication supported!
+    * Entire API and admin can be protected by HTTP Basic Auth. See the docs for
+      more details.
 
 ## Version 0.9.2
 
