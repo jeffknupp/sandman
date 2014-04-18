@@ -264,6 +264,12 @@ Version 0.9.3
    -  Entire API and admin can be protected by HTTP Basic Auth. See the
       docs for more details.
 
+-  ETAGs
+
+   -  Resources return the proper ETAG header and should reply with a
+      304 after the first request. This greatly improves the throughput
+      and performance of the API.
+
 Version 0.9.2
 -------------
 
