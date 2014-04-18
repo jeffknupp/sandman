@@ -11,7 +11,8 @@ from flask.ext.httpauth import HTTPBasicAuth
 app = Flask(__name__)
 app.secret_key = '42'
 db = SQLAlchemy(app)
-auth = HTTPBasicAuth
+auth = HTTPBasicAuth()
 from . import sandman
+
 
 __version__ = '0.9.2'
