@@ -4,7 +4,7 @@ clean:
 	rm -rf sandman_env htmlcov
 
 build:
-	virtualenv -p /usr/local/bin/python3 sandman_env && source sandman_env/bin/activate && \
+	virtualenv -p /usr/local/bin/python sandman_env && source sandman_env/bin/activate && \
 		pip install -r requirements.txt
 
 test: clean build
