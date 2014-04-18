@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman.sandman &mdash; sandman 0.9.2 documentation</title>
+    <title>sandman.sandman &mdash; sandman 0.9.3 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.9.2',
+        VERSION:     '0.9.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.9.2 documentation" href="../../index.html" />
+    <link rel="top" title="sandman 0.9.3 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.9.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.9.3 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -54,6 +54,7 @@
         <span class="n">make_response</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">.decorators</span> <span class="kn">import</span> <span class="n">etag</span>
 <span class="kn">from</span> <span class="nn">.exception</span> <span class="kn">import</span> <span class="n">InvalidAPIUsage</span>
 <span class="kn">from</span> <span class="nn">.model.models</span> <span class="kn">import</span> <span class="n">Model</span>
 <span class="kn">from</span> <span class="nn">.model.utils</span> <span class="kn">import</span> <span class="n">_get_session</span>
@@ -94,6 +95,12 @@
         <span class="c"># HTTP 406 Not Acceptable</span>
         <span class="k">raise</span> <span class="n">InvalidAPIUsage</span><span class="p">(</span><span class="mi">406</span><span class="p">)</span>
 
+<span class="nd">@app.after_request</span>
+<div class="viewcode-block" id="after_request"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.after_request">[docs]</a><span class="k">def</span> <span class="nf">after_request</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;headers&#39;</span><span class="p">):</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span>
+</div>
 <span class="nd">@app.errorhandler</span><span class="p">(</span><span class="n">InvalidAPIUsage</span><span class="p">)</span>
 <div class="viewcode-block" id="handle_exception"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.handle_exception">[docs]</a><span class="k">def</span> <span class="nf">handle_exception</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a response with the appropriate status code, message, and content</span>
@@ -475,6 +482,7 @@
     <span class="k">return</span> <span class="n">no_content_response</span><span class="p">()</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@etag</span>
 <div class="viewcode-block" id="get_resource"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.get_resource">[docs]</a><span class="k">def</span> <span class="nf">get_resource</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a single resource.</span>
 
@@ -489,6 +497,7 @@
     <span class="k">return</span> <span class="n">resource_response</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/&lt;key&gt;/&lt;attribute&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@etag</span>
 <div class="viewcode-block" id="get_resource_attribute"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.get_resource_attribute">[docs]</a><span class="k">def</span> <span class="nf">get_resource_attribute</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving an attribute of</span>
 <span class="sd">    a single resource.</span>
@@ -508,6 +517,7 @@
 
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@etag</span>
 <div class="viewcode-block" id="get_collection"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.get_collection">[docs]</a><span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the appropriate *Response* for retrieving a collection of</span>
 <span class="sd">    resources.</span>
@@ -532,12 +542,13 @@
     <span class="k">return</span> <span class="n">collection_response</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@etag</span>
 <div class="viewcode-block" id="index"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.index">[docs]</a><span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Return information about each type of resource and how it can be</span>
 <span class="sd">    accessed.&quot;&quot;&quot;</span>
     <span class="n">classes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
-        <span class="n">classes</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">class_references</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="n">classes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_app</span><span class="o">.</span><span class="n">class_references</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">_get_acceptable_response_type</span><span class="p">()</span> <span class="o">==</span> <span class="n">JSON</span><span class="p">:</span>
         <span class="n">meta_data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">cls</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
@@ -550,6 +561,7 @@
         <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s">&#39;index.html&#39;</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
 </div>
 <span class="nd">@app.route</span><span class="p">(</span><span class="s">&#39;/&lt;collection&gt;/meta&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@etag</span>
 <div class="viewcode-block" id="get_meta"><a class="viewcode-back" href="../../sandman.html#sandman.sandman.get_meta">[docs]</a><span class="k">def</span> <span class="nf">get_meta</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
     <span class="n">cls</span> <span class="o">=</span> <span class="n">endpoint_class</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">meta</span><span class="p">()</span>
@@ -587,7 +599,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">sandman 0.9.2 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">sandman 0.9.3 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

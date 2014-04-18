@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>sandman API &mdash; sandman 0.9.2 documentation</title>
+    <title>sandman API &mdash; sandman 0.9.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.2',
+        VERSION:     '0.9.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.9.2 documentation" href="index.html" />
-    <link rel="prev" title="The sandman Admin Interface" href="admin.html" /> 
+    <link rel="top" title="sandman 0.9.3 documentation" href="index.html" />
+    <link rel="prev" title="Authentication" href="authentication.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,9 +37,9 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="admin.html" title="The sandman Admin Interface"
+          <a href="authentication.html" title="Authentication"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.9.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -378,6 +378,11 @@ instance whose keys are the column names of the
 <span id="sandman-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">sandman</span></tt> Module<a class="headerlink" href="#module-sandman.sandman" title="Permalink to this headline">¶</a></h2>
 <p>Sandman REST API creator for Flask and SQLAlchemy</p>
 <dl class="function">
+<dt id="sandman.sandman.after_request">
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">after_request</tt><big>(</big><em>response</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#after_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.after_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="sandman.sandman.attribute_response">
 <tt class="descclassname">sandman.sandman.</tt><tt class="descname">attribute_response</tt><big>(</big><em>resource</em>, <em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#attribute_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.attribute_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a response for the <em>resource</em> of the appropriate content type.</p>
@@ -450,7 +455,7 @@ instance whose keys are the column names of the
 
 <dl class="function">
 <dt id="sandman.sandman.get_collection">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_collection</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_collection" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_collection</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_collection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the appropriate <em>Response</em> for retrieving a collection of
 resources.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -472,12 +477,12 @@ resources.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.get_meta">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_meta</tt><big>(</big><em>collection</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_meta" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_meta</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_meta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="sandman.sandman.get_resource">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource</tt><big>(</big><em>collection</em>, <em>key</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the appropriate <em>Response</em> for retrieving a single resource.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -498,7 +503,7 @@ resources.</p>
 
 <dl class="function">
 <dt id="sandman.sandman.get_resource_attribute">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource_attribute</tt><big>(</big><em>collection</em>, <em>key</em>, <em>attribute</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource_attribute" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">get_resource_attribute</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#get_resource_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.get_resource_attribute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the appropriate <em>Response</em> for retrieving an attribute of
 a single resource.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -533,7 +538,7 @@ type when an <tt class="docutils literal"><span class="pre">InvalidAPIUsage</spa
 
 <dl class="function">
 <dt id="sandman.sandman.index">
-<tt class="descclassname">sandman.sandman.</tt><tt class="descname">index</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.index" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">sandman.sandman.</tt><tt class="descname">index</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/sandman/sandman.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sandman.sandman.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return information about each type of resource and how it can be
 accessed.</p>
 </dd></dl>
@@ -730,8 +735,8 @@ values to use in a &#8216;where&#8217; clause search.</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="admin.html"
-                        title="previous chapter">The sandman Admin Interface</a></p>
+  <p class="topless"><a href="authentication.html"
+                        title="previous chapter">Authentication</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/sandman.txt"
@@ -764,9 +769,9 @@ values to use in a &#8216;where&#8217; clause search.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="admin.html" title="The sandman Admin Interface"
+          <a href="authentication.html" title="Authentication"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.9.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

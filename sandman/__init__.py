@@ -15,4 +15,4 @@ auth = HTTPBasicAuth()
 from . import sandman
 
 
-__version__ = '0.9.2'
+__version__ = '0.9.3'
