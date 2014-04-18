@@ -14,6 +14,7 @@ Contents:
    installation
    using_sandman
    admin
+   authentication
    sandman
 
 

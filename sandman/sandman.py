@@ -5,6 +5,7 @@ from flask import (jsonify, request, g,
         make_response)
 from sqlalchemy.exc import IntegrityError
 from . import app, db
+from .decorators import etag
 from .exception import InvalidAPIUsage
 from .model.models import Model
 from .model.utils import _get_session
@@ -44,6 +45,12 @@ def _get_acceptable_response_type():
     else:
         # HTTP 406 Not Acceptable
         raise InvalidAPIUsage(406)
+
+@app.after_request
+def after_request(response):
+    if hasattr(g, 'headers'):
+        response.headers.extend(g.headers)
+    return response
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
@@ -426,6 +433,7 @@ def delete_resource(collection, key):
     return no_content_response()
 
 @app.route('/<collection>/<key>', methods=['GET'])
+@etag
 def get_resource(collection, key):
     """Return the appropriate *Response* for retrieving a single resource.
 
@@ -440,6 +448,7 @@ def get_resource(collection, key):
     return resource_response(resource)
 
 @app.route('/<collection>/<key>/<attribute>', methods=['GET'])
+@etag
 def get_resource_attribute(collection, key, attribute):
     """Return the appropriate *Response* for retrieving an attribute of
     a single resource.
@@ -459,6 +468,7 @@ def get_resource_attribute(collection, key, attribute):
 
 
 @app.route('/<collection>', methods=['GET'])
+@etag
 def get_collection(collection):
     """Return the appropriate *Response* for retrieving a collection of
     resources.
@@ -483,6 +493,7 @@ def get_collection(collection):
     return collection_response(resources, start, stop)
 
 @app.route('/', methods=['GET'])
+@etag
 def index():
     """Return information about each type of resource and how it can be
     accessed."""
@@ -501,6 +512,7 @@ def index():
         return render_template('index.html', classes=classes)
 
 @app.route('/<collection>/meta', methods=['GET'])
+@etag
 def get_meta(collection):
     cls = endpoint_class(collection)
     description = cls.meta()

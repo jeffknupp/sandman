@@ -6,9 +6,13 @@ a completely new system based on your existing data, using HATEOAS."""
 
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.httpauth import HTTPBasicAuth
+
 app = Flask(__name__)
 app.secret_key = '42'
 db = SQLAlchemy(app)
+auth = HTTPBasicAuth()
 from . import sandman
+
 
 __version__ = '0.9.2'
