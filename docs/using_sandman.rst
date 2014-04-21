@@ -306,3 +306,27 @@ perfectly capable of introspecting all of them. To use introspection to make
 remove all model code and call `activate()` without ever registering a model.
 To stop a browser window from automatically popping up on sandman
 initialization, call `activate()` with `browser=False`.
+
+=========================================
+Running ``sandman`` alongside another app
+=========================================
+
+If you have an existing WSGI application you'd like to run in the same
+interpreter as ``sandman``, follow the instructions described here_.
+Essentially, you need to import both applications in your main file and use
+Flask's ``DispatcherMiddleware`` to give a unique route to each app. In the
+following example, ``sandman``-related endpoints can be accessed by adding the
+``/sandman`` prefix to ``sandman``'s normally generated URIs::
+
+    from my_application import app as my_app
+    from sandman import app as sandman_app
+    from werkzeug.wsgi import DispatcherMiddleware
+
+    application = DispatcherMiddleware(my_app, {
+        '/sandman': sandman_app,
+        })
+
+This allows both apps to coexist; ``my_app`` will be rooted at ``/`` and
+``sandman`` at ``/sandman``.
+
+.. _here: http://flask.pocoo.org/docs/patterns/appdispatch/#app-dispatch
