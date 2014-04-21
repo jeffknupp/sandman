@@ -44,6 +44,7 @@ setup(
                       'Flask-SQLAlchemy>=1.0',
                       'SQLAlchemy>=0.8.2',
                       'Flask-Admin>=1.0.6',
+                      'Flask-HTTPAuth>=2.2.1',
                       'docopt>=0.6.1',
                       ],
     cmdclass={'test': PyTest},

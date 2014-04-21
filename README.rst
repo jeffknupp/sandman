@@ -256,6 +256,12 @@ jeff@jeffknupp.com.
 Changelog
 =========
 
+Version 0.9.4
+-------------
+
+-  Fixes a critical bug in the requirements portion of ``setup.py``,
+   adding ``Flask-HTTPAuth``
+
 Version 0.9.3
 -------------
 
