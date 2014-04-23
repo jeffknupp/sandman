@@ -10,6 +10,7 @@ from .exception import InvalidAPIUsage
 from .model.models import Model
 from .model.utils import _get_session
 
+
 JSON, HTML = range(2)
 JSON_CONTENT_TYPES = set(['application/json',])
 HTML_CONTENT_TYPES = set(['text/html', 'application/x-www-form-urlencoded'])
@@ -217,6 +218,7 @@ def retrieve_collection(collection, query_arguments=None):
     if query_arguments:
         filters = []
         order = []
+	joins = []
         for key, value in query_arguments.items():
             if key == 'page':
                 continue
@@ -224,7 +226,17 @@ def retrieve_collection(collection, query_arguments=None):
                 filters.append(getattr(cls, key).like(str(value), escape='/'))
             elif key == 'sort':
                 order.append(getattr(cls, value))
-            elif key:
+	    elif key == 'join':
+		print str(value)
+		joins.append(str(value))
+            elif value.startswith('<'):
+		filters.append(getattr(cls, key) <= value[1:])
+	    elif value.startswith('>'):
+		filters.append(getattr(cls, key) >= value[1:])
+	    elif value.startswith('[') and value.endswith(']'):
+		filters.append(getattr(cls, key) >= value[1:-1].split(':')[0])	
+		filters.append(getattr(cls, key) <= value[1:-1].split(':')[1])
+	    elif key:
                 filters.append(getattr(cls, key) == value)
         resources = session.query(cls).filter(*filters).order_by(*order)
     else:
