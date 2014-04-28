@@ -131,8 +131,8 @@ following:
 - ``links``, ``primary_key``, and ``resource_uri`` methods that provide access
   to various attributes of the object derived from the underlying database model
 
-Creating a `models.py` file allows you to get *even more* out of ``sandman``. In the file,
-create a class that derives from `sandman.models.Model` for each table you want to
+Creating a ``models.py`` file allows you to get *even more* out of ``sandman``. In the file,
+create a class that derives from ``sandman.models.Model`` for each table you want to
 turn into a RESTful resource. Here's a simple example using the Chinook test database
 (widely available online)::
 
@@ -160,7 +160,7 @@ turn into a RESTful resource. Here's a simple example using the Chinook test dat
 Hooking up Models
 -----------------
 
-The `__tablename__` attribute is used to tell ``sandman`` which database table
+The ``__tablename__`` attribute is used to tell ``sandman`` which database table
 this class is modeling. It has *no default* and is *required* for all classes.
 
 Providing a custom endpoint
@@ -328,5 +328,12 @@ following example, ``sandman``-related endpoints can be accessed by adding the
 
 This allows both apps to coexist; ``my_app`` will be rooted at ``/`` and
 ``sandman`` at ``/sandman``.
+
+Using existing declarative models
+---------------------------------
+
+If you have a Flask/SQLAlchemy application that already has a number of existing
+declarative models, you can register these with ``sandman`` as if they were
+auto-generated classes. Simply add your existing classes in the call to :func:`sandman.model.register`
 
 .. _here: http://flask.pocoo.org/docs/patterns/appdispatch/#app-dispatch

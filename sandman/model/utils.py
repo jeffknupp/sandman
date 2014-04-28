@@ -114,6 +114,10 @@ def register_internal_data(cls):
 
     """
     with app.app_context():
+        if getattr(cls, 'endpoint', None) is None:
+            orig_class = cls
+            cls = type('Sandman' + cls.__name__, (cls, Model), {})
+            cls.__from_class__ = orig_class
         current_app.class_references[cls.__tablename__] = cls
         current_app.class_references[cls.__name__] = cls
         current_app.class_references[cls.endpoint()] = cls
