@@ -230,6 +230,13 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 
 # Changelog
 
+## Version 0.9.5
+
+* Fixes a critical bug where code used by the new `etag` decorators was
+  accidentally not included. Thanks to @mietek for the PR.
+* Fixes an issue when showing the HTML representation of an empty collection.
+* Thanks to @mietek for reporting the issue.
+
 ## Version 0.9.4
 
 * Fixes a critical bug in the requirements portion of `setup.py`, adding `Flask-HTTPAuth`
