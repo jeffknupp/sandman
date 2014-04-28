@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Sandman &mdash; sandman 0.9.4 documentation</title>
+    <title>Using Sandman &mdash; sandman 0.9.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.4',
+        VERSION:     '0.9.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="sandman 0.9.4 documentation" href="index.html" />
+    <link rel="top" title="sandman 0.9.5 documentation" href="index.html" />
     <link rel="next" title="The sandman Admin Interface" href="admin.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">sandman 0.9.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -355,6 +355,26 @@ remove all model code and call <cite>activate()</cite> without ever registering 
 To stop a browser window from automatically popping up on sandman
 initialization, call <cite>activate()</cite> with <cite>browser=False</cite>.</p>
 </div>
+<div class="section" id="running-sandman-alongside-another-app">
+<h1>Running <tt class="docutils literal"><span class="pre">sandman</span></tt> alongside another app<a class="headerlink" href="#running-sandman-alongside-another-app" title="Permalink to this headline">¶</a></h1>
+<p>If you have an existing WSGI application you&#8217;d like to run in the same
+interpreter as <tt class="docutils literal"><span class="pre">sandman</span></tt>, follow the instructions described <a class="reference external" href="http://flask.pocoo.org/docs/patterns/appdispatch/#app-dispatch">here</a>.
+Essentially, you need to import both applications in your main file and use
+Flask&#8217;s <tt class="docutils literal"><span class="pre">DispatcherMiddleware</span></tt> to give a unique route to each app. In the
+following example, <tt class="docutils literal"><span class="pre">sandman</span></tt>-related endpoints can be accessed by adding the
+<tt class="docutils literal"><span class="pre">/sandman</span></tt> prefix to <tt class="docutils literal"><span class="pre">sandman</span></tt>&#8216;s normally generated URIs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">my_application</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">my_app</span>
+<span class="kn">from</span> <span class="nn">sandman</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">sandman_app</span>
+<span class="kn">from</span> <span class="nn">werkzeug.wsgi</span> <span class="kn">import</span> <span class="n">DispatcherMiddleware</span>
+
+<span class="n">application</span> <span class="o">=</span> <span class="n">DispatcherMiddleware</span><span class="p">(</span><span class="n">my_app</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s">&#39;/sandman&#39;</span><span class="p">:</span> <span class="n">sandman_app</span><span class="p">,</span>
+    <span class="p">})</span>
+</pre></div>
+</div>
+<p>This allows both apps to coexist; <tt class="docutils literal"><span class="pre">my_app</span></tt> will be rooted at <tt class="docutils literal"><span class="pre">/</span></tt> and
+<tt class="docutils literal"><span class="pre">sandman</span></tt> at <tt class="docutils literal"><span class="pre">/sandman</span></tt>.</p>
+</div>
 
 
           </div>
@@ -387,6 +407,7 @@ initialization, call <cite>activate()</cite> with <cite>browser=False</cite>.</p
 </ul>
 </li>
 <li><a class="reference internal" href="#automatic-introspection">Automatic Introspection</a></li>
+<li><a class="reference internal" href="#running-sandman-alongside-another-app">Running <tt class="docutils literal"><span class="pre">sandman</span></tt> alongside another app</a></li>
 </ul>
 
   <h4>Previous topic</h4>
@@ -432,7 +453,7 @@ initialization, call <cite>activate()</cite> with <cite>browser=False</cite>.</p
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">sandman 0.9.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">sandman 0.9.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
