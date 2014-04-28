@@ -4,7 +4,8 @@ from flask import (jsonify, request, g,
         current_app, Response, render_template,
         make_response)
 from sqlalchemy.exc import IntegrityError
-from . import app, db
+from sqlalchemy import alias
+from . import app, db, auth
 from .decorators import etag
 from .exception import InvalidAPIUsage
 from .model.models import Model
@@ -23,6 +24,19 @@ FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource \
 type [{}].  Acceptable methods: [{}]"""
 UNSUPPORTED_CONTENT_TYPE_MESSAGE = 'Content-type [{types}] not supported.'
 #UNSUPPORTED_CONTENT_TYPE_MESSAGE += """\nSupported values for 'Content-type': {}""".format(ACCEPTABLE_CONTENT_TYPES)
+
+
+@auth.get_password
+def get_password(username):
+    """Return the password for *username*."""
+    return 'secret'
+
+@app.before_request
+@auth.login_required
+def before_request():
+	pass
+#https://sandman.readthedocs.org/en/latest/authentication.html
+
 
 def _perform_database_action(action, *args):
     """Call session.*action* with the given *args*.
@@ -80,6 +94,7 @@ def _single_attribute_json_response(name, value):
     :rtype: :class:`flask.Response`
 
     """
+    print 'json val'
     return jsonify({name: str(value)})
 
 def _single_resource_json_response(resource, depth=0):
@@ -90,6 +105,7 @@ def _single_resource_json_response(resource, depth=0):
     :rtype: :class:`flask.Response`
 
     """
+    print 'json res'
     links = resource.links()
     response = jsonify(**resource.as_dict(depth))
     response.headers['Link'] = ''
@@ -131,6 +147,7 @@ def _collection_json_response(resources, start, stop, depth=0):
     :rtype: :class:`flask.Response`
 
     """
+    print 'json collection'
     result_list = []
     for resource in resources:
         result_list.append(resource.as_dict(depth))
@@ -218,7 +235,8 @@ def retrieve_collection(collection, query_arguments=None):
     if query_arguments:
         filters = []
         order = []
-	joins = []
+	joins = 0
+	limits = 0
         for key, value in query_arguments.items():
             if key == 'page':
                 continue
@@ -226,9 +244,15 @@ def retrieve_collection(collection, query_arguments=None):
                 filters.append(getattr(cls, key).like(str(value), escape='/'))
             elif key == 'sort':
                 order.append(getattr(cls, value))
+	    elif key == 'limit':
+		limits = value
 	    elif key == 'join':
-		print str(value)
-		joins.append(str(value))
+		f1 = value.split('.')[0]
+		t2 = value.split('.')[1]
+		f2 = value.split('.')[2]
+		cls2 = endpoint_class(t2)
+		joins = 1;
+		#joins.append(getattr(cls, f1)==getattr(cls2, f2))
             elif value.startswith('<'):
 		filters.append(getattr(cls, key) <= value[1:])
 	    elif value.startswith('>'):
@@ -238,9 +262,23 @@ def retrieve_collection(collection, query_arguments=None):
 		filters.append(getattr(cls, key) <= value[1:-1].split(':')[1])
 	    elif key:
                 filters.append(getattr(cls, key) == value)
-        resources = session.query(cls).filter(*filters).order_by(*order)
+	#print 'e'
+	#print t2
+	#resources = session.query(cls, cls2).select_from(join(cls, cls2)).filter(getattr(cls,f1)==getattr(cls2,f2)).all()
+	#resources = session.query(cls, cls2).select_from(cls2).join(cls2, getattr(cls, f1)==getattr(cls2, f2))
+	#print 'it worked'
+	#resources = session.query(cls).all()
+	if joins == 1 :
+		print 'case1'
+		resources = session.query(getattr(aliased(cls), f1) , getattr(cls2, f2)).join(cls,getattr(cls, f1)==getattr(cls2, f2))#.filter(*filters).order_by(*order).limit(limits)
+	else:
+		print 'case2'
+		resources = session.query(cls).filter(*filters).order_by(*order).limit(limits)
+		
     else:
+	print 'case3'
         resources = session.query(cls).all()
+	print 'end'
     return resources
 
 
@@ -493,15 +531,16 @@ def get_collection(collection):
     cls = endpoint_class(collection)
 
     resources = retrieve_collection(collection, request.args)
-
+    print 'retrieved collection' 
     _validate(cls, request.method, resources)
-
+    print 'valid'
     start = stop = None
 
     if request.args and 'page' in request.args:
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
         start, stop = page * results_per_page, (page +1) * results_per_page
+    print 'collection response'
     return collection_response(resources, start, stop)
 
 @app.route('/', methods=['GET'])

@@ -8,7 +8,6 @@ from flask.ext.admin.contrib.sqla import ModelView
 
 from sandman import app, db
 
-
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
 

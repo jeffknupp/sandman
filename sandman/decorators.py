@@ -1,6 +1,6 @@
 import functools
 import hashlib
-from flask import jsonify, request, url_for, current_app, make_response, g
+from flask import jsonify, request, url_for, current_app, make_response, g, Response
 
 def cache_control(*directives):
     def decorator(f):
@@ -36,7 +36,10 @@ def etag(f):
                 rv = precondition_failed()
         elif if_none_match:
             etag_list = [tag.strip() for tag in if_none_match.split(',')]
-            if etag in etag_list or '*' in etag_list:
-                rv = not_modified()
+            if etag in etag_list or '*' in etag_list:              
+		rv = Response(status = 304)		
+		#rv = not_modified()
         return rv
     return wrapped
+
+

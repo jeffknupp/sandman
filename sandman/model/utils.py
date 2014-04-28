@@ -32,11 +32,20 @@ def generate_endpoint_classes(db, generate_pks=False):
         for name, table in db.metadata.tables.items():
             if not name in seen_classes:
                 seen_classes.add(name)
+		print name
                 if not table.primary_key and generate_pks:
                     cls = add_pk_if_required(db, table, name)
                 else:
                     cls = type(str(name), (sandman_model, db.Model),
-                            {'__tablename__': name})
+                        {'__tablename__': name})
+                register(cls)
+	# MODIFIED TO INCLUDE VIEWS
+        db.metadata.reflect(bind=db.engine, views=True)
+        for name, table in db.metadata.tables.items():
+            if not name in seen_classes:
+                seen_classes.add(name)
+		print 'view'+name
+                cls = add_pk_if_required(db, table, name)
                 register(cls)
 
 def add_pk_if_required(db, table, name):
@@ -47,11 +56,14 @@ def add_pk_if_required(db, table, name):
     :param  table: table to create primary key for
 
     """
-    db.metadata.reflect(bind=db.engine)
+    db.metadata.reflect(bind=db.engine, views=True)
     cls_dict = {'__tablename__': name}
     if not table.primary_key:
-        for column in table.columns:
-            column.primary_key = True
+	updated = True	
+	for column in table.columns:
+	    if updated:
+		column.primary_key = True
+		updated = False
         Table(name, db.metadata, *table.columns, extend_existing=True)
         cls_dict['__table__'] = table
         db.metadata.create_all(bind=db.engine)
