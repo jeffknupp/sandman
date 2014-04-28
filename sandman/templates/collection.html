@@ -2,29 +2,33 @@
 {% block content %}
 
 <div class="col-md-8">
-<h2>{{  resources_name }}</h2>
-<table class="table table-bordered table-hover">
-<thead>
-<tr>
-{% if resources != [] %}{% for key in resources[0].keys() %}<th>{{ key }}</th>{% endfor %}{% endif %}
-</tr>
-</thead>
+{% if resources %}
+<h2>{% for key in resources[0].keys() %}<th>{{ key }}</th>{% endfor %}</h2>
+<table class="table table-condensed table-striped">
+    <thead>
+        {% for name in resources[0].as_dict() %}
+        <th>{{ name }}</th>
+        {% endfor %}
+    </thead>
+    <tbody>
+    {% for resource in resources %}
+        <tr>
+            {% for attribute, value in resource.items() %}
+                {% if attribute == 'links' %}
+                    <td><ul>
+                    {% for link in value %}
+                        <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ link.rel }}</a></li>
+                    {% endfor %}
+                    </ul></td>
+                {% else %}
+                    <td>{{ value }}</td>
+                {% endif %}
+             {% endfor %}
 
-<tbody>
-{% for resource in resources %}
-<tr>
-{% for attribute, value in resource.items() %}
-  {% if attribute == 'links' %}
-    <td><ul>
-    {% for link in value %}
-      <li>{{ attribute }}: <a href="{{ link.uri }}">{{ link.rel }}</a></li>
-    {% endfor %}
-    </ul></td>
-  {% else %}
-    <td>{{ value }}</td>
-  {% endif %}
-{% endfor %}
-</tr>
-{% endfor %}
+	</tr>
+     {% endfor %}
 </table>
+{% else %}
+<h2>Empty collection</h2>
+{% endif %}
 {% endblock content%}
