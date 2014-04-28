@@ -39,6 +39,10 @@ class Model(object):
     __table__ = None
     """Will be populated by SQLAlchemy with the table's meta-information."""
 
+    __from_class__ = None
+    """Is this class being generated from an existing declarative SQLAlchemy
+    class?"""
+
     @classmethod
     def endpoint(cls):
         """Return the :class:`sandman.model.Model`'s endpoint.
@@ -46,12 +50,16 @@ class Model(object):
         :rtype: string
 
         """
+        endpoint = ''
         if cls.__endpoint__ is not None:
             return cls.__endpoint__
-        value = cls.__tablename__.lower()
-        if not value.endswith('s'):
-            value += 's'
-        return value
+        elif cls.__from_class__ is not None:
+            endpoint = cls.__from_class__.__name__.lower()
+        else:
+            endpoint = cls.__tablename__.lower()
+        if not endpoint.endswith('s'):
+            endpoint += 's'
+        return endpoint
 
     def resource_uri(self):
         """Return the URI at which the resource can be found.
@@ -70,6 +78,8 @@ class Model(object):
 
         """
 
+        if cls.__from_class__:
+            cls = cls.__from_class__
         return cls.__table__.primary_key.columns.values()[0].name
 
     def links(self):
@@ -150,6 +160,8 @@ class Model(object):
 
     @classmethod
     def meta(cls):
+        if __from_class__:
+            cls = self.__from_class__
         attribute_info = {}
         for name, value in cls.__table__.columns.items():
             attribute_info[name] = str(value.type).lower()

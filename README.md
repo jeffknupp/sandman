@@ -230,6 +230,14 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 
 # Changelog
 
+## Version 0.9.6
+
+* Support for using existing declarative models alongside `sandman` generated models
+    * If you have an existing app and want to include sandman in it, simply pass
+      your existing models in to the `register()` function along with any
+      `sanmdman` generated classes. `sandman` will detect the existing models
+      and augment them.
+
 ## Version 0.9.5
 
 * Fixes a critical bug where code used by the new `etag` decorators was
