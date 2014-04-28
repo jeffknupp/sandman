@@ -2,6 +2,7 @@
 {% block content %}
 
 <div class="col-md-8">
+{% if resources %}
 <h2>{{ resources[0].__tablename__ }}</h2>
 <table class="table table-condensed table-striped">
     <thead>
@@ -25,4 +26,7 @@
                 {% endfor %}
     {% endfor %}
 </table>
+{% else %}
+<h2>Empty collection</h2>
+{% endif %}
 {% endblock content%}
