@@ -160,7 +160,7 @@ class Model(object):
 
     @classmethod
     def meta(cls):
-        if __from_class__:
+        if getattr(cls, '__from_class__', None) is not None:
             cls = self.__from_class__
         attribute_info = {}
         for name, value in cls.__table__.columns.items():
