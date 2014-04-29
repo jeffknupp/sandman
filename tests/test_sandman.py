@@ -92,6 +92,17 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         response = self.get_response('/artists/1/Name', 200)
         assert json.loads(response.get_data(as_text=True))[u'Name'] == 'AC/DC'
 
+    def test_get_meta(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/', 200)
+        assert 'meta' in json.loads(response.get_data())['artists']
+
+    def test_get_root(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists/meta', 200)
+        assert 'Name' in json.loads(response.get_data())['Artist']
+
+
     def test_get_object_attribute(self):
         """Test simple HTTP GET"""
         response = self.get_response('/tracks/347', 200)
@@ -109,6 +120,19 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         """Does GETing a resource return the 'Link' header field?"""
         response = self.get_response('/tracks/1', 200, params={'expand': 1})
         assert 'album' in json.loads(response.get_data(as_text=True))
+
+    def test_get_etag_header(self):
+        """Does GETing a resource with the ETag header return a 304?"""
+        response = self.get_response('/tracks/1', 200)
+        assert 'ETag' in response.headers
+        etag_value = response.headers['ETag']
+        cached_response = self.get_response('/tracks/1', 304, headers={'If-None-Match': etag_value}, has_data=False)
+
+    def test_get_etag_no_match(self):
+        """Does GETing a resource return the 'Link' header field?"""
+        response = self.get_response('/tracks/1', 200)
+        assert 'ETag' in response.headers
+        cached_response = self.get_response('/tracks/1', 412, headers={'If-Match': 'foo'}, has_data=False)
 
     def test_post(self):
         """Test simple HTTP POST"""
@@ -150,6 +174,8 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert response.status_code == 201
         assert json.loads(response.get_data(as_text=True))['Name'] == u'Jeff Knupp'
         assert json.loads(response.get_data(as_text=True))['self'] == '/artists/276'
+
+
 
     def test_patch_existing_resource(self):
         """Send HTTP PATCH for an existing resource (should be updated)."""
@@ -312,6 +338,11 @@ class TestSandmanContentTypes(TestSandmanBase):
                 404,
                 headers={'Accept': 'text/html'})
         assert self.is_html_response(response)
+
+    def test_get_meta_html(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/', 200, headers={'Accept': 'text/html'})
+        assert 'meta' in response.get_data()
 
 
     def test_get_html_collection(self):
