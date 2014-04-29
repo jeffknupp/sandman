@@ -46,12 +46,6 @@ def _get_acceptable_response_type():
         # HTTP 406 Not Acceptable
         raise InvalidAPIUsage(406)
 
-@app.after_request
-def after_request(response):
-    if hasattr(g, 'headers'):
-        response.headers.extend(g.headers)
-    return response
-
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
     """Return a response with the appropriate status code, message, and content
