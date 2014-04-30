@@ -4,12 +4,13 @@ from flask import (jsonify, request, g,
         current_app, Response, render_template,
         make_response)
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import alias
 from . import app, db, auth
 from .decorators import etag
 from .exception import InvalidAPIUsage
 from .model.models import Model
 from .model.utils import _get_session
+from json import dumps
+from sqlalchemy.util._collections import KeyedTuple
 
 
 JSON, HTML = range(2)
@@ -94,7 +95,7 @@ def _single_attribute_json_response(name, value):
     :rtype: :class:`flask.Response`
 
     """
-    print 'json val'
+    print '_single_attribute_json_response'
     return jsonify({name: str(value)})
 
 def _single_resource_json_response(resource, depth=0):
@@ -105,7 +106,7 @@ def _single_resource_json_response(resource, depth=0):
     :rtype: :class:`flask.Response`
 
     """
-    print 'json res'
+    print '_single_resource_json_response'
     links = resource.links()
     response = jsonify(**resource.as_dict(depth))
     response.headers['Link'] = ''
@@ -123,6 +124,7 @@ def _single_attribute_html_response(resource, name, value):
     :rtype: :class:`flask.Response`
 
     """
+    print '_single_attribute_html_response'
     return make_response(render_template('attribute.html', resource=resource,
         name=name, value=value))
 
@@ -134,6 +136,7 @@ def _single_resource_html_response(resource):
     :rtype: :class:`flask.Response`
 
     """
+    print '_single_resource_html_response'
     tablename = resource.__tablename__
     resource.pk = getattr(resource, resource.primary_key())
     resource.attributes = resource.as_dict()
@@ -147,14 +150,14 @@ def _collection_json_response(resources, start, stop, depth=0):
     :rtype: :class:`flask.Response`
 
     """
-    print 'json collection'
-    result_list = []
-    for resource in resources:
-        result_list.append(resource.as_dict(depth))
+    print '_collection_json_response'
+    #result_list = []
+    #for resource in resources:
+    #    result_list.append(resource.as_dict(depth))
     if start is not None:
-        return jsonify(resources=result_list[start:stop])
+        return jsonify(resources=resources[start:stop])#result_list[start:stop])
     else:
-        return jsonify(resources=result_list)
+        return jsonify(resources=resources)#result_list)
 
 def _collection_html_response(resources, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
@@ -163,6 +166,7 @@ def _collection_html_response(resources, start=0, stop=20):
     :rtype: :class:`flask.Response`
 
     """
+    print '_collection_html_response'
     return make_response(render_template('collection.html',
         resources=resources[start:stop]))
 
@@ -247,10 +251,10 @@ def retrieve_collection(collection, query_arguments=None):
 	    elif key == 'limit':
 		limits = value
 	    elif key == 'join':
-		f1 = value.split('.')[0]
-		t2 = value.split('.')[1]
-		f2 = value.split('.')[2]
-		cls2 = endpoint_class(t2)
+		#f1 = value.split('.')[0]
+		#t2 = value.split('.')[1]
+		#f2 = value.split('.')[2]
+		cls2 = endpoint_class(value)#t2)
 		joins = 1;
 		#joins.append(getattr(cls, f1)==getattr(cls2, f2))
             elif value.startswith('<'):
@@ -262,22 +266,42 @@ def retrieve_collection(collection, query_arguments=None):
 		filters.append(getattr(cls, key) <= value[1:-1].split(':')[1])
 	    elif key:
                 filters.append(getattr(cls, key) == value)
-	#print 'e'
-	#print t2
-	#resources = session.query(cls, cls2).select_from(join(cls, cls2)).filter(getattr(cls,f1)==getattr(cls2,f2)).all()
-	#resources = session.query(cls, cls2).select_from(cls2).join(cls2, getattr(cls, f1)==getattr(cls2, f2))
-	#print 'it worked'
-	#resources = session.query(cls).all()
 	if joins == 1 :
 		print 'case1'
-		resources = session.query(getattr(aliased(cls), f1) , getattr(cls2, f2)).join(cls,getattr(cls, f1)==getattr(cls2, f2))#.filter(*filters).order_by(*order).limit(limits)
+		resources = session.query(cls,cls2).join(cls2).filter(*filters).order_by(*order)		
+		if limits != 0:
+			resources = resources.limit(limits)
+		res = []
+		for resource in resources:
+			#mixing dicts		
+			dicts = {}
+			links = []
+			for tablename, table in resource._asdict().items():
+				for fieldname, field in table.as_dict().items():
+					if fieldname == 'links':
+						field[0]['rel'] = tablename
+						links.append(field[0])				
+					elif fieldname != 'self': 
+						dicts.update({tablename + "." + fieldname: field})
+			dicts.update({'links': links})
+			res.append(dicts)	
+		resources = res
 	else:
 		print 'case2'
-		resources = session.query(cls).filter(*filters).order_by(*order).limit(limits)
-		
+		resources = session.query(cls).filter(*filters).order_by(*order)
+		if limits != 0:
+			resources = resources.limit(limits)
+		res = []
+		for resource in resources:
+			res.append(resource.as_dict())
+		resources = res
     else:
 	print 'case3'
         resources = session.query(cls).all()
+	res = []
+	for resource in resources:
+		res.append(resource.as_dict())
+	resources = res
 	print 'end'
     return resources
 
@@ -528,19 +552,17 @@ def get_collection(collection):
     :rtype: :class:`flask.Response`
 
     """
+    print 'get_collection'
     cls = endpoint_class(collection)
 
     resources = retrieve_collection(collection, request.args)
-    print 'retrieved collection' 
     _validate(cls, request.method, resources)
-    print 'valid'
     start = stop = None
 
     if request.args and 'page' in request.args:
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
         start, stop = page * results_per_page, (page +1) * results_per_page
-    print 'collection response'
     return collection_response(resources, start, stop)
 
 @app.route('/', methods=['GET'])
