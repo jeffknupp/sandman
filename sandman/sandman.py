@@ -95,7 +95,6 @@ def _single_attribute_json_response(name, value):
     :rtype: :class:`flask.Response`
 
     """
-    print '_single_attribute_json_response'
     return jsonify({name: str(value)})
 
 def _single_resource_json_response(resource, depth=0):
@@ -106,7 +105,6 @@ def _single_resource_json_response(resource, depth=0):
     :rtype: :class:`flask.Response`
 
     """
-    print '_single_resource_json_response'
     links = resource.links()
     response = jsonify(**resource.as_dict(depth))
     response.headers['Link'] = ''
@@ -124,7 +122,6 @@ def _single_attribute_html_response(resource, name, value):
     :rtype: :class:`flask.Response`
 
     """
-    print '_single_attribute_html_response'
     return make_response(render_template('attribute.html', resource=resource,
         name=name, value=value))
 
@@ -136,7 +133,6 @@ def _single_resource_html_response(resource):
     :rtype: :class:`flask.Response`
 
     """
-    print '_single_resource_html_response'
     tablename = resource.__tablename__
     resource.pk = getattr(resource, resource.primary_key())
     resource.attributes = resource.as_dict()
@@ -150,7 +146,6 @@ def _collection_json_response(resources, start, stop, depth=0):
     :rtype: :class:`flask.Response`
 
     """
-    print '_collection_json_response'
     if start is not None:
         return jsonify(resources=resources[start:stop])
     else:
@@ -163,7 +158,6 @@ def _collection_html_response(resources, resources_name, start=0, stop=20):
     :rtype: :class:`flask.Response`
 
     """
-    print '_collection_html_response '
     if start is not None:
         return make_response(render_template('collection.html',
             resources=resources[start:stop], resources_name=resources_name))
@@ -311,7 +305,7 @@ def retrieve_collection(collection, query_arguments=None):
 	    dicts.update({'links': links})
 	    _resources.append(dicts)
 	if resources.all() == []:
-	    resources_name = 'No Data found with the given criterion'
+	    resources_name = 'No Collection'
 	else:
 	    resources_name = reduce(lambda s,t : s + ">" + t, resources[0]._asdict().keys())
 	    resources_name = resources_name = "Join:"+resources_name
@@ -320,7 +314,7 @@ def retrieve_collection(collection, query_arguments=None):
 	for resource in resources:
 	    _resources.append(resource.as_dict())
 	if resources.all() == []:
-	    resources_name = 'No Data found with the given criterion'
+	    resources_name = 'No Collection'
 	else:
 	    resources_name = resources[0].__tablename__
     resources = _resources
@@ -573,7 +567,6 @@ def get_collection(collection):
     :rtype: :class:`flask.Response`
 
     """
-    print 'get_collection'
     cls = endpoint_class(collection)
 
     resources, resources_name = retrieve_collection(collection, request.args)

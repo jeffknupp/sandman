@@ -3,10 +3,10 @@
 
 <div class="col-md-8">
 {% if resources %}
-<h2>{% for key in resources[0].keys() %}<th>{{ key }}</th>{% endfor %}</h2>
+<h2>{{  resources_name }}</h2>
 <table class="table table-condensed table-striped">
     <thead>
-        {% for name in resources[0].as_dict() %}
+        {% for name in resources[0].keys() %}
         <th>{{ name }}</th>
         {% endfor %}
     </thead>
