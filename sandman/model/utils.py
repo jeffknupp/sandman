@@ -32,19 +32,18 @@ def generate_endpoint_classes(db, generate_pks=False):
         for name, table in db.metadata.tables.items():
             if not name in seen_classes:
                 seen_classes.add(name)
-		print name
                 if not table.primary_key and generate_pks:
                     cls = add_pk_if_required(db, table, name)
                 else:
                     cls = type(str(name), (sandman_model, db.Model),
                         {'__tablename__': name})
                 register(cls)
-	# MODIFIED TO INCLUDE VIEWS
+	# added this to include views
+	# for the moment, the primary key for views is set on the first column, looking for something wiser to do
         db.metadata.reflect(bind=db.engine, views=True)
         for name, table in db.metadata.tables.items():
             if not name in seen_classes:
                 seen_classes.add(name)
-		print 'view'+name
                 cls = add_pk_if_required(db, table, name)
                 register(cls)
 

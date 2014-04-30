@@ -2,11 +2,11 @@
 {% block content %}
 
 <div class="col-md-8">
-<h2>{{ 'TODO' }}</h2>
+<h2>{{  resources_name }}</h2>
 <table class="table table-bordered table-hover">
 <thead>
 <tr>
-{% for key in resources[0].keys() %}<th>{{ key }}</th>{% endfor %}
+{% if resources != [] %}{% for key in resources[0].keys() %}<th>{{ key }}</th>{% endfor %}{% endif %}
 </tr>
 </thead>
 

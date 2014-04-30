@@ -9,8 +9,7 @@ from .decorators import etag
 from .exception import InvalidAPIUsage
 from .model.models import Model
 from .model.utils import _get_session
-from json import dumps
-from sqlalchemy.util._collections import KeyedTuple
+
 
 
 JSON, HTML = range(2)
@@ -26,7 +25,9 @@ type [{}].  Acceptable methods: [{}]"""
 UNSUPPORTED_CONTENT_TYPE_MESSAGE = 'Content-type [{types}] not supported.'
 #UNSUPPORTED_CONTENT_TYPE_MESSAGE += """\nSupported values for 'Content-type': {}""".format(ACCEPTABLE_CONTENT_TYPES)
 
-
+#Simple authentification
+#https://sandman.readthedocs.org/en/latest/authentication.html
+'''
 @auth.get_password
 def get_password(username):
     """Return the password for *username*."""
@@ -36,8 +37,7 @@ def get_password(username):
 @auth.login_required
 def before_request():
 	pass
-#https://sandman.readthedocs.org/en/latest/authentication.html
-
+'''
 
 def _perform_database_action(action, *args):
     """Call session.*action* with the given *args*.
@@ -151,24 +151,25 @@ def _collection_json_response(resources, start, stop, depth=0):
 
     """
     print '_collection_json_response'
-    #result_list = []
-    #for resource in resources:
-    #    result_list.append(resource.as_dict(depth))
     if start is not None:
-        return jsonify(resources=resources[start:stop])#result_list[start:stop])
+        return jsonify(resources=resources[start:stop])
     else:
-        return jsonify(resources=resources)#result_list)
+        return jsonify(resources=resources)
 
-def _collection_html_response(resources, start=0, stop=20):
+def _collection_html_response(resources, resources_name, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
     :rtype: :class:`flask.Response`
 
     """
-    print '_collection_html_response'
-    return make_response(render_template('collection.html',
-        resources=resources[start:stop]))
+    print '_collection_html_response '
+    if start is not None:
+        return make_response(render_template('collection.html',
+            resources=resources[start:stop], resources_name=resources_name))
+    else:
+        return make_response(render_template('collection.html',
+            resources=resources, resources_name=resources_name))	
 
 def _validate(cls, method, resource=None):
     """Return ``True`` if the the given *cls* supports the HTTP *method* found
@@ -236,74 +237,94 @@ def retrieve_collection(collection, query_arguments=None):
     """
     session = _get_session()
     cls = endpoint_class(collection)
-    if query_arguments:
-        filters = []
-        order = []
-	joins = 0
-	limits = 0
-        for key, value in query_arguments.items():
-            if key == 'page':
-                continue
-            if value.startswith('%'):
-                filters.append(getattr(cls, key).like(str(value), escape='/'))
-            elif key == 'sort':
-                order.append(getattr(cls, value))
-	    elif key == 'limit':
-		limits = value
-	    elif key == 'join':
-		#f1 = value.split('.')[0]
-		#t2 = value.split('.')[1]
-		#f2 = value.split('.')[2]
-		cls2 = endpoint_class(value)#t2)
-		joins = 1;
-		#joins.append(getattr(cls, f1)==getattr(cls2, f2))
-            elif value.startswith('<'):
-		filters.append(getattr(cls, key) <= value[1:])
-	    elif value.startswith('>'):
-		filters.append(getattr(cls, key) >= value[1:])
-	    elif value.startswith('[') and value.endswith(']'):
-		filters.append(getattr(cls, key) >= value[1:-1].split(':')[0])	
-		filters.append(getattr(cls, key) <= value[1:-1].split(':')[1])
-	    elif key:
-                filters.append(getattr(cls, key) == value)
-	if joins == 1 :
-		print 'case1'
-		resources = session.query(cls,cls2).join(cls2).filter(*filters).order_by(*order)		
-		if limits != 0:
-			resources = resources.limit(limits)
-		res = []
-		for resource in resources:
-			#mixing dicts		
-			dicts = {}
-			links = []
-			for tablename, table in resource._asdict().items():
-				for fieldname, field in table.as_dict().items():
-					if fieldname == 'links':
-						field[0]['rel'] = tablename
-						links.append(field[0])				
-					elif fieldname != 'self': 
-						dicts.update({tablename + "." + fieldname: field})
-			dicts.update({'links': links})
-			res.append(dicts)	
-		resources = res
+
+    filters = []
+    order = []
+    join_query = [cls]
+    join_ons = []
+    limits = 0
+
+    for key, value in query_arguments.items():
+	# specify the current page displayed
+        if key == 'page':
+            continue
+	# perform like selection on a column
+        if value.startswith('%'):
+            filters.append(getattr(cls, key).like(str(value), escape='/'))
+	# sort according to columns
+        elif key == 'sort':
+            order.append(getattr(cls, value))
+	# limit the amount of data returned
+        elif key == 'limit':
+	    limits = value
+	# request joins
+	# Syntax is << /table1?jointo:table2.field2=field1 >> equivalent to << SELECT * FROM table1 JOIN table2 ON table1.field1 = table2.field2 >>
+	elif key.startswith('jointo:'):
+	    if value == 'fk':
+		join_cls_2 = endpoint_class(key[7:])
+		join_ons.append(join_cls_2)
+	    else:
+	        join_cls_2 = endpoint_class(key[7:].split('.')[0])
+	        join_field_1 = value
+                join_field_2 = key[7:].split('.')[1]
+	        join_ons.append((join_cls_2, getattr(cls, join_field_1)==getattr(join_cls_2, join_field_2)))
+	    join_query.append(join_cls_2)
+	# select rows for which the value is lower than << /table?field=<42 >>
+        elif value.startswith('<'):
+	    filters.append(getattr(cls, key) <= value[1:])
+	# select rows for which the value is greater than << /table?field=>42 >>
+	elif value.startswith('>'):
+	    filters.append(getattr(cls, key) >= value[1:])
+	# select rows for which the value is in the set << /table?field=[42:142] >>
+	elif value.startswith('[') and value.endswith(']'):
+	    filters.append(getattr(cls, key) >= value[1:-1].split(':')[0])	
+	    filters.append(getattr(cls, key) <= value[1:-1].split(':')[1])
+	# select rows for which the value is known << /table?field=42 >>
+	elif key:
+            filters.append(getattr(cls, key) == value)
+
+    resources = session.query(*join_query)
+    # perform the joins	
+    for join_on in join_ons:
+        resources = resources.join(join_on)
+    # apply filters
+    resources = resources.filter(*filters).order_by(*order)			
+    if limits != 0:
+	resources = resources.limit(limits)
+    # postprocess data so that it can be displayed for more than one table	
+    _resources = []
+    resources_name = ''
+    if len(join_query) > 1:
+	# are there joins requested? (returned data structure is different)
+	for resource in resources:		
+	    dicts = {}
+	    links = []
+	    for tablename, table in resource._asdict().items():
+	        for fieldname, field in table.as_dict().items():
+	            if fieldname == 'links':
+	                field[0]['rel'] = tablename
+	                links.append(field[0])	
+		    elif fieldname == 'self':
+			continue			
+                    else:
+	                dicts.update({tablename + "." + fieldname: field})
+	    dicts.update({'links': links})
+	    _resources.append(dicts)
+	if resources.all() == []:
+	    resources_name = 'No Data found with the given criterion'
 	else:
-		print 'case2'
-		resources = session.query(cls).filter(*filters).order_by(*order)
-		if limits != 0:
-			resources = resources.limit(limits)
-		res = []
-		for resource in resources:
-			res.append(resource.as_dict())
-		resources = res
+	    resources_name = reduce(lambda s,t : s + ">" + t, resources[0]._asdict().keys())
+	    resources_name = resources_name = "Join:"+resources_name
     else:
-	print 'case3'
-        resources = session.query(cls).all()
-	res = []
+	# no joins
 	for resource in resources:
-		res.append(resource.as_dict())
-	resources = res
-	print 'end'
-    return resources
+	    _resources.append(resource.as_dict())
+	if resources.all() == []:
+	    resources_name = 'No Data found with the given criterion'
+	else:
+	    resources_name = resources[0].__tablename__
+    resources = _resources
+    return resources, resources_name
 
 
 def retrieve_resource(collection, key):
@@ -339,7 +360,7 @@ def resource_created_response(resource):
             resource.resource_uri())
     return response
 
-def collection_response(resources, start=None, stop=None):
+def collection_response(resources, resources_name, start=None, stop=None):
     """Return a response for the *resources* of the appropriate content type.
 
     :param resources: resources to be returned in request
@@ -350,7 +371,7 @@ def collection_response(resources, start=None, stop=None):
     if _get_acceptable_response_type() == JSON:
         return _collection_json_response(resources, start, stop)
     else:
-        return _collection_html_response(resources, start, stop)
+        return _collection_html_response(resources, resources_name, start, stop)
 
 
 def resource_response(resource, depth=0):
@@ -555,7 +576,7 @@ def get_collection(collection):
     print 'get_collection'
     cls = endpoint_class(collection)
 
-    resources = retrieve_collection(collection, request.args)
+    resources, resources_name = retrieve_collection(collection, request.args)
     _validate(cls, request.method, resources)
     start = stop = None
 
@@ -563,7 +584,7 @@ def get_collection(collection):
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
         start, stop = page * results_per_page, (page +1) * results_per_page
-    return collection_response(resources, start, stop)
+    return collection_response(resources, resources_name, start, stop)
 
 @app.route('/', methods=['GET'])
 @etag
