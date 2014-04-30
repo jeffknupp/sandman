@@ -37,8 +37,7 @@ def etag(f):
         elif if_none_match:
             etag_list = [tag.strip() for tag in if_none_match.split(',')]
             if etag in etag_list or '*' in etag_list:              
-		rv = Response(status = 304)		
-		#rv = not_modified()
+		rv = not_modified()
         return rv
     return wrapped
 
