@@ -17,7 +17,7 @@
                 {% if attribute == 'links' %}
                     <td><ul>
                     {% for link in value %}
-                        <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ link.rel }}</a></li>
+                        <li><a href="{{ link['uri'] }}">{{ link['rel'] }}</a></li>
                     {% endfor %}
                     </ul></td>
                 {% else %}

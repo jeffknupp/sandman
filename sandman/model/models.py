@@ -91,7 +91,7 @@ class Model(object):
                 table = foreign_key.column.table.name
                 with app.app_context():
                     endpoint = current_app.class_references[table]
-                links.append({'rel': 'related', 'uri': '/{}/{}'.format(
+                links.append({'rel': 'related('+table+')', 'uri': '/{}/{}'.format(
                     endpoint.__name__, column_value)})
         links.append({'rel': 'self', 'uri': self.resource_uri()})
         return links

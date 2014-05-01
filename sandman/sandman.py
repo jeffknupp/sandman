@@ -296,8 +296,9 @@ def retrieve_collection(collection, query_arguments=None):
 	    for tablename, table in resource._asdict().items():
 	        for fieldname, field in table.as_dict().items():
 	            if fieldname == 'links':
-	                field[0]['rel'] = tablename
-	                links.append(field[0])	
+			for link in field:
+ 	                	link['rel'] = tablename+'.'+link['rel']
+	                	links.append(link)	
 		    elif fieldname == 'self':
 			continue			
                     else:
