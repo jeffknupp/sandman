@@ -2,9 +2,15 @@
 
 from flask.ext.admin.contrib.sqla import ModelView
 from sandman.model import register, Model, activate
+from sandman.model.models import db
 
 class ArtistAdminView(ModelView):
     pass
+
+class SomeModel(db.Model):
+    __tablename__ = 'some_model'
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.String)
 
 class Artist(Model):
     """Model mapped to the "Artist" table"""
@@ -89,6 +95,5 @@ class Style(Model):
             return False
         return True
 
-register((Artist, Album, Playlist, Track, MediaType))
-register(Style)
+register((Artist, Album, Playlist, Track, MediaType, Style, SomeModel))
 activate(browser=True)
