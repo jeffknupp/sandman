@@ -1,4 +1,11 @@
 from sandman.model import register, activate, Model
+from sandman import db
+
+class SomeModel(db.Model):
+    __tablename__ = 'some_model'
+
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.String)
 
 class Track(Model):
     __tablename__ = 'Track'
@@ -43,5 +50,5 @@ class Genre(Model):
     def __str__(self):
         return self.Name
 
-register((Artist, Album, Playlist, Type, Track, MediaType, PlaylistTrack, Genre))
+register((Artist, Album, Playlist, Type, Track, MediaType, PlaylistTrack, Genre, SomeModel))
 activate(admin=True, browser=False)
