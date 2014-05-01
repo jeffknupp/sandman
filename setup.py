@@ -46,6 +46,7 @@ setup(
                       'Flask-Admin>=1.0.6',
                       'Flask-HTTPAuth>=2.2.1',
                       'docopt>=0.6.1',
+                      'sphinx-rtd-theme',
                       ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
