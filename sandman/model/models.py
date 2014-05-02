@@ -5,9 +5,9 @@ from decimal import Decimal
 
 from flask import current_app
 from flask.ext.admin.contrib.sqla import ModelView
+from flask.ext.sqlalchemy import SQLAlchemy
 
-from sandman import app, db
-
+db = SQLAlchemy()
 
 class Model(object):
     """A mixin class containing the majority of the RESTful API functionality.
@@ -117,8 +117,7 @@ class Model(object):
                 table = foreign_key.column.table.name
                 with app.app_context():
                     endpoint = current_app.class_references[table]
-                    session = db.session()
-                    resource = session.query(endpoint).get(column_value)
+                    resource = endpoint.query.get(column_value)
                 if depth > 0:
                     result_dict.update({
                         'rel': endpoint.__name__, 

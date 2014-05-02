@@ -10,8 +10,8 @@ from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 
-from sandman import app, db
-from sandman.model.models import Model, AdminModelViewWithPK
+from sandman.application import app
+from sandman.model.models import db, Model, AdminModelViewWithPK
 
 def _get_session():
     """Return (and memoize) a database session"""

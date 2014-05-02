@@ -1,14 +1,15 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
+from __future__ import absolute_import
 
 from flask import (jsonify, request, g,
         current_app, Response, render_template,
         make_response)
 from sqlalchemy.exc import IntegrityError
-from . import app, db
-from .decorators import etag
-from .exception import InvalidAPIUsage
-from .model.models import Model
-from .model.utils import _get_session
+from sandman.application import app
+from sandman.decorators import etag
+from sandman.exception import InvalidAPIUsage
+from sandman.model.models import Model
+from sandman.model.utils import _get_session
 
 JSON, HTML = range(2)
 JSON_CONTENT_TYPES = set(['application/json',])

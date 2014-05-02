@@ -1,7 +1,5 @@
 """Run server"""
-from sandman import app, db
-import os
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite+pysqlite:///tests/data/existing.sqlite3'
-app.secret_key = 's3cr3t'
+from sandman.application import get_app
+app = get_app('test', 'sqlite+pysqlite:///tests/data/existing.sqlite3')
 import models
 app.run(host='0.0.0.0', debug=True)

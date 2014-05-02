@@ -1,5 +1,5 @@
 from sandman.model import register, activate, Model
-from sandman import db
+from sandman.model.models import db
 
 class SomeModel(db.Model):
     __tablename__ = 'some_model'
