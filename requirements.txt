@@ -9,5 +9,5 @@ WTForms==1.0.5
 Werkzeug==0.9.4
 itsdangerous==0.24
 wsgiref==0.1.2
-docopt==0.6.1
+click==0.7
 sphinx-rtd-theme==0.1.6
