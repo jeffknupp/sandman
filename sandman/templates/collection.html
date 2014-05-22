@@ -3,28 +3,30 @@
 
 <div class="col-md-8">
 {% if resources %}
-<h2>{{ resources[0].__tablename__ }}</h2>
+<h2>{{  resources_name }}</h2>
 <table class="table table-condensed table-striped">
     <thead>
-        {% for name in resources[0].as_dict() %}
+        {% for name in resources[0].keys() %}
         <th>{{ name }}</th>
         {% endfor %}
     </thead>
     <tbody>
     {% for resource in resources %}
         <tr>
-            {% for attribute, value in resource.as_dict().items() %}
+            {% for attribute, value in resource.items() %}
                 {% if attribute == 'links' %}
-                <td><ul>
+                    <td><ul>
                     {% for link in value %}
-                        <li>{{ attribute }}: <a href="{{ value[0].uri }}">{{ value[0].rel }}</a></li>
+                        <li><a href="{{ link['uri'] }}">{{ link['rel'] }}</a></li>
                     {% endfor %}
-            </ul></td>
-                    {% else %}
+                    </ul></td>
+                {% else %}
                     <td>{{ value }}</td>
-                    {% endif %}
-                {% endfor %}
-    {% endfor %}
+                {% endif %}
+             {% endfor %}
+
+	</tr>
+     {% endfor %}
 </table>
 {% else %}
 <h2>Empty collection</h2>
