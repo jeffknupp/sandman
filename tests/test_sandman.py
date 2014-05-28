@@ -29,7 +29,7 @@ class TestSandmanBase(object):
         self.app = app.test_client()
         #pylint: disable=unused-variable
         from . import models
- 
+
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
@@ -71,6 +71,11 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200)
         assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
+
+    def test_get_with_limit(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'limit': 10})
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 10
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""

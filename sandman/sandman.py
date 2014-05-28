@@ -211,6 +211,7 @@ def retrieve_collection(collection, query_arguments=None):
     if query_arguments:
         filters = []
         order = []
+        limit = None
         for key, value in query_arguments.items():
             if key == 'page':
                 continue
@@ -218,9 +219,11 @@ def retrieve_collection(collection, query_arguments=None):
                 filters.append(getattr(cls, key).like(str(value), escape='/'))
             elif key == 'sort':
                 order.append(getattr(cls, value))
+            elif key == 'limit':
+                limit = value
             elif key:
                 filters.append(getattr(cls, key) == value)
-        resources = session.query(cls).filter(*filters).order_by(*order)
+        resources = session.query(cls).filter(*filters).order_by(*order).limit(limit)
     else:
         resources = session.query(cls).all()
     return resources
