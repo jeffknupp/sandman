@@ -289,6 +289,12 @@ class TestSandmanUserDefinitions(TestSandmanBase):
                       'UnitPrice': 0.99,}))
         assert response.status_code == 403
 
+    def test_responds_with_top_level_json_name_if_present(self):
+        """Test top level json element is the one defined on the Model
+        rather than the string 'resources'"""
+        response = self.get_response('/albums', 200)
+        assert len(json.loads(response.get_data(as_text=True))[u'Albums']) == 347
+
 class TestSandmanValidation(TestSandmanBase):
     """Sandman tests related to request validation"""
 

@@ -51,6 +51,7 @@ class Album(Model):
 
     __tablename__ = 'Album'
     __methods__ = ('POST', 'PATCH', 'DELETE', 'PUT', 'GET')
+    __top_level_json_name__ = 'Albums'
 
     def __str__(self):
         """Return string representation of *self*."""

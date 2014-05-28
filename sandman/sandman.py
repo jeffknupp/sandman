@@ -117,20 +117,31 @@ def _single_resource_html_response(resource):
     return make_response(render_template('resource.html', resource=resource,
         tablename=tablename))
 
-def _collection_json_response(resources, start, stop, depth=0):
+def _collection_json_response(cls, resources, start, stop, depth=0):
     """Return the JSON representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
     :rtype: :class:`flask.Response`
 
     """
+
+    top_level_json_name = None
+    if cls.__top_level_json_name__ is not None:
+        top_level_json_name = cls.__top_level_json_name__
+    else:
+        top_level_json_name = 'resources'
+
     result_list = []
     for resource in resources:
         result_list.append(resource.as_dict(depth))
+
+    payload = {}
     if start is not None:
-        return jsonify(resources=result_list[start:stop])
+        payload[top_level_json_name] = result_list[start:stop]
     else:
-        return jsonify(resources=result_list)
+        payload[top_level_json_name] = result_list
+
+    return jsonify(payload)
 
 def _collection_html_response(resources, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
@@ -262,7 +273,7 @@ def resource_created_response(resource):
             resource.resource_uri())
     return response
 
-def collection_response(resources, start=None, stop=None):
+def collection_response(cls, resources, start=None, stop=None):
     """Return a response for the *resources* of the appropriate content type.
 
     :param resources: resources to be returned in request
@@ -271,7 +282,7 @@ def collection_response(resources, start=None, stop=None):
 
     """
     if _get_acceptable_response_type() == JSON:
-        return _collection_json_response(resources, start, stop)
+        return _collection_json_response(cls, resources, start, stop)
     else:
         return _collection_html_response(resources, start, stop)
 
@@ -487,7 +498,7 @@ def get_collection(collection):
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
         start, stop = page * results_per_page, (page +1) * results_per_page
-    return collection_response(resources, start, stop)
+    return collection_response(cls, resources, start, stop)
 
 @app.route('/', methods=['GET'])
 @etag
