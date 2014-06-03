@@ -29,7 +29,7 @@ class TestSandmanBase(object):
         self.app = app.test_client()
         #pylint: disable=unused-variable
         from . import models
- 
+
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
@@ -71,6 +71,11 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200)
         assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
+
+    def test_get_with_limit(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'limit': 10})
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 10
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""
@@ -283,6 +288,12 @@ class TestSandmanUserDefinitions(TestSandmanBase):
                       'TrackId': 999,
                       'UnitPrice': 0.99,}))
         assert response.status_code == 403
+
+    def test_responds_with_top_level_json_name_if_present(self):
+        """Test top level json element is the one defined on the Model
+        rather than the string 'resources'"""
+        response = self.get_response('/albums', 200)
+        assert len(json.loads(response.get_data(as_text=True))[u'Albums']) == 347
 
 class TestSandmanValidation(TestSandmanBase):
     """Sandman tests related to request validation"""

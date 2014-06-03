@@ -29,6 +29,12 @@ class Model(object):
     Default: None
     """
 
+    __top_level_json_name__ = None
+    """The top level json text to output for this class
+
+    Default: 'resources'
+    """
+
     __methods__ = ('GET', 'POST', 'PATCH', 'DELETE', 'PUT')
     """override :attr:`__methods__` if you wish to change the HTTP methods
     this :class:`sandman.model.Model` supports.

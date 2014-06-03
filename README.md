@@ -157,7 +157,8 @@ register((Artist, Album, Playlist))
 ```
 
 And if you wanted to add custom logic for an endpoint? Or change the endpoint
-name? Or add validation? All supported. Here's a "fancy" class definition:
+name? Or change your top level json object name? Or add validation? All supported.
+Here's a "fancy" class definition:
 
 ```python
 class Style(Model):
@@ -172,6 +173,7 @@ class Style(Model):
     __tablename__ = 'Genre'
     __endpoint__ = 'styles'
     __methods__ = ('GET', 'DELETE')
+    __top_level_json_name__ = 'Genres'
 
     @staticmethod
     def validate_GET(resource=None):
