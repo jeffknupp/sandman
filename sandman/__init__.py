@@ -5,12 +5,13 @@ associated database table, and off you go! The generated API essentially exposes
 a completely new system based on your existing data, using HATEOAS."""
 import os
 
-from flask import Flask
+from flask import Flask, send_file
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
 app.secret_key = '42'
+app.static_folder = 'static'
 db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
 from . import sandman
@@ -29,6 +30,16 @@ def css_proxy(path):
 def img_proxy(path):
     # send_static_file will guess the correct MIME type
     return app.send_static_file(os.path.join('img', path))
+
+@app.route('/static/img/<path:path>/<file>.png')
+def png_proxy(path, file):
+    # send_static_file will guess the correct MIME type
+    return send_file(os.path.join('static/img', path,  file + '.png'))
+
+@app.route('/static/fonts/<path:path>')
+def font_proxy(path):
+    # send_static_file will guess the correct MIME type
+    return app.send_static_file(os.path.join('fonts', path))
 
 
 

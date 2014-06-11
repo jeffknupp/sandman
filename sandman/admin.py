@@ -13,12 +13,12 @@ class Admin():
         self._name = name
         self.blueprint = Blueprint(self._endpoint, name)
         self.blueprint.add_url_rule(self._endpoint, view_func=self.home)
-        self._model_classes = []
+        self._tables = []
 
     def register(self, cls):
         """Register a class to be given a REST API."""
         cls.__admin__ = self
-        self._model_classes.append(cls)
+        self._tables.append(cls.__model__.__tablename__)
         view_func = cls.as_view(
             cls.__model__.__tablename__)
         self.blueprint.add_url_rule(
@@ -26,7 +26,7 @@ class Admin():
             view_func=view_func)
 
     def home(self):
-        return render_template('admin/base.html')
+        return render_template('admin/base.html', admin=self)
 
 
 class AdminModel(MethodView):
