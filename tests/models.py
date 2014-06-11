@@ -96,4 +96,4 @@ class Style(Model):
         return True
 
 register((Artist, Album, Playlist, Track, MediaType, Style, SomeModel))
-activate(browser=True)
+activate(admin=True, browser=True)

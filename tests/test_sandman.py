@@ -452,32 +452,14 @@ class TestSandmanAdmin(TestSandmanBase):
 
     def test_admin_index(self):
         """Ensure the main admin page is served correctly."""
-        self.get_response('/admin/', 200)
+        self.get_response('/admin', 200)
 
     def test_admin_collection_view(self):
         """Ensure user-defined ``__str__`` implementations are being picked up
         by the admin."""
 
-        response = self.get_response('/admin/trackview/', 200)
+        response = self.get_response('/admin/track', 200)
         # If related tables are being loaded correctly, Tracks will have a
         # Mediatype column, at least one of which has the value 'MPEG audio
         # file'.
-        assert 'MPEG audio file' in str(response.get_data(as_text=True))
-
-    def test_admin_default_str_repr(self):
-        """Ensure default ``__str__`` implementations works in the admin."""
-
-        response = self.get_response('/admin/trackview/?page=3/', 200)
-        # If related tables are being loaded correctly, Tracks will have a
-        # Genre column, but should display the GenreId and not the name ('Jazz'
-        # is the genre for many results on the third page
-        assert 'Jazz' not in str(response.get_data(as_text=True))
-
-    #pylint: disable=invalid-name
-    def test_admin_default_str_repr_different_table_class_name(self):
-        """Ensure default ``__str__`` representation for classes where the
-        classname differs from the table name show up with the classname (not the
-        table name)."""
-
-        response = self.get_response('/admin/styleview/', 200)
-        assert 'Genre' not in str(response.get_data(as_text=True))
+        assert 'Balls to the Wall' in response.data
