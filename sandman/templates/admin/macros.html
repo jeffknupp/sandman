@@ -1,0 +1,16 @@
+{% macro list_resources(resources) %}
+<table class="table" role="table">
+    <thead>
+    {% for attribute in resources[0].__table__.columns.keys() %}
+        <th>{{ attribute }}</th>
+    {% endfor %}
+    </thead>
+    {% for resource in resources %}
+        <tr>
+            {% for attribute in resource.__table__.columns.keys() %}
+                <td>{{ resource|attr(attribute) }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+{% endmacro %}

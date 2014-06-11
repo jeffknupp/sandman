@@ -3,15 +3,14 @@ import webbrowser
 import collections
 
 from flask import current_app, g
-from flask.ext.admin import Admin
-from flask.ext.admin.contrib.sqla import ModelView
 from sqlalchemy.engine import reflection
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 
 from sandman import app, db
-from sandman.model.models import Model, AdminModelViewWithPK
+from sandman.model.models import Model
+from sandman.admin import Admin, AdminModel
 
 def _get_session():
     """Return (and memoize) a database session"""
@@ -125,23 +124,13 @@ def register_classes_for_admin(db_session, show_pks=True,
     """
 
     with app.app_context():
-        admin_view = Admin(current_app, name=name)
+        admin = Admin(current_app, name=name)
         for cls in set(cls for cls in current_app.class_references.values() if
                 cls.use_admin == True):
-            column_list = [column.name for column in
-                    cls.__table__.columns.values()]
-            if hasattr(cls, '__view__'):
-                # allow ability for model classes to specify model views
-                admin_view_class = type('AdminView', (cls.__view__,),
-                        {'form_columns': column_list})
-            elif show_pks:
-                # the default of Flask-SQLAlchemy is to not show primary
-                # classes, which obviously isn't acceptable in some cases
-                admin_view_class = type('AdminView', (AdminModelViewWithPK,),
-                        {'form_columns': column_list})
-            else:
-                admin_view_class = ModelView
-            admin_view.add_view(admin_view_class(cls, db_session))
+                admin_view_class = type(cls.__name__ + 'AdminModel', (AdminModel,), {'__model__': cls})
+                admin.register(admin_view_class)
+
+        app.register_blueprint(admin.blueprint)
 
 def activate(admin=True, browser=True, name='admin', reflect_all=False):
     """Activate each pre-registered model or generate the model classes and

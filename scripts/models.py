@@ -50,5 +50,5 @@ class Genre(Model):
     def __str__(self):
         return self.Name
 
-register((Artist, Album, Playlist, Type, Track, MediaType, PlaylistTrack, Genre, SomeModel))
+register((Artist, Album, Playlist, Type, Track, MediaType, PlaylistTrack)) 
 activate(admin=True, browser=False)
