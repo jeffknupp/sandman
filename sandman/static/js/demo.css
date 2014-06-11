@@ -1,0 +1,209 @@
+	/*
+	 * Toggle Demo
+	 */
+	
+	.toggle-demo {
+		position: absolute;
+		top: 10px;
+		right: -8px;
+		display: block;
+		width: 150px;
+		height: auto;
+		z-index: 99;
+		opacity: .9;
+		
+	}.toggle-demo:hover {
+		opacity:1;
+	}
+	
+	.toggle-demo .btn-group {
+		width:100px;
+		float:left;
+	}
+	
+	.toggle-demo > span {
+		display:inline-block;
+		float:left;
+		margin-right:5px;
+		line-height: 21px;
+		color: #757575;
+	}
+	
+
+	/*
+	 * noUISlider vertical demo
+	 */
+	.demo-vertical-uislider {
+		
+		box-sizing: border-box;
+		-webkit-box-sizing:border-box;
+		-moz-box-sizing:border-box;
+	}
+	.demo-vertical-uislider > div {
+		height:200px;
+		margin: 0 0px 0 10px;
+		display:inline-block;
+	}
+	
+	.demo-vertical-uislider >:first-child {
+		margin-left:15px;
+	}
+
+	
+	/*
+	 * Knobs demo
+	 */
+	
+	.knobs-demo > div {
+		display:inline-block;
+		margin-left:30px;
+	}
+	.knobs-demo >:first-child {
+		margin-left:0;
+	} 
+
+	/*
+	 * DEMO INPUT
+	 */
+	
+	.demo label input[type=radio].radiobox+span:before, .demo label input[type=checkbox].checkbox+span:before {
+		border: 1px solid #5E5E5E;
+	}
+
+	.demo label:hover input[type=checkbox].checkbox+span:before {
+		border-color:#E77317;
+	}
+
+	/*
+	 * DEMO
+	 * Demo CSS only
+	 */	
+	.demo label {
+		margin-bottom:4 !important;
+	}
+	
+	.demo .checkbox i {
+		border-color: #7A7A7A;
+	}
+	
+	.demo .radio, .demo .checkbox {
+	 	padding-left:22px;
+	}
+	
+	.demo.activate {
+		right:0px !important;
+		box-shadow: -11px 12px 23px rgba(0, 0, 0, 0.2);
+		padding:5px 10px 10px; 
+	}
+
+	.demo #demo-setting + form {
+		display:none;
+	}
+	
+	.demo.activate #demo-setting + form {
+		display:block;
+	}
+	
+	.demo {
+		position:absolute; 
+		top:5px; 
+		right:0px; 
+		width:160px;
+		z-index:5; 
+		background:#F1DA91;
+	}
+	
+	.demo > span {
+		position: absolute;
+		right: 0px;
+		top: 0px;
+		display: block;
+		height: 30px;
+		width: 30px;
+		border-radius: 5px 0 0 5px;
+		background: #F1DA91;
+		padding: 2px;
+		text-align: center;
+		line-height: 28px;
+		cursor:pointer;
+	}
+	
+	.demo > span i {
+		font-size:17px;
+	}
+	
+	.demo.activate > span i:before {
+		content: "\f00d";
+	}
+	
+	.demo.activate > span {
+		left: -30px;
+	}
+	
+	.demo > span:hover i {
+		color:#333 !important;
+	}
+	
+	.demo form section {
+		margin:0 !important;
+	}
+	
+	.demo .btn {
+		font-size: 13px !important;
+		line-height: 1.5 !important;
+		border-radius: 3px !important;
+		padding: 3px 7px !important;
+		height:auto !important;
+	}
+	
+	.demo-liveupdate-1 {
+		font-size: 12px !important;
+		position: absolute !important;
+		left: 33px;
+		top: 15px;
+		display: block;
+		z-index: 2;
+		font-weight: bold;
+		padding: 1px 61px 3px 7px;
+	}
+
+	.demo-btns {
+		margin:0;
+		padding:0;
+		list-style:none;
+	}
+	.demo-btns > li {
+		display:inline-block;
+		margin-bottom:7px;
+	}
+
+	
+	.demo-icon-font {
+		font-size: 14px;
+		margin-bottom: 6px;
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+	
+	.demo-icon-font:hover {
+		background-color: rgba(86, 61, 124, 0.1);
+		text-decoration: none;
+	}
+	
+	.demo-modal {
+		width: auto;
+		max-width:600px;
+		z-index: 1;
+	}
+	
+	.demo-red {
+		color:#DF413E
+	}
+	
+	.demo-orange {
+		color:#DAA03E;
+	}
+	
+	.demo-border {
+		border:1px solid rgba(0,0,0,.2)
+	}

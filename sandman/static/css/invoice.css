@@ -1,0 +1,132 @@
+	/* ---------------------------------------------------------------------- */
+	/*	Invoice
+	/* ---------------------------------------------------------------------- */
+	
+	
+	#invoice-bar {
+		text-align: right;
+	}
+	.invoice {
+		border: 1px solid #d3d3d3;
+		margin-bottom: 30px;
+		display:block;
+	}
+	.no-padding .invoice {
+		margin:0;
+		border:none;
+	}
+	
+	.invoice h3, .invoice h4, .invoice h5 {
+		margin: 0;
+	}
+
+
+	.invoice-footer {
+		border-bottom: 1px dotted #AAA;
+		width: 100%;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+	}
+	.client-info, .invoice-info, .invoice-sum-total, .payment-methods {
+		margin: 0;
+		display: inline-block;
+		vertical-align: top;
+	}
+	.invoice-info, .invoice-sum-total {
+		text-align: right;
+	}
+	.client-info, .invoice-info {
+		font-size: 12px;
+	}
+	.invoice-sum-total {
+		margin-top: 30px;
+	}
+	
+	
+	.client-info li {
+		font-weight:normal;
+	}
+	.client-info li span {
+		display:block;
+		margin-bottom:3px;
+		font-size:14px;
+	}
+	
+	.invoice-body table {
+		border-top: none;
+		border-bottom: none;
+		margin:0;
+	}
+	.invoice, .invoice-body table thead tr {
+		background: #fff;
+	}
+	.invoice-body table thead tr {
+		border-top: none;
+	}
+	.invoice-body table tr, .invoice-body table th {
+		line-height: 18px;
+		text-align: left;
+		vertical-align: top;
+		border-top: 1px solid #DDD;
+		font-size: 13px;
+	}
+	.invoice-body table td, .invoice-body table th {
+		padding: 10px 32px !important;
+	}
+	.invoice-body table th.item {
+		width: 18%;
+	}
+	.invoice-body table th.desc {
+		width: 38%;
+	}
+	.invoice-body table th.price {
+		width: 15%;
+	}
+	.invoice-body table th.qtn {
+		width: 15%;
+	}
+	.invoice-body table th.sub {
+		width: 15;
+	}
+	
+	.invoice table td.invoice-sub {
+		text-align: right;
+		font-weight: bold;
+	}
+	.invoice td a {
+		font-weight: bold;
+		color: #2D67A3;
+	}
+	
+	.invoice-footer {
+		border-bottom: none;
+		border-top: 1px dotted #AAA;
+	}
+	
+ .invoice-body table th {
+padding: 10px 32px;
+}
+
+
+@media print {
+	#shortcut, #header, #left-panel, #ribbon, #sparks, .page-title, .panel-heading{
+		display:none !important;
+	}
+	table, .invoice-body table tr, .invoice-body table th {
+		border-bottom:1px dotted #333;
+		border-top:1px dotted #333 !important;
+	}
+	.invoice {
+		border:none;
+	}
+	.invoice td a {
+		font-weight:normal;
+	}
+	.invoice-body table td, .invoice-body table th, .invoice-header, .invoice-client-info, .invoice-footer {
+		font-family: 'Segoe UI', Tahoma, sans-serif !important;
+	}
+	
+	
+}
+
