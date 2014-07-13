@@ -166,8 +166,8 @@ available, how do you do that? With this little ditty:
     register((Artist, Album, Playlist))
 
 And if you wanted to add custom logic for an endpoint? Or change the
-endpoint name? Or add validation? All supported. Here's a "fancy" class
-definition:
+endpoint name? Or change your top level json object name? Or add
+validation? All supported. Here's a "fancy" class definition:
 
 .. code:: python
 
@@ -183,6 +183,7 @@ definition:
         __tablename__ = 'Genre'
         __endpoint__ = 'styles'
         __methods__ = ('GET', 'DELETE')
+        __top_level_json_name__ = 'Genres'
 
         @staticmethod
         def validate_GET(resource=None):
@@ -255,6 +256,11 @@ jeff@jeffknupp.com.
 
 Changelog
 =========
+
+Version 0.9.7
+-------------
+
+-  Slightly better test coverage and documentation
 
 Version 0.9.6
 -------------

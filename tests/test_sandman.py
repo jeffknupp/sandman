@@ -492,3 +492,20 @@ class TestSandmanAdmin(TestSandmanBase):
 
         response = self.get_response('/admin/styleview/', 200)
         assert 'Genre' not in str(response.get_data(as_text=True))
+
+
+class TestExistingModel(TestSandmanBase):
+    """Test the functionality allowing exisitng DB Models to be registered as
+    resources."""
+
+    def setup_method(self, args):
+        super(TestExistingModel, self).setup_method(args)
+        app.config['SANDMAN_SHOW_PKS'] = True
+
+    def test_get_resource_for_existing_model(self):
+        """Can we get a resource for an existing model?"""
+        self.get_response('/somemodels/1', 200)
+
+    def test_get_meta_for_existing_class(self):
+        """Can we get the meta information for an existing model."""
+        self.get_response('/somemodels/meta', 200)

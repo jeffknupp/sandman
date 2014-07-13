@@ -89,7 +89,12 @@ class Model(object):
         return cls.__table__.primary_key.columns.values()[0].name
 
     def links(self):
-        """Return a list of links for endpoints related to the resource."""
+        """Return a list of links for endpoints related to the resource.
+
+        :rtype: list
+
+        """
+
         links = []
         for foreign_key in self.__table__.foreign_keys:
             column = foreign_key.column.name
@@ -107,6 +112,7 @@ class Model(object):
         """Return a dictionary containing only the attributes which map to
         an instance's database columns.
 
+        :param int depth: Maximum depth to recurse subobjects
         :rtype: dict
 
         """
@@ -127,11 +133,13 @@ class Model(object):
                     resource = session.query(endpoint).get(column_value)
                 if depth > 0:
                     result_dict.update({
-                        'rel': endpoint.__name__, 
-                        endpoint.__name__.lower() : resource.as_dict(depth - 1)
+                        'rel': endpoint.__name__,
+                        endpoint.__name__.lower(): resource.as_dict(depth - 1)
                         })
                 else:
-                    result_dict[endpoint.__name__.lower() + '_url'] = '/{}/{}'.format(endpoint.__name__, column_value)
+                    result_dict[
+                        endpoint.__name__.lower() + '_url'] = '/{}/{}'.format(
+                        endpoint.__name__, column_value)
 
         result_dict['self'] = self.resource_uri()
         return result_dict
@@ -166,8 +174,10 @@ class Model(object):
 
     @classmethod
     def meta(cls):
+        """Return a dictionary containing meta-information about the given
+        resource."""
         if getattr(cls, '__from_class__', None) is not None:
-            cls = self.__from_class__
+            cls = cls.__from_class__
         attribute_info = {}
         for name, value in cls.__table__.columns.items():
             attribute_info[name] = str(value.type).lower()
@@ -176,6 +186,7 @@ class Model(object):
 
     def __str__(self):
         return str(getattr(self, self.primary_key()))
+
 
 class AdminModelViewWithPK(ModelView):
     """Mixin admin view class that displays primary keys on the admin form"""

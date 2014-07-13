@@ -13,6 +13,7 @@ from sqlalchemy.schema import Table
 from sandman import app, db
 from sandman.model.models import Model, AdminModelViewWithPK
 
+
 def _get_session():
     """Return (and memoize) a database session"""
     session = getattr(g, '_session', None)
@@ -35,9 +36,12 @@ def generate_endpoint_classes(db, generate_pks=False):
                 if not table.primary_key and generate_pks:
                     cls = add_pk_if_required(db, table, name)
                 else:
-                    cls = type(str(name), (sandman_model, db.Model),
-                            {'__tablename__': name})
+                    cls = type(
+                        str(name),
+                        (sandman_model, db.Model),
+                        {'__tablename__': name})
                 register(cls)
+
 
 def add_pk_if_required(db, table, name):
     """Return a class deriving from our Model class as well as the SQLAlchemy
@@ -58,6 +62,7 @@ def add_pk_if_required(db, table, name):
 
     return type(str(name), (sandman_model, db.Model), cls_dict)
 
+
 def prepare_relationships(db, known_tables):
     """Enrich the registered Models with SQLAlchemy ``relationships``
     so that related tables are correctly processed up by the admin.
@@ -69,16 +74,21 @@ def prepare_relationships(db, known_tables):
             if foreign_key['referred_table'] in known_tables:
                 other = known_tables[foreign_key['referred_table']]
                 constrained_column = foreign_key['constrained_columns']
-                if other not in cls.__related_tables__ and cls not in other.__related_tables__ and other != cls:
+                if other not in cls.__related_tables__ and cls not in (
+                        other.__related_tables__) and other != cls:
                     cls.__related_tables__.add(other)
-                    # Add a SQLAlchemy relationship as an attribute on the class
+                    # Add a SQLAlchemy relationship as an attribute
+                    # on the class
                     setattr(cls, other.__table__.name, relationship(
-                            other.__name__, backref=db.backref(cls.__name__.lower()),
-                            foreign_keys=str(cls.__name__) + '.' + ''.join(constrained_column)))
+                            other.__name__, backref=db.backref(
+                                cls.__name__.lower()),
+                            foreign_keys=str(cls.__name__) + '.' +
+                            ''.join(constrained_column)))
+
 
 def register(cls, use_admin=True):
-    """Register with the API a :class:`sandman.model.Model` class and associated
-    endpoint.
+    """Register with the API a :class:`sandman.model.Model` class and
+    associated endpoint.
 
     :param cls: User-defined class derived from :class:`sandman.model.Model` to
                 be registered with the endpoint returned by :func:`endpoint()`
@@ -95,6 +105,7 @@ def register(cls, use_admin=True):
         else:
             register_internal_data(cls)
             cls.use_admin = use_admin
+
 
 def register_internal_data(cls):
     """Register a new class, *cls*, with various internal data structures.
@@ -113,8 +124,8 @@ def register_internal_data(cls):
         if not getattr(cls, '__related_tables__', None):
             cls.__related_tables__ = set()
 
-def register_classes_for_admin(db_session, show_pks=True,
-        name='admin'):
+
+def register_classes_for_admin(db_session, show_pks=True, name='admin'):
     """Registers classes for the Admin view that ultimately creates the admin
     interface.
 
@@ -126,22 +137,28 @@ def register_classes_for_admin(db_session, show_pks=True,
 
     with app.app_context():
         admin_view = Admin(current_app, name=name)
-        for cls in set(cls for cls in current_app.class_references.values() if
-                cls.use_admin == True):
+        for cls in set(
+            cls for cls in current_app.class_references.values() if
+                cls.use_admin):
             column_list = [column.name for column in
-                    cls.__table__.columns.values()]
+                           cls.__table__.columns.values()]
             if hasattr(cls, '__view__'):
                 # allow ability for model classes to specify model views
-                admin_view_class = type('AdminView', (cls.__view__,),
-                        {'form_columns': column_list})
+                admin_view_class = type(
+                    'AdminView',
+                    (cls.__view__,),
+                    {'form_columns': column_list})
             elif show_pks:
                 # the default of Flask-SQLAlchemy is to not show primary
                 # classes, which obviously isn't acceptable in some cases
-                admin_view_class = type('AdminView', (AdminModelViewWithPK,),
-                        {'form_columns': column_list})
+                admin_view_class = type(
+                    'AdminView',
+                    (AdminModelViewWithPK,),
+                    {'form_columns': column_list})
             else:
                 admin_view_class = ModelView
             admin_view.add_view(admin_view_class(cls, db_session))
+
 
 def activate(admin=True, browser=True, name='admin', reflect_all=False):
     """Activate each pre-registered model or generate the model classes and
@@ -150,8 +167,9 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False):
     :param bool admin: should we generate the admin interface?
     :param bool browser: should we open the browser for the user?
     :param name: name to use for blueprint created by the admin interface. Set
-                 this to avoid naming conflicts with other blueprints (if trying
-                 to use sandman to connect to multiple databases simultaneously)
+                 this to avoid naming conflicts with other blueprints (if
+                 trying to use sandman to connect to multiple databases
+                 simultaneously)
 
     """
     with app.app_context():

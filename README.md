@@ -232,6 +232,10 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 
 # Changelog
 
+## Version 0.9.7
+
+* Slightly better test coverage and documentation
+
 ## Version 0.9.6
 
 * Support for using existing declarative models alongside `sandman` generated models

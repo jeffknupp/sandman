@@ -1,27 +1,32 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
 
-from flask import (jsonify, request, g,
-        current_app, Response, render_template,
-        make_response)
+from flask import (
+    jsonify,
+    request,
+    current_app,
+    Response,
+    render_template,
+    make_response)
 from sqlalchemy.exc import IntegrityError
-from . import app, db
-from .decorators import etag
+from . import app
+from .decorators import etag, no_cache
 from .exception import InvalidAPIUsage
 from .model.models import Model
 from .model.utils import _get_session
 
 JSON, HTML = range(2)
-JSON_CONTENT_TYPES = set(['application/json',])
+JSON_CONTENT_TYPES = set(['application/json'])
 HTML_CONTENT_TYPES = set(['text/html', 'application/x-www-form-urlencoded'])
 ALL_CONTENT_TYPES = set(['*/*'])
-ACCEPTABLE_CONTENT_TYPES = (JSON_CONTENT_TYPES | HTML_CONTENT_TYPES
-        | ALL_CONTENT_TYPES)
+ACCEPTABLE_CONTENT_TYPES = (
+    JSON_CONTENT_TYPES |
+    HTML_CONTENT_TYPES |
+    ALL_CONTENT_TYPES)
 
 FORWARDED_EXCEPTION_MESSAGE = 'Request could not be completed. Exception: [{}]'
 FORBIDDEN_EXCEPTION_MESSAGE = """Method [{}] not acceptable for resource \
 type [{}].  Acceptable methods: [{}]"""
 UNSUPPORTED_CONTENT_TYPE_MESSAGE = 'Content-type [{types}] not supported.'
-#UNSUPPORTED_CONTENT_TYPE_MESSAGE += """\nSupported values for 'Content-type': {}""".format(ACCEPTABLE_CONTENT_TYPES)
 
 def _perform_database_action(action, *args):
     """Call session.*action* with the given *args*.
@@ -32,12 +37,14 @@ def _perform_database_action(action, *args):
     getattr(session, action)(*args)
     session.commit()
 
+
 def _get_acceptable_response_type():
     """Return the mimetype for this request."""
     if ('Accept' not in request.headers or request.headers['Accept'] in
             ALL_CONTENT_TYPES):
         return JSON
-    acceptable_content_types = set(request.headers['ACCEPT'].strip().split(','))
+    acceptable_content_types = set(
+        request.headers['ACCEPT'].strip().split(','))
     if acceptable_content_types & HTML_CONTENT_TYPES:
         return HTML
     elif acceptable_content_types & JSON_CONTENT_TYPES:
@@ -45,6 +52,7 @@ def _get_acceptable_response_type():
     else:
         # HTTP 406 Not Acceptable
         raise InvalidAPIUsage(406)
+
 
 @app.errorhandler(InvalidAPIUsage)
 def handle_exception(error):
@@ -57,13 +65,14 @@ def handle_exception(error):
             return response
         else:
             return error.abort()
-    except InvalidAPIUsage as _:
+    except InvalidAPIUsage:
         # In addition to the original exception, we don't support the content
         # type in the request's 'Accept' header, which is a more important
         # error, so return that instead of what was originally raised.
         response = jsonify(error.to_dict())
         response.status_code = 415
         return response
+
 
 def _single_attribute_json_response(name, value):
     """Return the json representation of a single attribute of a resource.
@@ -74,6 +83,7 @@ def _single_attribute_json_response(name, value):
 
     """
     return jsonify({name: str(value)})
+
 
 def _single_resource_json_response(resource, depth=0):
     """Return the JSON representation of *resource*.
@@ -87,21 +97,26 @@ def _single_resource_json_response(resource, depth=0):
     response = jsonify(**resource.as_dict(depth))
     response.headers['Link'] = ''
     for link in links:
-        response.headers['Link'] += '<{}>; rel="{}",'.format(link['uri'], link['rel'])
-    response.headers['Link'] = response.headers['Link'][:-1] 
+        response.headers['Link'] += '<{}>; rel="{}",'.format(
+            link['uri'], link['rel'])
+    response.headers['Link'] = response.headers['Link'][:-1]
     return response
+
 
 def _single_attribute_html_response(resource, name, value):
     """Return the json representation of a single attribute of a resource.
 
-    :param :class:`sandman.model.Model` resource: resource to get attribute from
+    :param :class:`sandman.model.Model` resource: resource for attribute
     :param string name:  name of the attribute
     :param string value: string value of the attribute
     :rtype: :class:`flask.Response`
 
     """
-    return make_response(render_template('attribute.html', resource=resource,
+    return make_response(render_template(
+        'attribute.html',
+        resource=resource,
         name=name, value=value))
+
 
 def _single_resource_html_response(resource):
     """Return the HTML representation of *resource*.
@@ -114,8 +129,11 @@ def _single_resource_html_response(resource):
     tablename = resource.__tablename__
     resource.pk = getattr(resource, resource.primary_key())
     resource.attributes = resource.as_dict()
-    return make_response(render_template('resource.html', resource=resource,
+    return make_response(render_template(
+        'resource.html',
+        resource=resource,
         tablename=tablename))
+
 
 def _collection_json_response(cls, resources, start, stop, depth=0):
     """Return the JSON representation of the collection *resources*.
@@ -143,6 +161,7 @@ def _collection_json_response(cls, resources, start, stop, depth=0):
 
     return jsonify(payload)
 
+
 def _collection_html_response(resources, start=0, stop=20):
     """Return the HTML representation of the collection *resources*.
 
@@ -150,8 +169,10 @@ def _collection_html_response(resources, start=0, stop=20):
     :rtype: :class:`flask.Response`
 
     """
-    return make_response(render_template('collection.html',
+    return make_response(render_template(
+        'collection.html',
         resources=resources[start:stop]))
+
 
 def _validate(cls, method, resource=None):
     """Return ``True`` if the the given *cls* supports the HTTP *method* found
@@ -167,7 +188,8 @@ def _validate(cls, method, resource=None):
 
     """
     if method not in cls.__methods__:
-        raise InvalidAPIUsage(403, FORBIDDEN_EXCEPTION_MESSAGE.format(method,
+        raise InvalidAPIUsage(403, FORBIDDEN_EXCEPTION_MESSAGE.format(
+            method,
             cls.endpoint(), cls.__methods__))
 
     class_validator_name = 'validate_' + method
@@ -177,8 +199,10 @@ def _validate(cls, method, resource=None):
         if not class_validator(resource):
             raise InvalidAPIUsage(403)
 
+
 def get_resource_data(incoming_request):
-    """Return the data from the incoming *request* based on the Content-type."""
+    """Return the data from the incoming *request* based on the
+    Content-type."""
     content_type = incoming_request.headers['Content-type'].split(';')[0]
     if ('Content-type' not in incoming_request.headers or
             content_type in JSON_CONTENT_TYPES):
@@ -189,9 +213,11 @@ def get_resource_data(incoming_request):
         return incoming_request.form
     else:
         # HTTP 415: Unsupported Media Type
-        raise InvalidAPIUsage(415,
-                UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(types=
-                    incoming_request.headers['Content-type']))
+        raise InvalidAPIUsage(
+            415,
+            UNSUPPORTED_CONTENT_TYPE_MESSAGE.format(
+                types=incoming_request.headers['Content-type']))
+
 
 def endpoint_class(collection):
     """Return the :class:`sandman.model.Model` associated with the endpoint
@@ -207,6 +233,7 @@ def endpoint_class(collection):
         except KeyError:
             raise InvalidAPIUsage(404)
         return cls
+
 
 def retrieve_collection(collection, query_arguments=None):
     """Return the resources in *collection*, possibly filtered by a series of
@@ -234,7 +261,8 @@ def retrieve_collection(collection, query_arguments=None):
                 limit = value
             elif key:
                 filters.append(getattr(cls, key) == value)
-        resources = session.query(cls).filter(*filters).order_by(*order).limit(limit)
+        resources = session.query(cls).filter(*filters).order_by(
+            *order).limit(limit)
     else:
         resources = session.query(cls).all()
     return resources
@@ -255,6 +283,7 @@ def retrieve_resource(collection, key):
         raise InvalidAPIUsage(404)
     return resource
 
+
 def resource_created_response(resource):
     """Return HTTP response with status code *201*, signaling a created
     *resource*
@@ -270,8 +299,9 @@ def resource_created_response(resource):
         response = _single_resource_html_response(resource)
     response.status_code = 201
     response.headers['Location'] = 'http://localhost:5000/{}'.format(
-            resource.resource_uri())
+        resource.resource_uri())
     return response
+
 
 def collection_response(cls, resources, start=None, stop=None):
     """Return a response for the *resources* of the appropriate content type.
@@ -296,12 +326,13 @@ def resource_response(resource, depth=0):
 
     """
     if _get_acceptable_response_type() == JSON:
-        depth=0
+        depth = 0
         if 'expand' in request.args:
             depth = 1
         return _single_resource_json_response(resource, depth)
     else:
         return _single_resource_html_response(resource)
+
 
 def attribute_response(resource, name, value):
     """Return a response for the *resource* of the appropriate content type.
@@ -317,6 +348,7 @@ def attribute_response(resource, name, value):
         return _single_attribute_html_response(resource, name, value)
 
 
+@no_cache
 def no_content_response():
     """Return the appropriate *Response* with status code *204*, signaling a
     completed action which does not require data in the response body
@@ -327,6 +359,7 @@ def no_content_response():
     response = Response()
     response.status_code = 204
     return response
+
 
 def update_resource(resource, incoming_request):
     """Replace the contents of a resource with *data* and return an appropriate
@@ -378,6 +411,7 @@ def patch_resource(collection, key):
     else:
         return update_resource(resource, request)
 
+
 @app.route('/<collection>/<key>', methods=['PUT'])
 def put_resource(collection, key):
     """Replace the resource identified by the given key and return the
@@ -399,6 +433,7 @@ def put_resource(collection, key):
             exception))
     return no_content_response()
 
+
 @app.route('/<collection>', methods=['POST'])
 def post_resource(collection):
     """Return the appropriate *Response* based on adding a new resource to
@@ -416,6 +451,7 @@ def post_resource(collection):
 
     _perform_database_action('add', resource)
     return resource_created_response(resource)
+
 
 @app.route('/<collection>/<key>', methods=['DELETE'])
 def delete_resource(collection, key):
@@ -440,6 +476,7 @@ def delete_resource(collection, key):
             exception))
     return no_content_response()
 
+
 @app.route('/<collection>/<key>', methods=['GET'])
 @etag
 def get_resource(collection, key):
@@ -454,6 +491,7 @@ def get_resource(collection, key):
     _validate(endpoint_class(collection), request.method, resource)
 
     return resource_response(resource)
+
 
 @app.route('/<collection>/<key>/<attribute>', methods=['GET'])
 @etag
@@ -497,8 +535,9 @@ def get_collection(collection):
     if request.args and 'page' in request.args:
         page = int(request.args['page'])
         results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
-        start, stop = page * results_per_page, (page +1) * results_per_page
+        start, stop = page * results_per_page, (page + 1) * results_per_page
     return collection_response(cls, resources, start, stop)
+
 
 @app.route('/', methods=['GET'])
 @etag
@@ -512,16 +551,23 @@ def index():
         meta_data = {}
         for cls in classes:
             meta_data[cls.endpoint()] = {
-                    'link': '/' + cls.endpoint(),
-                    'meta': '/' + cls.endpoint() + '/meta'
-                    }
+                'link': '/' + cls.endpoint(),
+                'meta': '/' + cls.endpoint() + '/meta'
+                }
         return jsonify(meta_data)
     else:
         return render_template('index.html', classes=classes)
 
+
 @app.route('/<collection>/meta', methods=['GET'])
 @etag
 def get_meta(collection):
+    """Return the meta-description of a given resource.
+
+    :param collection: The collection to get meta-info for
+
+    """
+
     cls = endpoint_class(collection)
     description = cls.meta()
     return jsonify(description)
