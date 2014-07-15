@@ -41,6 +41,11 @@ database using ``sandman``:
 .. code:: bash
 
     $ sandmanctl sqlite:////tmp/my_database.db
+    
+**Use an absolute path to the database or a 'full' URI** such as:
+   - postgresql+psycopg2://scott:tiger@localhost/test
+   - sqlite+pysqlite:///relative/path/to/db.db
+
 
 *That's it.* ``sandman`` will then do the following:
 
