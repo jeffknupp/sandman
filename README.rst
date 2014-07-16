@@ -257,6 +257,11 @@ jeff@jeffknupp.com.
 Changelog
 =========
 
+Version 0.9.8
+-------------
+
+-  Support for the ``wheel`` distribution format
+
 Version 0.9.7
 -------------
 
