@@ -100,12 +100,12 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     def test_get_meta(self):
         """Test simple HTTP GET"""
         response = self.get_response('/', 200)
-        assert 'meta' in json.loads(response.get_data())['artists']
+        assert 'meta' in json.loads(response.get_data(as_text=True))['artists']
 
     def test_get_root(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists/meta', 200)
-        assert 'Name' in json.loads(response.get_data())['Artist']
+        assert 'Name' in json.loads(response.get_data(as_text=True))['Artist']
 
 
     def test_get_object_attribute(self):
@@ -353,7 +353,7 @@ class TestSandmanContentTypes(TestSandmanBase):
     def test_get_meta_html(self):
         """Test simple HTTP GET"""
         response = self.get_response('/', 200, headers={'Accept': 'text/html'})
-        assert 'meta' in response.get_data()
+        assert 'meta' in response.get_data(as_text=True)
 
 
     def test_get_html_collection(self):
