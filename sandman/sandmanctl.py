@@ -26,9 +26,9 @@ def print_version(ctx, value):
 @click.option('--show-pks/--no-show-pks', default=False,
         help='Have sandman show primary key columns in the admin view')
 @click.option('--host', default='0.0.0.0',
-        help='Hostname of database server to connect to')
+        help='Hostname sandman should bind to')
 @click.option('--port', default=8080,
-        help='Port of database server to connect to')
+        help='Port sandman should bind to')
 @click.option('--version', is_flag=True,
         callback=print_version, expose_value=False, is_eager=True)
 @click.argument('URI', metavar='<URI>')
