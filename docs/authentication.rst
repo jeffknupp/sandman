@@ -3,7 +3,7 @@ Authentication
 ==============
 
 ``sandman`` supports HTTP basic authentication, meaning a username and password
-must be passed on each request via the ``Authorization`` header. 
+must be passed on each request via the ``Authorization`` header.
 
 Enabling Authentication
 -----------------------
@@ -22,7 +22,7 @@ authentication. The latter is used to ensure that _all_ requests are authorized.
 
 The ``get_password`` function takes a ``username`` as an argument and should
 return the associated password for that user. To notify Flask-HTTPAuth that this
-is the function responsible for returning passwords, it must be wrapped with the 
+is the function responsible for returning passwords, it must be wrapped with the
 ``@auth.get_password`` decorator (``auth`` is importable from ``sandman``, e.g.
 ``from sandman import app, db, auth``). How you implement your user
 management system is up to you; you simply need to implement ``get_password`` in

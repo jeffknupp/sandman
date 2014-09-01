@@ -20,7 +20,7 @@ Discuss
 -------
 
 Looking for a place to ask questions about sandman? Check out the <a href="https://groups.google.com/forum/#!forum/sandman-discuss">sandman-discuss</a> and <a href="https://groups.google.com/forum/#!forum/sandman-users">sandman-users</a> forums!
- 
+
 Documentation
 -------------
 
@@ -28,7 +28,7 @@ Documentation
 
 `sandman` "makes things REST". Have an existing database you'd like to expose via
 a REST API? Normally, you'd have to write a ton of boilerplate code for
-the ORM you're using, then integrate that into some web framework. 
+the ORM you're using, then integrate that into some web framework.
 
 I don't want to write boilerplate.
 
@@ -91,7 +91,7 @@ activate()
 app.run()
 ```
 
-**You don't even need to tell `sandman` what tables your database contains.** 
+**You don't even need to tell `sandman` what tables your database contains.**
 Just point `sandman` at your database and let it do all the heavy lifting
 
 Let's start our new service and make a request. While we're at it, lets make use
@@ -196,8 +196,8 @@ With `sandman`, zero boilerplate code is required. In fact, using `sandmanctl`,
 structure and schema is introspected and your database tables magically get a
 RESTful API and admin interface. For each table, `sandman` creates:
 
-* proper endpoints 
-* support for a configurable set of HTTP verbs 
+* proper endpoints
+* support for a configurable set of HTTP verbs
     * GET
     * POST
     * PATCH
@@ -213,7 +213,7 @@ RESTful API and admin interface. For each table, `sandman` creates:
 `sandman` is under active development but should be usable in any environment due
 to one simple fact:
 
-**`sandman` never alters your database unless you add or change a record yourself.  It adds no extra tables to your existing database and requires no changes to any of your existing tables. If you start `sandman`, use it to browse your database via cURL, then stop `sandman`, your database will be in exactly the same state as it was before you began.** 
+**`sandman` never alters your database unless you add or change a record yourself.  It adds no extra tables to your existing database and requires no changes to any of your existing tables. If you start `sandman`, use it to browse your database via cURL, then stop `sandman`, your database will be in exactly the same state as it was before you began.**
 
 ### Installation
 
@@ -245,7 +245,7 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 * Support for using existing declarative models alongside `sandman` generated models
     * If you have an existing app and want to include sandman in it, simply pass
       your existing models in to the `register()` function along with any
-      `sanmdman` generated classes. `sandman` will detect the existing models
+      `sandman` generated classes. `sandman` will detect the existing models
       and augment them.
 
 ## Version 0.9.5
@@ -273,7 +273,7 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 
 * The `meta` endpoint
     * All resources now have a `/<resource>/meta` endpoint that describes the
-      types of each of their fields (both in HTML and JSON) 
+      types of each of their fields (both in HTML and JSON)
 * The root endpoint
     * A "root" endpoint (`/`) has been created. It lists all resources
       registered in the application and includes URLs to their various
@@ -298,7 +298,7 @@ Questions or comments about `sandman`? Hit me up at [jeff@jeffknupp.com](mailto:
 * Nested JSON models no longer the default; hitting a URL with the argument "expand"
   will show one level of nested resources
     * This conforms more closely to REST principles while not sacrificing the
-      functionality. 
+      functionality.
 
 
 ## Version 0.7.8
