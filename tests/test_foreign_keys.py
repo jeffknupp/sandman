@@ -4,7 +4,7 @@ import shutil
 import json
 
 from sandman import app
-
+from flask import current_app
 
 class TestSandmanForeignKeysBase(object):
     """Class to test edge-case foreign key conditions, using a database
@@ -39,7 +39,12 @@ class TestSandmanForeignKeysBase(object):
         """Test serializing a datetime object works properly."""
         response = self.app.get('/date_times')
         assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
-        
+
+    def test_composite_keys(self):
+        with app.app_context():
+            cls = current_app.class_references['vendors_regions']
+            assert hasattr(cls, 'vendors')
+
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)

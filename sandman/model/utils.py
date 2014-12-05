@@ -68,12 +68,16 @@ def prepare_relationships(db, known_tables):
     so that related tables are correctly processed up by the admin.
 
     """
+    def foreign_keys_str(cls_name, constrained_columns):
+        qualified_names = [ "{}.{}".format(cls_name, column) for column in constrained_columns ]
+        return "[{}]".format(','.join(qualified_names))
+
     inspector = reflection.Inspector.from_engine(db.engine)
     for cls in set(known_tables.values()):
         for foreign_key in inspector.get_foreign_keys(cls.__tablename__):
             if foreign_key['referred_table'] in known_tables:
                 other = known_tables[foreign_key['referred_table']]
-                constrained_column = foreign_key['constrained_columns']
+                constrained_columns = foreign_key['constrained_columns']
                 if other not in cls.__related_tables__ and cls not in (
                         other.__related_tables__) and other != cls:
                     cls.__related_tables__.add(other)
@@ -82,8 +86,7 @@ def prepare_relationships(db, known_tables):
                     setattr(cls, other.__table__.name, relationship(
                             other.__name__, backref=db.backref(
                                 cls.__name__.lower()),
-                            foreign_keys=str(cls.__name__) + '.' +
-                            ''.join(constrained_column)))
+                            foreign_keys=foreign_keys_str(str(cls.__name__), constrained_columns)))
 
 
 def register(cls, use_admin=True):
