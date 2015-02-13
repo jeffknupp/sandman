@@ -250,11 +250,20 @@ def retrieve_collection(collection, query_arguments=None):
         filters = []
         order = []
         limit = None
+        _skip_arguments = []
         for key, value in query_arguments.items():
-            if key == 'page':
+            if key == 'page' or key in _skip_arguments:
                 continue
             if value.startswith('%'):
                 filters.append(getattr(cls, key).like(str(value), escape='/'))
+            # Custom filter with params from query arguments
+            elif value.startswith('#'):
+                filter_name = value[1:]
+                params_name = '{}_param'.format(filter_name)
+                _skip_arguments.append(params_name)
+                filter_args = query_arguments.getlist(params_name)
+                filter_ = getattr(cls, filter_name)
+                filters.append(filter_(key, *filter_args))
             elif key == 'sort':
                 order.append(getattr(cls, value))
             elif key == 'limit':
