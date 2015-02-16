@@ -42,6 +42,16 @@ class Track(Model):
             return False
         return True
 
+    @classmethod
+    def min_track_length_filter(cls, key, min_length):
+        """Filter tracks by minimum length.
+
+        :param min_length: minimum legth of atrack
+
+        """
+        field = getattr(cls, key)
+        return field >= int(min_length)
+
 class Album(Model):
     """Model mapped to the "Album" table
 

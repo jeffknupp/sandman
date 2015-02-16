@@ -82,6 +82,15 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
         assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
 
+    def test_get_with_custom_filter(self):
+        """Test custom filter"""
+        params = {
+            'Milliseconds': '#min_track_length_filter',
+            'min_track_length_filter_args': '2926593'
+        }
+        response = self.get_response('/tracks', 200, params=params)
+        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 10
+
     def test_get_with_like_filter(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
