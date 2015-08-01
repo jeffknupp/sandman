@@ -5,6 +5,8 @@ import shutil
 import json
 import datetime
 
+from flask import url_for
+
 from sandman import app
 
 class TestSandmanBase(object):
@@ -27,12 +29,15 @@ class TestSandmanBase(object):
         app.config['SANDMAN_GENERATE_PKS'] = False
         app.config['TESTING'] = True
         self.app = app.test_client()
+        self.context = app.test_request_context()
+        self.context.push()
         #pylint: disable=unused-variable
         from . import models
 
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
+        self.context.pop()
         #pylint: disable=attribute-defined-outside-init
         self.app = None
 
@@ -427,6 +432,7 @@ class TestSandmanContentTypes(TestSandmanBase):
     def test_post_no_html_form_data(self):
         """Test POSTing a resource with no form data."""
         response = self.app.post('/artists',
+                content_type='application/json',
                 data=dict())
         assert response.status_code == 400
 
@@ -469,7 +475,7 @@ class TestSandmanAdmin(TestSandmanBase):
         """Ensure user-defined ``__str__`` implementations are being picked up
         by the admin."""
 
-        response = self.get_response('/admin/trackview/', 200)
+        response = self.get_response(url_for('track.index_view'), 200)
         # If related tables are being loaded correctly, Tracks will have a
         # Mediatype column, at least one of which has the value 'MPEG audio
         # file'.
@@ -478,7 +484,7 @@ class TestSandmanAdmin(TestSandmanBase):
     def test_admin_default_str_repr(self):
         """Ensure default ``__str__`` implementations works in the admin."""
 
-        response = self.get_response('/admin/trackview/?page=3/', 200)
+        response = self.get_response(url_for('track.index_view', page=3), 200)
         # If related tables are being loaded correctly, Tracks will have a
         # Genre column, but should display the GenreId and not the name ('Jazz'
         # is the genre for many results on the third page
@@ -490,7 +496,7 @@ class TestSandmanAdmin(TestSandmanBase):
         classname differs from the table name show up with the classname (not the
         table name)."""
 
-        response = self.get_response('/admin/styleview/', 200)
+        response = self.get_response(url_for('style.index_view'), 200)
         assert 'Genre' not in str(response.get_data(as_text=True))
 
 
