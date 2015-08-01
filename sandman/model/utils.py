@@ -5,6 +5,7 @@ import collections
 from flask import current_app, g
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
+from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import reflection
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.orm import relationship
@@ -200,4 +201,7 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False, base=Non
 # actually the same thing.
 
 sandman_model = Model
-Model = declarative_base(cls=(Model, DeferredReflection))
+# Model = declarative_base(cls=(Model, DeferredReflection))
+
+class Model(Model, DeferredReflection, db.Model):
+    __abstract__ = True
