@@ -188,7 +188,7 @@ def _validate(cls, method, resource=None):
 
     """
     if method not in cls.__methods__:
-        raise InvalidAPIUsage(403, FORBIDDEN_EXCEPTION_MESSAGE.format(
+        raise InvalidAPIUsage(405, FORBIDDEN_EXCEPTION_MESSAGE.format(
             method,
             cls.endpoint(), cls.__methods__))
 

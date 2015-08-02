@@ -301,25 +301,25 @@ class TestSandmanValidation(TestSandmanBase):
     def test_delete_not_supported(self):
         """Test DELETEing a resource for an endpoint that doesn't support it."""
         response = self.app.delete('/playlists/1')
-        assert response.status_code == 403
+        assert response.status_code == 405
 
     def test_unsupported_patch_resource(self):
         """Test PATCHing a resource for an endpoint that doesn't support it."""
         response = self.app.patch('/styles/26',
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Hip-Hop'}))
-        assert response.status_code == 403
+        assert response.status_code == 405
 
     def test_unsupported_get_resource(self):
         """Test GETing a resource for an endpoint that doesn't support it."""
-        self.get_response('/playlists', 403, False)
+        self.get_response('/playlists', 405, False)
 
     def test_unsupported_collection_method(self):
         """Test POSTing a collection for an endpoint that doesn't support it."""
         response = self.app.post('/styles',
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
-        assert response.status_code == 403
+        assert response.status_code == 405
 
     def test_pagination(self):
         """Can we get paginated results?"""
