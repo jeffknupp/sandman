@@ -22,7 +22,7 @@ def _get_session():
     return session
 
 
-def generate_endpoint_classes(db, generate_pks=False):
+def generate_endpoint_classes(db, generate_pks=False, base=None):
     """Return a list of model classes generated for each reflected database
     table."""
     seen_classes = set()
@@ -38,7 +38,7 @@ def generate_endpoint_classes(db, generate_pks=False):
                 else:
                     cls = type(
                         str(name),
-                        (sandman_model, db.Model),
+                        (base or sandman_model, db.Model),
                         {'__tablename__': name})
                 register(cls)
 
@@ -160,7 +160,7 @@ def register_classes_for_admin(db_session, show_pks=True, name='admin'):
             admin_view.add_view(admin_view_class(cls, db_session))
 
 
-def activate(admin=True, browser=True, name='admin', reflect_all=False):
+def activate(admin=True, browser=True, name='admin', reflect_all=False, base=None):
     """Activate each pre-registered model or generate the model classes and
     (possibly) register them for the admin.
 
@@ -170,13 +170,14 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False):
                  this to avoid naming conflicts with other blueprints (if
                  trying to use sandman to connect to multiple databases
                  simultaneously)
+    :param base: Optional base model class; defaults to `model.Model`
 
     """
     with app.app_context():
         generate_pks = app.config.get('SANDMAN_GENERATE_PKS', None) or False
         if getattr(app, 'class_references', None) is None or reflect_all:
             app.class_references = collections.OrderedDict()
-            generate_endpoint_classes(db, generate_pks)
+            generate_endpoint_classes(db, generate_pks, base=base)
         else:
             Model.prepare(db.engine)
         prepare_relationships(db, current_app.class_references)
