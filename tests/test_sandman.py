@@ -75,27 +75,29 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     def test_get(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200)
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
-
-    def test_get_with_limit(self):
-        """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'limit': 10})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 10
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 275
+        assert len(parsed['resources']) == 20
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 1
+        assert len(parsed['resources']) == 1
 
     def test_get_with_like_filter(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 1
+        assert len(parsed['resources']) == 1
 
     def test_get_with_sort(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'sort': 'Name'})
-        assert json.loads(response.get_data(as_text=True))[u'resources'][0]['Name'] == 'A Cor Do Som'
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['resources'][0]['Name'] == 'A Cor Do Som'
 
     def test_get_attribute(self):
         """Test simple HTTP GET"""
@@ -268,7 +270,9 @@ class TestSandmanUserDefinitions(TestSandmanBase):
     def test_user_defined_endpoint(self):
         """Make sure user-defined endpoint exists."""
         response = self.get_response('/styles', 200)
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 25
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 25
+        assert len(parsed['resources']) == 20
 
     def test_user_validation_reject(self):
         """Test user-defined validation which on request which should be
@@ -298,7 +302,9 @@ class TestSandmanUserDefinitions(TestSandmanBase):
         """Test top level json element is the one defined on the Model
         rather than the string 'resources'"""
         response = self.get_response('/albums', 200)
-        assert len(json.loads(response.get_data(as_text=True))[u'Albums']) == 347
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 347
+        assert len(parsed['Albums']) == 20
 
 class TestSandmanValidation(TestSandmanBase):
     """Sandman tests related to request validation"""
@@ -374,7 +380,9 @@ class TestSandmanContentTypes(TestSandmanBase):
         response = self.get_response('/artists',
                 200,
                 headers={'Accept': 'application/json'})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 275
+        assert len(parsed['resources']) == 20
 
     def test_get_unknown_url(self):
         """Test sending a GET request to a URL that would match the

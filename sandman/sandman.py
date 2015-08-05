@@ -143,17 +143,16 @@ def _collection_json_response(cls, resources, depth=0):
 
     """
 
-    top_level_json_name = None
-    if cls.__top_level_json_name__ is not None:
-        top_level_json_name = cls.__top_level_json_name__
-    else:
-        top_level_json_name = 'resources'
+    resource_key = cls.__top_level_json_name__ or 'resources'
 
-    result_list = []
-    for resource in resources:
-        result_list.append(resource.as_dict(depth))
-
-    payload = {top_level_json_name: result_list}
+    payload = {
+        resource_key: [each.as_dict(depth) for each in resources.items],
+        'pagination': {
+            'page': resources.page,
+            'per_page': resources.per_page,
+            'count': resources.total,
+        }
+    }
     return jsonify(payload)
 
 
@@ -166,7 +165,7 @@ def _collection_html_response(resources):
     """
     return make_response(render_template(
         'collection.html',
-        resources=resources))
+        resources=resources.items))
 
 
 def _validate(cls, method, resource=None):
@@ -525,8 +524,8 @@ def get_collection(collection):
     except (TypeError, ValueError):
         raise InvalidAPIUsage(422)
     per_page = app.config.get('RESULTS_PER_PAGE', 20)
-    resources = resources.paginate(page, per_page)
-    return collection_response(cls, resources.items)
+    resources = resources.paginate(page, per_page, error_out=False)
+    return collection_response(cls, resources)
 
 
 @app.route('/', methods=['GET'])
