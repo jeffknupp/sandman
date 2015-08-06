@@ -86,6 +86,21 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         assert parsed['pagination']['count'] == 1
         assert len(parsed['resources']) == 1
 
+    def test_get_with_filter_case_insensitive(self):
+        """Test simple HTTP GET"""
+        self.app.application.config['CASE_INSENSITIVE'] = True
+        try:
+            response = self.get_response('/artists', 200, params={'Name': 'ac/dc'})
+            parsed = json.loads(response.get_data(as_text=True))
+            assert parsed['pagination']['count'] == 1
+            assert len(parsed['resources']) == 1
+        finally:
+            del self.app.application.config['CASE_INSENSITIVE']
+
+    def test_get_with_filter_missing_column(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 422, params={'Missing': 'AC/DC'})
+
     def test_get_with_like_filter(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})

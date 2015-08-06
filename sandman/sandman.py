@@ -7,7 +7,7 @@ from flask import (
     Response,
     render_template,
     make_response)
-from sqlalchemy.exc import IntegrityError
+import sqlalchemy as sa
 from . import app
 from .decorators import etag, no_cache
 from .exception import InvalidAPIUsage
@@ -52,6 +52,20 @@ def _get_acceptable_response_type():
     else:
         # HTTP 406 Not Acceptable
         raise InvalidAPIUsage(406)
+
+
+def _get_column(model, key):
+    try:
+        return getattr(model, key)
+    except AttributeError:
+        raise InvalidAPIUsage(422)
+
+
+def _column_type(attribute):
+    columns = attribute.property.columns
+    if len(columns) == 1:
+        return columns[0].type.python_type
+    return None
 
 
 @app.errorhandler(InvalidAPIUsage)
@@ -246,11 +260,17 @@ def retrieve_collection(collection, query_arguments=None):
             if key in ['page', 'limit']:
                 continue
             if value.startswith('%'):
-                filters.append(getattr(cls, key).like(str(value), escape='/'))
+                filters.append(_get_column(cls, key).like(str(value), escape='/'))
             elif key == 'sort':
-                order.append(getattr(cls, value))
+                order.append(_get_column(cls, value))
+            elif key == 'limit':
+                limit = value
             elif key:
-                filters.append(getattr(cls, key) == value)
+                column = _get_column(cls, key)
+                if app.config.get('CASE_INSENSITIVE') and issubclass(_column_type(column), str):
+                    filters.append(sa.func.upper(column) == value.upper())
+                else:
+                    filters.append(column == value)
         resources = cls.query.filter(*filters).order_by(*order)
     else:
         resources = cls.query
@@ -417,7 +437,7 @@ def put_resource(collection, key):
     resource.replace(get_resource_data(request))
     try:
         _perform_database_action('add', resource)
-    except IntegrityError as exception:
+    except sa.exc.IntegrityError as exception:
         raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(
             exception))
     return no_content_response()
@@ -460,7 +480,7 @@ def delete_resource(collection, key):
 
     try:
         _perform_database_action('delete', resource)
-    except IntegrityError as exception:
+    except sa.exc.IntegrityError as exception:
         raise InvalidAPIUsage(422, FORWARDED_EXCEPTION_MESSAGE.format(
             exception))
     return no_content_response()
