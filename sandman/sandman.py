@@ -1,5 +1,6 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
 
+import six
 from flask import (
     jsonify,
     request,
@@ -267,7 +268,7 @@ def retrieve_collection(collection, query_arguments=None):
                 limit = value
             elif key:
                 column = _get_column(cls, key)
-                if app.config.get('CASE_INSENSITIVE') and issubclass(_column_type(column), str):
+                if app.config.get('CASE_INSENSITIVE') and issubclass(_column_type(column), six.string_types):
                     filters.append(sa.func.upper(column) == value.upper())
                 else:
                     filters.append(column == value)

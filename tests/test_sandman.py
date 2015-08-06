@@ -97,6 +97,17 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         finally:
             del self.app.application.config['CASE_INSENSITIVE']
 
+    def test_get_with_filter_non_string_case_insensitive(self):
+        """Test simple HTTP GET"""
+        self.app.application.config['CASE_INSENSITIVE'] = True
+        try:
+            response = self.get_response('/artists', 200, params={'ArtistId': 1})
+            parsed = json.loads(response.get_data(as_text=True))
+            assert parsed['pagination']['count'] == 1
+            assert len(parsed['resources']) == 1
+        finally:
+            del self.app.application.config['CASE_INSENSITIVE']
+
     def test_get_with_filter_missing_column(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 422, params={'Missing': 'AC/DC'})
@@ -511,7 +522,7 @@ class TestSandmanAdmin(TestSandmanBase):
         # If related tables are being loaded correctly, Tracks will have a
         # Genre column, but should display the GenreId and not the name ('Jazz'
         # is the genre for many results on the third page
-        assert 'Jazz' not in str(response.get_data(as_text=True))
+        assert 'Jazz' not in response.get_data(as_text=True)
 
     #pylint: disable=invalid-name
     def test_admin_default_str_repr_different_table_class_name(self):
