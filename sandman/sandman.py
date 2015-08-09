@@ -62,6 +62,11 @@ def _get_column(model, key):
         raise InvalidAPIUsage(422)
 
 
+def _get_order(model, key):
+    direction = sa.desc if key.startswith('-') else sa.asc
+    return direction(_get_column(model, key.lstrip('-')))
+
+
 def _column_type(attribute):
     columns = attribute.property.columns
     if len(columns) == 1:
@@ -254,28 +259,21 @@ def retrieve_collection(collection, query_arguments=None):
 
     """
     cls = endpoint_class(collection)
-    if query_arguments:
-        filters = []
-        order = []
-        for key, value in query_arguments.items():
-            if key in ['page', 'limit']:
-                continue
-            if value.startswith('%'):
-                filters.append(_get_column(cls, key).like(str(value), escape='/'))
-            elif key == 'sort':
-                order.append(_get_column(cls, value))
-            elif key == 'limit':
-                limit = value
-            elif key:
-                column = _get_column(cls, key)
-                if app.config.get('CASE_INSENSITIVE') and issubclass(_column_type(column), six.string_types):
-                    filters.append(sa.func.upper(column) == value.upper())
-                else:
-                    filters.append(column == value)
-        resources = cls.query.filter(*filters).order_by(*order)
-    else:
-        resources = cls.query
-    return resources
+    query = cls.query
+    for key, value in query_arguments.items(multi=True):
+        if key in ['page', 'limit']:
+            continue
+        if value.startswith('%'):
+            query = query.filter(_get_column(cls, key).like(str(value), escape='/'))
+        elif key == 'sort':
+            query = query.order_by(_get_order(cls, value))
+        elif key:
+            column = _get_column(cls, key)
+            if app.config.get('CASE_INSENSITIVE') and issubclass(_column_type(column), six.string_types):
+                query = query.filter(sa.func.upper(column) == value.upper())
+            else:
+                query = query.filter(column == value)
+    return query
 
 
 def retrieve_resource(collection, key):

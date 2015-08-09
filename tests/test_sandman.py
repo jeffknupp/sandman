@@ -6,6 +6,7 @@ import json
 import datetime
 
 from flask import url_for
+from six.moves import urllib
 
 from sandman import app
 
@@ -48,7 +49,8 @@ class TestSandmanBase(object):
         validation on the response."""
         if headers is None:
             headers = {}
-        response = self.app.get(uri, query_string=params, headers=headers)
+        query = urllib.parse.urlencode(params or {}, doseq=True)
+        response = self.app.get(uri, query_string=query or None, headers=headers)
         assert response.status_code == status_code
         if has_data:
             assert response.get_data(as_text=True)
@@ -124,6 +126,19 @@ class TestSandmanBasicVerbs(TestSandmanBase):
         response = self.get_response('/artists', 200, params={'sort': 'Name'})
         parsed = json.loads(response.get_data(as_text=True))
         assert parsed['resources'][0]['Name'] == 'A Cor Do Som'
+
+    def test_get_with_sort_descending(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'sort': '-Name'})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['resources'][0]['Name'] == 'Zeca Pagodinho'
+
+    def test_get_with_sort_multi_column(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/tracks', 200, params={'sort': ['-Composer', 'Name']})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['resources'][0]['Composer'] == 'roger glover'
+        assert parsed['resources'][0]['Name'] == 'A Twist In The Tail'
 
     def test_get_attribute(self):
         """Test simple HTTP GET"""
