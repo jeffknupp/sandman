@@ -1,5 +1,7 @@
 """Sandman REST API creator for Flask and SQLAlchemy"""
 
+from __future__ import absolute_import
+
 import six
 from flask import (
     jsonify,
