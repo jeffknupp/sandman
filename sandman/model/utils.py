@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 
 from sandman import app, db
+from sandman.exception import InvalidAPIUsage
 from sandman.model.models import Model, AdminModelViewWithPK
 
 
@@ -21,6 +22,20 @@ def _get_session():
     if session is None:
         session = g._session = db.session()
     return session
+
+
+def _get_column(model, key):
+    try:
+        return getattr(model, key)
+    except AttributeError:
+        raise InvalidAPIUsage(422)
+
+
+def _column_type(attribute):
+    columns = attribute.property.columns
+    if len(columns) == 1:
+        return columns[0].type.python_type
+    return None
 
 
 def generate_endpoint_classes(db, generate_pks=False, base=None):

@@ -13,7 +13,8 @@ from . import app
 from .decorators import etag, no_cache
 from .exception import InvalidAPIUsage
 from .model.models import Model
-from .model.utils import _get_session
+from sandman import operator
+from sandman.model import utils
 
 JSON, HTML = range(2)
 JSON_CONTENT_TYPES = set(['application/json'])
@@ -34,7 +35,7 @@ def _perform_database_action(action, *args):
 
     Will later be used to abstract away database backend.
     """
-    session = _get_session()
+    session = utils._get_session()
     getattr(session, action)(*args)
     session.commit()
 
@@ -263,16 +264,10 @@ def retrieve_collection(collection, query_arguments=None):
     for key, value in query_arguments.items(multi=True):
         if key in ['page', 'limit']:
             continue
-        if value.startswith('%'):
-            query = query.filter(_get_column(cls, key).like(str(value), escape='/'))
         elif key == 'sort':
             query = query.order_by(_get_order(cls, value))
         elif key:
-            column = _get_column(cls, key)
-            if app.config.get('CASE_INSENSITIVE') and issubclass(_column_type(column), six.string_types):
-                query = query.filter(sa.func.upper(column) == value.upper())
-            else:
-                query = query.filter(column == value)
+            query = query.filter(operator.filter(cls, key, value))
     return query
 
 
@@ -284,7 +279,7 @@ def retrieve_resource(collection, key):
     :rtype: class:`sandman.model.Model`
 
     """
-    session = _get_session()
+    session = utils._get_session()
     cls = endpoint_class(collection)
     resource = session.query(cls).get(key)
     if resource is None:

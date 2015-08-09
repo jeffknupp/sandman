@@ -116,10 +116,30 @@ class TestSandmanBasicVerbs(TestSandmanBase):
 
     def test_get_with_like_filter(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
+        response = self.get_response('/artists', 200, params={'Name__like': '%AC%DC%'})
         parsed = json.loads(response.get_data(as_text=True))
         assert parsed['pagination']['count'] == 1
         assert len(parsed['resources']) == 1
+
+    def test_get_with_greater_than(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'ArtistId__gt': 7})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert all(each['ArtistId'] > 7 for each in parsed['resources'])
+
+    def test_get_with_greater_equal(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'ArtistId__gte': 7})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert all(each['ArtistId'] >= 7 for each in parsed['resources'])
+
+    def test_get_with_invalid_operator(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 422, params={'ArtistId__gte__lte': 7})
+
+    def test_get_with_unknown_operator(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 422, params={'ArtistId__wat': 7})
 
     def test_get_with_sort(self):
         """Test simple HTTP GET"""
