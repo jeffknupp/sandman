@@ -1,5 +1,5 @@
-sandman
-=======
+This version is obsolete, please consider to use https://github.com/jeffknupp/sandman2
+======================================================================================
 
 [![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
 
