@@ -11,10 +11,6 @@ This version is obsolete, please consider using https://github.com/jeffknupp/san
 
 [![PyPI](http://img.shields.io/pypi/dm/sandman.svg)](http://img.shields.io/pypi/dm/sandman.svg)
 
-Homepage
---------
-
-Visit the home of `sandman` on the web: [sandman.io](http://www.sandman.io)
 
 Discuss
 -------
