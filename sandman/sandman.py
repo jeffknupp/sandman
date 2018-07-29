@@ -135,7 +135,7 @@ def _single_resource_html_response(resource):
         tablename=tablename))
 
 
-def _collection_json_response(cls, resources, start, stop, depth=0):
+def _collection_json_response(cls, resources, depth=0):
     """Return the JSON representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
@@ -143,26 +143,20 @@ def _collection_json_response(cls, resources, start, stop, depth=0):
 
     """
 
-    top_level_json_name = None
-    if cls.__top_level_json_name__ is not None:
-        top_level_json_name = cls.__top_level_json_name__
-    else:
-        top_level_json_name = 'resources'
+    resource_key = cls.__top_level_json_name__ or 'resources'
 
-    result_list = []
-    for resource in resources:
-        result_list.append(resource.as_dict(depth))
-
-    payload = {}
-    if start is not None:
-        payload[top_level_json_name] = result_list[start:stop]
-    else:
-        payload[top_level_json_name] = result_list
-
+    payload = {
+        resource_key: [each.as_dict(depth) for each in resources.items],
+        'pagination': {
+            'page': resources.page,
+            'per_page': resources.per_page,
+            'count': resources.total,
+        }
+    }
     return jsonify(payload)
 
 
-def _collection_html_response(resources, start=0, stop=20):
+def _collection_html_response(resources):
     """Return the HTML representation of the collection *resources*.
 
     :param list resources: list of :class:`sandman.model.Model`s to render
@@ -171,7 +165,7 @@ def _collection_html_response(resources, start=0, stop=20):
     """
     return make_response(render_template(
         'collection.html',
-        resources=resources[start:stop]))
+        resources=resources.items))
 
 
 def _validate(cls, method, resource=None):
@@ -244,27 +238,22 @@ def retrieve_collection(collection, query_arguments=None):
     :rtype: class:`sandman.model.Model`
 
     """
-    session = _get_session()
     cls = endpoint_class(collection)
     if query_arguments:
         filters = []
         order = []
-        limit = None
         for key, value in query_arguments.items():
-            if key == 'page':
+            if key in ['page', 'limit']:
                 continue
             if value.startswith('%'):
                 filters.append(getattr(cls, key).like(str(value), escape='/'))
             elif key == 'sort':
                 order.append(getattr(cls, value))
-            elif key == 'limit':
-                limit = value
             elif key:
                 filters.append(getattr(cls, key) == value)
-        resources = session.query(cls).filter(*filters).order_by(
-            *order).limit(limit)
+        resources = cls.query.filter(*filters).order_by(*order)
     else:
-        resources = session.query(cls).all()
+        resources = cls.query
     return resources
 
 
@@ -303,7 +292,7 @@ def resource_created_response(resource):
     return response
 
 
-def collection_response(cls, resources, start=None, stop=None):
+def collection_response(cls, resources):
     """Return a response for the *resources* of the appropriate content type.
 
     :param resources: resources to be returned in request
@@ -312,9 +301,9 @@ def collection_response(cls, resources, start=None, stop=None):
 
     """
     if _get_acceptable_response_type() == JSON:
-        return _collection_json_response(cls, resources, start, stop)
+        return _collection_json_response(cls, resources)
     else:
-        return _collection_html_response(resources, start, stop)
+        return _collection_html_response(resources)
 
 
 def resource_response(resource, depth=0):
@@ -530,13 +519,13 @@ def get_collection(collection):
 
     _validate(cls, request.method, resources)
 
-    start = stop = None
-
-    if request.args and 'page' in request.args:
-        page = int(request.args['page'])
-        results_per_page = app.config.get('RESULTS_PER_PAGE', 20)
-        start, stop = page * results_per_page, (page + 1) * results_per_page
-    return collection_response(cls, resources, start, stop)
+    try:
+        page = int(request.args.get('page', 1))
+    except (TypeError, ValueError):
+        raise InvalidAPIUsage(422)
+    per_page = app.config.get('RESULTS_PER_PAGE', 20)
+    resources = resources.paginate(page, per_page, error_out=False)
+    return collection_response(cls, resources)
 
 
 @app.route('/', methods=['GET'])
