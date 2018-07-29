@@ -5,6 +5,9 @@ import shutil
 import json
 import datetime
 
+from flask import url_for
+from six.moves import urllib
+
 from sandman import app
 
 class TestSandmanBase(object):
@@ -27,12 +30,15 @@ class TestSandmanBase(object):
         app.config['SANDMAN_GENERATE_PKS'] = False
         app.config['TESTING'] = True
         self.app = app.test_client()
+        self.context = app.test_request_context()
+        self.context.push()
         #pylint: disable=unused-variable
         from . import models
 
     def teardown_method(self, _):
         """Remove the database file copied during setup."""
         os.unlink(self.DB_LOCATION)
+        self.context.pop()
         #pylint: disable=attribute-defined-outside-init
         self.app = None
 
@@ -43,7 +49,8 @@ class TestSandmanBase(object):
         validation on the response."""
         if headers is None:
             headers = {}
-        response = self.app.get(uri, query_string=params, headers=headers)
+        query = urllib.parse.urlencode(params or {}, doseq=True)
+        response = self.app.get(uri, query_string=query or None, headers=headers)
         assert response.status_code == status_code
         if has_data:
             assert response.get_data(as_text=True)
@@ -70,27 +77,88 @@ class TestSandmanBasicVerbs(TestSandmanBase):
     def test_get(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200)
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
-
-    def test_get_with_limit(self):
-        """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'limit': 10})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 10
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 275
+        assert len(parsed['resources']) == 20
 
     def test_get_with_filter(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'Name': 'AC/DC'})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 1
+        assert len(parsed['resources']) == 1
+
+    def test_get_with_filter_case_insensitive(self):
+        """Test simple HTTP GET"""
+        self.app.application.config['CASE_INSENSITIVE'] = True
+        try:
+            response = self.get_response('/artists', 200, params={'Name': 'ac/dc'})
+            parsed = json.loads(response.get_data(as_text=True))
+            assert parsed['pagination']['count'] == 1
+            assert len(parsed['resources']) == 1
+        finally:
+            del self.app.application.config['CASE_INSENSITIVE']
+
+    def test_get_with_filter_non_string_case_insensitive(self):
+        """Test simple HTTP GET"""
+        self.app.application.config['CASE_INSENSITIVE'] = True
+        try:
+            response = self.get_response('/artists', 200, params={'ArtistId': 1})
+            parsed = json.loads(response.get_data(as_text=True))
+            assert parsed['pagination']['count'] == 1
+            assert len(parsed['resources']) == 1
+        finally:
+            del self.app.application.config['CASE_INSENSITIVE']
+
+    def test_get_with_filter_missing_column(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 422, params={'Missing': 'AC/DC'})
 
     def test_get_with_like_filter(self):
         """Test simple HTTP GET"""
-        response = self.get_response('/artists', 200, params={'Name': '%AC%DC%'})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 1
+        response = self.get_response('/artists', 200, params={'Name__like': '%AC%DC%'})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 1
+        assert len(parsed['resources']) == 1
+
+    def test_get_with_greater_than(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'ArtistId__gt': 7})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert all(each['ArtistId'] > 7 for each in parsed['resources'])
+
+    def test_get_with_greater_equal(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'ArtistId__gte': 7})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert all(each['ArtistId'] >= 7 for each in parsed['resources'])
+
+    def test_get_with_invalid_operator(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 422, params={'ArtistId__gte__lte': 7})
+
+    def test_get_with_unknown_operator(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 422, params={'ArtistId__wat': 7})
 
     def test_get_with_sort(self):
         """Test simple HTTP GET"""
         response = self.get_response('/artists', 200, params={'sort': 'Name'})
-        assert json.loads(response.get_data(as_text=True))[u'resources'][0]['Name'] == 'A Cor Do Som'
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['resources'][0]['Name'] == 'A Cor Do Som'
+
+    def test_get_with_sort_descending(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/artists', 200, params={'sort': '-Name'})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['resources'][0]['Name'] == 'Zeca Pagodinho'
+
+    def test_get_with_sort_multi_column(self):
+        """Test simple HTTP GET"""
+        response = self.get_response('/tracks', 200, params={'sort': ['-Composer', 'Name']})
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['resources'][0]['Composer'] == 'roger glover'
+        assert parsed['resources'][0]['Name'] == 'A Twist In The Tail'
 
     def test_get_attribute(self):
         """Test simple HTTP GET"""
@@ -263,7 +331,9 @@ class TestSandmanUserDefinitions(TestSandmanBase):
     def test_user_defined_endpoint(self):
         """Make sure user-defined endpoint exists."""
         response = self.get_response('/styles', 200)
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 25
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 25
+        assert len(parsed['resources']) == 20
 
     def test_user_validation_reject(self):
         """Test user-defined validation which on request which should be
@@ -293,7 +363,9 @@ class TestSandmanUserDefinitions(TestSandmanBase):
         """Test top level json element is the one defined on the Model
         rather than the string 'resources'"""
         response = self.get_response('/albums', 200)
-        assert len(json.loads(response.get_data(as_text=True))[u'Albums']) == 347
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 347
+        assert len(parsed['Albums']) == 20
 
 class TestSandmanValidation(TestSandmanBase):
     """Sandman tests related to request validation"""
@@ -301,25 +373,25 @@ class TestSandmanValidation(TestSandmanBase):
     def test_delete_not_supported(self):
         """Test DELETEing a resource for an endpoint that doesn't support it."""
         response = self.app.delete('/playlists/1')
-        assert response.status_code == 403
+        assert response.status_code == 405
 
     def test_unsupported_patch_resource(self):
         """Test PATCHing a resource for an endpoint that doesn't support it."""
         response = self.app.patch('/styles/26',
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Hip-Hop'}))
-        assert response.status_code == 403
+        assert response.status_code == 405
 
     def test_unsupported_get_resource(self):
         """Test GETing a resource for an endpoint that doesn't support it."""
-        self.get_response('/playlists', 403, False)
+        self.get_response('/playlists', 405, False)
 
     def test_unsupported_collection_method(self):
         """Test POSTing a collection for an endpoint that doesn't support it."""
         response = self.app.post('/styles',
                 content_type='application/json',
                 data=json.dumps({u'Name': u'Jeff Knupp'}))
-        assert response.status_code == 403
+        assert response.status_code == 405
 
     def test_pagination(self):
         """Can we get paginated results?"""
@@ -369,7 +441,9 @@ class TestSandmanContentTypes(TestSandmanBase):
         response = self.get_response('/artists',
                 200,
                 headers={'Accept': 'application/json'})
-        assert len(json.loads(response.get_data(as_text=True))[u'resources']) == 275
+        parsed = json.loads(response.get_data(as_text=True))
+        assert parsed['pagination']['count'] == 275
+        assert len(parsed['resources']) == 20
 
     def test_get_unknown_url(self):
         """Test sending a GET request to a URL that would match the
@@ -427,6 +501,7 @@ class TestSandmanContentTypes(TestSandmanBase):
     def test_post_no_html_form_data(self):
         """Test POSTing a resource with no form data."""
         response = self.app.post('/artists',
+                content_type='application/json',
                 data=dict())
         assert response.status_code == 400
 
@@ -469,7 +544,7 @@ class TestSandmanAdmin(TestSandmanBase):
         """Ensure user-defined ``__str__`` implementations are being picked up
         by the admin."""
 
-        response = self.get_response('/admin/trackview/', 200)
+        response = self.get_response(url_for('track.index_view'), 200)
         # If related tables are being loaded correctly, Tracks will have a
         # Mediatype column, at least one of which has the value 'MPEG audio
         # file'.
@@ -478,11 +553,11 @@ class TestSandmanAdmin(TestSandmanBase):
     def test_admin_default_str_repr(self):
         """Ensure default ``__str__`` implementations works in the admin."""
 
-        response = self.get_response('/admin/trackview/?page=3/', 200)
+        response = self.get_response(url_for('track.index_view', page=3), 200)
         # If related tables are being loaded correctly, Tracks will have a
         # Genre column, but should display the GenreId and not the name ('Jazz'
         # is the genre for many results on the third page
-        assert 'Jazz' not in str(response.get_data(as_text=True))
+        assert 'Jazz' not in response.get_data(as_text=True)
 
     #pylint: disable=invalid-name
     def test_admin_default_str_repr_different_table_class_name(self):
@@ -490,7 +565,7 @@ class TestSandmanAdmin(TestSandmanBase):
         classname differs from the table name show up with the classname (not the
         table name)."""
 
-        response = self.get_response('/admin/styleview/', 200)
+        response = self.get_response(url_for('style.index_view'), 200)
         assert 'Genre' not in str(response.get_data(as_text=True))
 
 

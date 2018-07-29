@@ -5,12 +5,14 @@ import collections
 from flask import current_app, g
 from flask.ext.admin import Admin
 from flask.ext.admin.contrib.sqla import ModelView
+from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import reflection
 from sqlalchemy.ext.declarative import declarative_base, DeferredReflection
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 
 from sandman import app, db
+from sandman.exception import InvalidAPIUsage
 from sandman.model.models import Model, AdminModelViewWithPK
 
 
@@ -22,7 +24,21 @@ def _get_session():
     return session
 
 
-def generate_endpoint_classes(db, generate_pks=False):
+def _get_column(model, key):
+    try:
+        return getattr(model, key)
+    except AttributeError:
+        raise InvalidAPIUsage(422)
+
+
+def _column_type(attribute):
+    columns = attribute.property.columns
+    if len(columns) == 1:
+        return columns[0].type.python_type
+    return None
+
+
+def generate_endpoint_classes(db, generate_pks=False, base=None):
     """Return a list of model classes generated for each reflected database
     table."""
     seen_classes = set()
@@ -38,7 +54,7 @@ def generate_endpoint_classes(db, generate_pks=False):
                 else:
                     cls = type(
                         str(name),
-                        (sandman_model, db.Model),
+                        (base or sandman_model, db.Model),
                         {'__tablename__': name})
                 register(cls)
 
@@ -160,7 +176,7 @@ def register_classes_for_admin(db_session, show_pks=True, name='admin'):
             admin_view.add_view(admin_view_class(cls, db_session))
 
 
-def activate(admin=True, browser=True, name='admin', reflect_all=False):
+def activate(admin=True, browser=True, name='admin', reflect_all=False, base=None):
     """Activate each pre-registered model or generate the model classes and
     (possibly) register them for the admin.
 
@@ -170,13 +186,14 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False):
                  this to avoid naming conflicts with other blueprints (if
                  trying to use sandman to connect to multiple databases
                  simultaneously)
+    :param base: Optional base model class; defaults to `model.Model`
 
     """
     with app.app_context():
         generate_pks = app.config.get('SANDMAN_GENERATE_PKS', None) or False
         if getattr(app, 'class_references', None) is None or reflect_all:
             app.class_references = collections.OrderedDict()
-            generate_endpoint_classes(db, generate_pks)
+            generate_endpoint_classes(db, generate_pks, base=base)
         else:
             Model.prepare(db.engine)
         prepare_relationships(db, current_app.class_references)
@@ -199,4 +216,7 @@ def activate(admin=True, browser=True, name='admin', reflect_all=False):
 # actually the same thing.
 
 sandman_model = Model
-Model = declarative_base(cls=(Model, DeferredReflection))
+# Model = declarative_base(cls=(Model, DeferredReflection))
+
+class Model(Model, DeferredReflection, db.Model):
+    __abstract__ = True

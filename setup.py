@@ -47,6 +47,8 @@ setup(
                       'Flask-HTTPAuth>=2.2.1',
                       'docopt>=0.6.1',
                       'click',
+                      'six',
+                      'python-dateutil',
                       #'sphinx-rtd-theme',
                       ],
     cmdclass={'test': PyTest},
