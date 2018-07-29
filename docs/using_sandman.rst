@@ -57,7 +57,7 @@ Beyond `sandmanctl`
 **Notice you don't even need to tell ``sandman`` what tables your database contains.**
 Just point ``sandman`` at your database and let it do all the heavy lifting.
 
-If you put the code above into a file named ``runserver.py``, You can start this new 
+If you put the code above into a file named ``runserver.py``, You can start this new
 service and make a request. While we're at it, lets make use
 of ``sandman``'s awesome filtering capability by specifying a filter term::
 
@@ -86,7 +86,7 @@ you should see the following::
 If you were to leave off the filtering term, you would get **all** results from
 the ``Artist`` table. You can also *paginate* these results by specifying ``?page=2``
 or something similar. The number of results returned per page is controlled by
-the config value ``RESULTS_PER_PAGE``, which defaults to 20. 
+the config value ``RESULTS_PER_PAGE``, which defaults to 20.
 
 A Quick Guide to REST APIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +115,7 @@ Creating Models
 
 A ``Model`` represents a table in your database. You control which tables to
 expose in the API through the creation of classes which inherit from
-:class:`sandman.model.models.Model`. If you create a ``Model``, the only attribute you 
+:class:`sandman.model.models.Model`. If you create a ``Model``, the only attribute you
 must define in your class is the ``__tablename__`` attribute. ``sandman`` uses this to map your
 class to the corresponding database table. From there, ``sandman`` is able to divine
 all other properties of your tables. Specifically, ``sandman`` creates the
@@ -290,8 +290,8 @@ The ``/meta`` endpoint
 ----------------------
 
 A ``/meta`` endpoint, which lists the models attributes (i.e. the database
-columns) and their type. This can be used to create client code that is 
-decoupled from the structure of your database. 
+columns) and their type. This can be used to create client code that is
+decoupled from the structure of your database.
 
 A ``/meta`` endpoint is automatically generated for every ``Model`` you register.
 This is available both as JSON and HTML.

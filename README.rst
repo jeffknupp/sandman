@@ -41,7 +41,7 @@ database using ``sandman``:
 .. code:: bash
 
     $ sandmanctl sqlite:////tmp/my_database.db
-    
+
 **Use an absolute path to the database or a 'full' URI** such as:
    - postgresql+psycopg2://scott:tiger@localhost/test
    - sqlite+pysqlite:///relative/path/to/db.db
@@ -280,7 +280,7 @@ Version 0.9.6
 
    -  If you have an existing app and want to include sandman in it,
       simply pass your existing models in to the ``register()`` function
-      along with any ``sanmdman`` generated classes. ``sandman`` will
+      along with any ``sandman`` generated classes. ``sandman`` will
       detect the existing models and augment them.
 
 Version 0.9.5
