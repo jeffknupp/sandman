@@ -1,0 +1,2 @@
+recursive-include sandman/static *
+recursive-include sandman/templates *
