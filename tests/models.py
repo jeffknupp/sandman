@@ -1,5 +1,6 @@
 """Models for unit testing sandman"""
 
+from flask.ext.sqlalchemy import BaseQuery
 from flask.ext.admin.contrib.sqla import ModelView
 from sandman.model import register, Model, activate
 from sandman.model.models import db
@@ -90,11 +91,11 @@ class Style(Model):
 
         """
 
-        if isinstance(resource, list):
+        if isinstance(resource, BaseQuery):
             return True
         elif resource and resource.GenreId == 1:
             return False
         return True
 
 register((Artist, Album, Playlist, Track, MediaType, Style, SomeModel))
-activate(browser=True)
+activate(browser=False)
