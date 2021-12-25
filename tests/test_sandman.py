@@ -495,7 +495,7 @@ class TestSandmanAdmin(TestSandmanBase):
 
 
 class TestExistingModel(TestSandmanBase):
-    """Test the functionality allowing exisitng DB Models to be registered as
+    """Test the functionality allowing existing DB Models to be registered as
     resources."""
 
     def setup_method(self, args):
