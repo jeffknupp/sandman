@@ -11,7 +11,7 @@ that might aid you in contributing to `sandman`.
 
 * Create a new, Python 2.7+ virtualenv and install the requirements via pip: `pip install -r requirements.txt`
 * Make sure you have a [GitHub account](https://github.com/signup/free)
-* Either sumbit an issue directly on GitHub or head to `sandman's` [Waffle.io](https://waffle.io/jeffknupp/sandman) page
+* Either submit an issue directly on GitHub or head to `sandman's` [Waffle.io](https://waffle.io/jeffknupp/sandman) page
   * For bugs, clearly describe the issue including steps to reproduce
   * For enhancement proposals, be sure to indicate if you're willing to work on implementing the enhancement
 * Fork the repository on GitHub
@@ -28,7 +28,7 @@ that might aid you in contributing to `sandman`.
     * Aim for 100% coverage on your code
         * If this is not possible, explain why in your commit message
         * This may be an indication that your code should be refactored
-    * If you're creating a totaly new feature, create a new class in `test_sandmand.py` that inherits from `TestSandmanBase`
+    * If you're creating a totally new feature, create a new class in `test_sandmand.py` that inherits from `TestSandmanBase`
 * Run `python setup.py test` to make sure your tests pass
 * Run `coverage run --source=sandman setup.py test` if you have the `coverage` package installed to generate coverage data
 * Check your coverage by running `coverage report`
